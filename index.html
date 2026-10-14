@@ -185,6 +185,10 @@ body.keys .act::after{content:'SPACE';position:absolute;bottom:-18px;left:50%;tr
 .title .go+*{margin-top:10px}
 .title .howto,.title .links{margin-top:8px}
 .title .sub+.howto{margin-top:6px}
+.xclose{position:sticky;top:0;justify-self:end;z-index:3;width:38px;height:38px;padding:7px;margin:-2px -6px -40px 0;border:2.5px solid var(--ink);border-radius:50%;background:var(--paper);box-shadow:3px 3px 0 var(--ink);cursor:pointer;display:flex}
+.xclose svg{width:100%;height:100%}
+.xclose:active{transform:translate(3px,3px);box-shadow:0 0 0 var(--ink)}
+.xclose:focus-visible{outline:3px dashed var(--ink);outline-offset:3px}
 #profPage{z-index:14}#profile{z-index:15}
 .pf-pre{font-size:22px;-webkit-text-stroke:2px var(--ink);text-shadow:2px 2px 0 var(--ink)}
 .pf-logo{font-size:clamp(40px,11vmin,62px)}
@@ -274,6 +278,7 @@ body.keys .act::after{content:'SPACE';position:absolute;bottom:-18px;left:50%;tr
 
   <div class="overlay dim" id="storePage" hidden>
     <div class="card wide store">
+      <button class="xclose" id="stX" type="button" aria-label="Close the store"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" stroke="#161616" stroke-width="3.2" stroke-linecap="round"/></svg></button>
       <p class="pre outline st-pre">The Waffle</p>
       <h2 class="logo st-logo" aria-label="Store"><span>S</span><span>T</span><span>O</span><span>R</span><span>E</span></h2>
       <p class="wallet" id="stWallet"><span>BALANCE:</span><b id="stBal">0</b><img class="wicon" alt="waffles"></p>
@@ -1318,7 +1323,7 @@ async function buyItem(k){
 }
 function openStore(){audio();stConfirm=null;$('stMsg').hidden=true;$('storePage').hidden=false;renderStore();if(typeof window.onStoreOpen==='function')window.onStoreOpen()}
 $('storeBtn').onclick=openStore; $('storeBtn2').onclick=openStore;
-$('stClose').onclick=()=>{$('storePage').hidden=true};
+$('stClose').onclick=$('stX').onclick=()=>{$('storePage').hidden=true};
 $('stBuyW').onclick=buyWaffles; $('noBuy').onclick=buyWaffles; $('noClose').onclick=()=>{$('stNo').hidden=true};
 
 /* ---------- sharing on X ---------- */
