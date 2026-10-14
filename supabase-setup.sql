@@ -81,18 +81,23 @@ revoke all on function public.submit_run(jsonb, int, int) from public, anon;
 grant execute on function public.submit_run(jsonb, int, int) to authenticated;
 
 -- ---------------------------------------------------------------------------
--- Profiles: a board name plus a 4-digit PIN, so a player can log in on
--- another phone and keep their waffles. Everything happens inside the game.
+-- Profiles: just a board name and a picture. To move to a new phone, the old
+-- phone shows a one-time move code that's typed into the new phone.
 -- ---------------------------------------------------------------------------
 create schema if not exists extensions;
 create extension if not exists pgcrypto with schema extensions;
 
-alter table public.waffle_board add column if not exists pin_hash text;
-alter table public.waffle_board add column if not exists pin_fails int not null default 0;
-alter table public.waffle_board add column if not exists locked_until timestamptz;
 alter table public.waffle_board add column if not exists pfp text;
+alter table public.waffle_board add column if not exists move_code text;
+alter table public.waffle_board add column if not exists move_expires timestamptz;
+drop function if exists public.login_profile(text, text);
+drop function if exists public.set_nick(text);
+drop function if exists public.save_profile(text, text);
+alter table public.waffle_board drop column if exists pin_hash;
+alter table public.waffle_board drop column if exists pin_fails;
+alter table public.waffle_board drop column if exists locked_until;
 
--- PINs stay private: players can read every column except the PIN ones.
+-- Move codes stay private: players can read every other column.
 revoke select on public.waffle_board from anon, authenticated;
 grant select (id, nick, pfp, waffles, best, runs, updated_at) on public.waffle_board to anon, authenticated;
 
@@ -110,17 +115,17 @@ security definer
 set search_path = public
 as $$
   select coalesce(
-    (select jsonb_build_object('nick', nick, 'pfp', pfp, 'has_pin', pin_hash is not null, 'waffles', waffles, 'best', best, 'runs', runs)
+    (select jsonb_build_object('nick', nick, 'pfp', pfp, 'waffles', waffles, 'best', best, 'runs', runs)
        from public.waffle_board where id = auth.uid()),
     '{}'::jsonb);
 $$;
 
--- Create a profile, or change your name (pass p_pin = null to keep your PIN).
-create or replace function public.save_profile(p_nick text, p_pin text)
+-- Create a profile or change your name.
+create or replace function public.save_profile(p_nick text)
 returns jsonb
 language plpgsql
 security definer
-set search_path = public, extensions
+set search_path = public
 as $$
 declare
   uid uuid := auth.uid();
@@ -128,23 +133,17 @@ declare
 begin
   if uid is null then return jsonb_build_object('ok', false, 'reason', 'signed_out'); end if;
   if clean !~ '^[A-Za-z0-9 _.-]{2,14}$' then return jsonb_build_object('ok', false, 'reason', 'bad_name'); end if;
-  if p_pin is not null and p_pin !~ '^[0-9]{4}$' then return jsonb_build_object('ok', false, 'reason', 'bad_pin'); end if;
   if exists (select 1 from public.waffle_board where lower(nick) = lower(clean) and id <> uid) then
     return jsonb_build_object('ok', false, 'reason', 'name_taken');
   end if;
-  insert into public.waffle_board as b (id, nick, pin_hash)
-  values (uid, clean, case when p_pin is null then null else crypt(p_pin, gen_salt('bf')) end)
-  on conflict (id) do update
-    set nick = excluded.nick,
-        pin_hash = coalesce(excluded.pin_hash, b.pin_hash),
-        updated_at = now();
+  insert into public.waffle_board as b (id, nick) values (uid, clean)
+  on conflict (id) do update set nick = excluded.nick, updated_at = now();
   return jsonb_build_object('ok', true, 'nick', clean);
 end;
 $$;
 
--- Log in to an existing profile from this phone. Waffles earned here before
--- logging in are added to the profile. Six wrong PINs in a row locks it for 15 minutes.
-create or replace function public.login_profile(p_nick text, p_pin text)
+-- Old phone: get a one-time code (good for 15 minutes).
+create or replace function public.get_move_code()
 returns jsonb
 language plpgsql
 security definer
@@ -152,36 +151,50 @@ set search_path = public, extensions
 as $$
 declare
   uid uuid := auth.uid();
+  abc text := 'ABCDEFGHJKMNPQRSTUVWXYZ23456789';
+  b bytea := gen_random_bytes(6);
+  code text := '';
+  i int;
+begin
+  if uid is null then return jsonb_build_object('ok', false, 'reason', 'signed_out'); end if;
+  if not exists (select 1 from public.waffle_board where id = uid and nick is not null) then
+    return jsonb_build_object('ok', false, 'reason', 'no_profile');
+  end if;
+  for i in 0..5 loop code := code || substr(abc, 1 + get_byte(b, i) % length(abc), 1); end loop;
+  update public.waffle_board set move_code = code, move_expires = now() + interval '15 minutes' where id = uid;
+  return jsonb_build_object('ok', true, 'code', code);
+end;
+$$;
+
+-- New phone: type the code to bring the profile over. Waffles earned on the
+-- new phone before moving get added to the profile.
+create or replace function public.use_move_code(p_code text)
+returns jsonb
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  uid uuid := auth.uid();
   r public.waffle_board;
   m public.waffle_board;
 begin
   if uid is null then return jsonb_build_object('ok', false, 'reason', 'signed_out'); end if;
-  select * into r from public.waffle_board where lower(nick) = lower(trim(coalesce(p_nick, ''))) for update;
-  if not found or r.pin_hash is null then return jsonb_build_object('ok', false, 'reason', 'no_profile'); end if;
-  if r.locked_until is not null and r.locked_until > now() then return jsonb_build_object('ok', false, 'reason', 'locked'); end if;
-  if r.pin_hash <> crypt(coalesce(p_pin, ''), r.pin_hash) then
-    update public.waffle_board
-       set pin_fails = pin_fails + 1,
-           locked_until = case when pin_fails + 1 >= 6 then now() + interval '15 minutes' else locked_until end
-     where id = r.id;
-    return jsonb_build_object('ok', false, 'reason', 'wrong_pin');
-  end if;
-  if r.id = uid then
-    update public.waffle_board set pin_fails = 0, locked_until = null where id = uid;
-    return jsonb_build_object('ok', true, 'nick', r.nick, 'waffles', r.waffles);
-  end if;
+  select * into r from public.waffle_board
+   where move_code = upper(replace(trim(coalesce(p_code, '')), ' ', '')) and move_expires > now()
+   for update;
+  if not found then return jsonb_build_object('ok', false, 'reason', 'bad_code'); end if;
+  if r.id = uid then return jsonb_build_object('ok', true, 'nick', r.nick, 'waffles', r.waffles); end if;
   select * into m from public.waffle_board where id = uid for update;
-  if found and m.pin_hash is not null then
-    return jsonb_build_object('ok', false, 'reason', 'switch_needed');
-  end if;
+  if found and m.nick is not null then return jsonb_build_object('ok', false, 'reason', 'switch_needed'); end if;
   if found then delete from public.waffle_board where id = uid; end if;
   update public.waffle_board
      set id = uid,
          waffles = r.waffles + coalesce(m.waffles, 0),
          best = greatest(r.best, coalesce(m.best, 0)),
          runs = r.runs + coalesce(m.runs, 0),
-         pin_fails = 0,
-         locked_until = null,
+         move_code = null,
+         move_expires = null,
          updated_at = now()
    where id = r.id;
   return jsonb_build_object('ok', true, 'nick', r.nick, 'waffles', r.waffles + coalesce(m.waffles, 0));
@@ -206,23 +219,14 @@ begin
   return jsonb_build_object('ok', true, 'pfp', p_pfp);
 end;
 $$;
-revoke all on function public.set_pfp(text) from public, anon;
-grant execute on function public.set_pfp(text) to authenticated;
-
--- Older versions of the game called set_nick; it now follows the same name rules.
-drop function if exists public.set_nick(text);
-create or replace function public.set_nick(p_nick text)
-returns jsonb
-language sql
-security definer
-set search_path = public
-as $$ select public.save_profile(p_nick, null); $$;
 
 revoke all on function public.my_profile() from public, anon;
-revoke all on function public.save_profile(text, text) from public, anon;
-revoke all on function public.login_profile(text, text) from public, anon;
+revoke all on function public.save_profile(text) from public, anon;
+revoke all on function public.get_move_code() from public, anon;
+revoke all on function public.use_move_code(text) from public, anon;
+revoke all on function public.set_pfp(text) from public, anon;
 grant execute on function public.my_profile() to authenticated;
-grant execute on function public.save_profile(text, text) to authenticated;
-grant execute on function public.login_profile(text, text) to authenticated;
-revoke all on function public.set_nick(text) from public, anon;
-grant execute on function public.set_nick(text) to authenticated;
+grant execute on function public.save_profile(text) to authenticated;
+grant execute on function public.get_move_code() to authenticated;
+grant execute on function public.use_move_code(text) to authenticated;
+grant execute on function public.set_pfp(text) to authenticated;

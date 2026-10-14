@@ -5,7 +5,7 @@
 2. Authentication > Sign In / Providers: turn on **Allow anonymous sign-ins**.
 3. SQL Editor > New query: paste all of `supabase-setup.sql` and click Run. (Safe to run again after updates.)
 4. Project Settings > API: copy the **Project URL** and the **anon public** key.
-5. Put the Project URL and anon key into `SUPABASE_URL` and `SUPABASE_KEY` near the Waffle Board section of `index.html`.
+5. The game already has the project URL and public key filled in.
    (The anon key is meant to be public; the database rules only let each player change their own row.)
 
 Free Supabase projects pause after about a week with no visitors. Open the Supabase dashboard and click Restore if that happens.

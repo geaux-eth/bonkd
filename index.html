@@ -151,6 +151,9 @@ canvas{display:block;width:100%;height:100%;touch-action:none;cursor:grab}
 .sw.on{box-shadow:0 0 0 3px var(--paper),0 0 0 5.5px var(--ink)}
 .pp-who button:focus-visible,.sw:focus-visible{outline:3px dashed var(--ink);outline-offset:3px}
 .board .av{width:24px;height:24px}
+.movebox{border:2.5px dashed var(--ink);border-radius:14px;padding:8px 10px;display:grid;gap:4px}
+.code{margin:0;font-family:var(--display);font-size:36px;letter-spacing:.18em;line-height:1}
+#pfPin{letter-spacing:.2em;text-transform:uppercase}
 @media (prefers-reduced-motion:reduce){.logo span{animation:none}}
 </style>
 
@@ -232,7 +235,7 @@ canvas{display:block;width:100%;height:100%;touch-action:none;cursor:grab}
         <p>Bonkd is an app in development. Things will change, and some may break. Scores and the Waffle Board may be reset during testing.</p>
         <h3>The fine print</h3>
         <p>Waffles are just for fun. They have no cash value and can't be bought, sold or traded. There are no ads or purchases in this game.</p>
-        <p>To keep the Waffle Board, the game stores a random player ID on this device along with your board name, picture choice, a scrambled copy of your PIN, and your waffle totals. It does not collect your real name, email, contacts or location. If you clear your browser data or switch phones, log back in with your name and PIN. Your board name is visible to everyone, so don't use your real name.</p>
+        <p>To keep the Waffle Board, the game stores a random player ID on this device along with your board name, picture choice and waffle totals. It does not collect your real name, email, contacts or location. Switching phones? Get a move code under Settings → Profile on your old phone. If you clear your browser data without one, you start over. Your board name is visible to everyone, so don't use your real name.</p>
         <p>Characters and artwork are owned by geaux.eth but are a part of The Nibbles, an 8,888 NFT collection within the Franky The Frog ecosystem by Lonely Lily Studios.</p>
         <p>The Nibbles: <a href="https://opensea.io/collection/the-nibbles" target="_blank" rel="noopener">opensea.io/collection/the-nibbles</a><br>Franky The Frog: <a href="https://frankythefrog.com/hub" target="_blank" rel="noopener">frankythefrog.com/hub</a></p>
         <p class="ver">Bonkd beta 0.1</p>
@@ -247,13 +250,14 @@ canvas{display:block;width:100%;height:100%;touch-action:none;cursor:grab}
       <div class="pp-head"><img class="av big" id="ppAv" alt=""><div class="pp-id"><b id="ppName">No profile yet</b><span id="ppWaf"></span></div></div>
       <div id="ppNone">
         <p class="note">Create a profile to put your name on the Waffle Board and keep your waffles on any phone.</p>
-        <div class="btns"><button class="btn red" id="ppCreate" type="button">Create profile</button><button class="link" id="ppLogin" type="button">Log in</button></div>
+        <div class="btns"><button class="btn red" id="ppCreate" type="button">Create profile</button><button class="link" id="ppLogin" type="button">Use a move code</button></div>
       </div>
       <div id="ppHas" hidden>
         <p class="label">Profile picture</p>
         <div class="pp-who" id="ppWho" role="group" aria-label="Character"></div>
         <div class="pp-col" id="ppCol" role="group" aria-label="Background color"></div>
-        <div class="btns"><button class="seg" id="ppRename" type="button">Change name</button><button class="seg" id="ppPin" type="button">Change PIN</button><button class="seg" id="ppSwitch" type="button">Log in as someone else</button></div>
+        <div class="btns"><button class="seg" id="ppRename" type="button">Change name</button><button class="seg" id="ppPin" type="button">Move to another phone</button><button class="seg" id="ppSwitch" type="button">Use a move code</button></div>
+        <div class="movebox" id="ppMove" hidden><p class="label">Your move code</p><p class="code" id="ppCode"></p><p class="note">On your new phone, open Settings → Profile → Use a move code and type this in. It works once, for the next 15 minutes.</p></div>
       </div>
       <div class="btns"><button class="btn plain small" id="ppClose" type="button">Close</button></div>
     </div>
@@ -266,11 +270,10 @@ canvas{display:block;width:100%;height:100%;touch-action:none;cursor:grab}
       <p class="note" id="pfText"></p>
       <form class="pf" id="pfForm">
         <input id="pfName" maxlength="14" autocomplete="nickname" autocapitalize="words" placeholder="Board name" aria-label="Board name">
-        <input id="pfPin" type="password" inputmode="numeric" pattern="[0-9]*" maxlength="4" autocomplete="off" placeholder="4-digit PIN" aria-label="4-digit PIN">
+        <input id="pfPin" maxlength="7" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="Move code" aria-label="Move code">
         <p class="err" id="pfErr" role="alert" hidden></p>
         <div class="btns"><button class="btn red" id="pfGo" type="submit">Save</button><button class="btn plain small" id="pfCancel" type="button">Not now</button></div>
       </form>
-      <button class="link" id="pfForgot" type="button" hidden>Forgot your PIN?</button>
       <button class="link" id="pfSwap" type="button">Already have a profile? Log in</button>
     </div>
   </div>
@@ -1021,7 +1024,7 @@ function avatarURL(key){
 }
 function setImg(el,key){const u=avatarURL(key);if(u)el.src=u;else setTimeout(()=>setImg(el,key),300)}
 function renderProfile(){
-  const has=!!prof.has_pin, key=prof.pfp||'waffle:gold';
+  const has=!!!!prof.nick, key=prof.pfp||'waffle:gold';
   $('pfShow').textContent=has?prof.nick:(SB?'No profile yet':'Offline'); $('pfEdit').hidden=!SB;
   setImg($('setAv'),key); $('setAv').hidden=!has;
   $('pfBoardLine').textContent=has?'Playing as '+prof.nick+'.':"You don't have a profile yet.";
@@ -1060,49 +1063,46 @@ function renderBoard(){
 function openBoard(){$('boardPanel').hidden=false;renderProfile();renderBoard();loadTop().then(renderBoard)}
 $('boardBtn').onclick=openBoard; $('boardBtn2').onclick=openBoard;
 $('boardClose').onclick=()=>{$('boardPanel').hidden=true};
-function openPage(){if(!SB)return;$('profPage').hidden=false;renderProfile();loadMe()}
+function openPage(){if(!SB)return;$('ppMove').hidden=true;$('profPage').hidden=false;renderProfile();loadMe()}
 $('pfEdit').onclick=openPage; $('pfBoardEdit').onclick=openPage; $('ppClose').onclick=()=>{$('profPage').hidden=true};
 $('ppCreate').onclick=()=>openProfile('create'); $('ppLogin').onclick=()=>openProfile('login');
-$('ppRename').onclick=()=>openProfile('rename'); $('ppPin').onclick=()=>openProfile('pin'); $('ppSwitch').onclick=()=>openProfile('login');
+$('ppRename').onclick=()=>openProfile('rename'); $('ppSwitch').onclick=()=>openProfile('login');
+$('ppPin').onclick=async()=>{try{const {data,error}=await SB.rpc('get_move_code');if(error||!data.ok)throw 0;$('ppCode').textContent=data.code;$('ppMove').hidden=false}catch(e){$('ppCode').textContent='Try again';$('ppMove').hidden=false}};
 /* one-time prompt per session, right after a level is cleared */
-window.onLevelClear=()=>{if(SB&&!prof.has_pin&&!askedSession){askedSession=true;setTimeout(()=>{if(state==='clear')openProfile('create')},700)}};
+window.onLevelClear=()=>{if(SB&&!!!prof.nick&&!askedSession){askedSession=true;setTimeout(()=>{if(state==='clear')openProfile('create')},700)}};
 /* create / log in / change name / change PIN — all in-game */
 const PF={
-  create:{pre:'Save your',logo:'WAFFLES!',text:'Pick a name for the Waffle Board and a 4-digit PIN. Use them to log in on another phone and keep your waffles.',go:'Save',cancel:'Not now',swap:'Already have a profile? Log in',name:true,pin:true},
-  login:{pre:'Welcome',logo:'BACK!',text:'Log in with your board name and PIN. Waffles you earned on this phone get added to your profile.',go:'Log in',cancel:'Cancel',swap:'New here? Create a profile',name:true,pin:true,forgot:true},
-  rename:{pre:'Change your',logo:'NAME',text:'Your waffles and PIN stay the same.',go:'Save',cancel:'Cancel',name:true,pin:false},
-  pin:{pre:'Change your',logo:'PIN',text:'Pick a new 4-digit PIN. You won\'t need the old one on this phone.',go:'Save',cancel:'Cancel',name:false,pin:true}
+  create:{pre:'Save your',logo:'WAFFLES!',text:'Pick a name for the Waffle Board. You can change it anytime.',go:'Save',cancel:'Not now',swap:'Moving from another phone? Use a move code',name:true,pin:false},
+  login:{pre:'Welcome',logo:'BACK!',text:'Type the move code from your old phone. Waffles you earned on this phone get added to your profile.',go:'Move here',cancel:'Cancel',swap:'New here? Create a profile',name:false,pin:true},
+  rename:{pre:'Change your',logo:'NAME',text:'Your waffles stay the same.',go:'Save',cancel:'Cancel',name:true,pin:false}
 };
 function logoSpans(el,txt){el.textContent='';el.setAttribute('aria-label',txt);for(const ch of txt){const sp=document.createElement('span');sp.textContent=ch;el.append(sp)}}
 function openProfile(mode){
   if(!SB)return; pfMode=mode; const m=PF[mode];
   $('pfPre').textContent=m.pre; logoSpans($('pfLogo'),m.logo); $('pfText').textContent=m.text;
   $('pfGo').textContent=m.go;$('pfCancel').textContent=m.cancel;
-  $('pfSwap').textContent=m.swap||'';$('pfSwap').hidden=!m.swap;$('pfForgot').hidden=!m.forgot;
+  $('pfSwap').textContent=m.swap||'';$('pfSwap').hidden=!m.swap;
   $('pfName').hidden=!m.name;$('pfPin').hidden=!m.pin;$('pfPin').value='';$('pfErr').hidden=true;
-  $('pfPin').placeholder=mode==='pin'?'New 4-digit PIN':'4-digit PIN';
   $('pfName').value=(mode==='rename'||mode==='create')?(prof.nick||''):'';
   $('profile').hidden=false; setTimeout(()=>{try{(m.name?$('pfName'):$('pfPin')).focus({preventScroll:true})}catch(e){}},60);
 }
-const PFERR={name_taken:"That name's taken! Try another.",bad_name:'Use 2–14 letters, numbers or spaces.',bad_pin:'Your PIN needs to be 4 numbers.',wrong_pin:"That PIN doesn't match.",locked:'Too many tries. Wait 15 minutes and try again.',no_profile:'No profile with that name.',signed_out:"Couldn't reach the Waffle Board. Try again."};
+const PFERR={name_taken:"That name's taken! Try another.",bad_name:'Use 2–14 letters, numbers or spaces.',bad_code:"That code didn't work. Codes work once, for 15 minutes.",no_profile:'Create a profile first.',signed_out:"Couldn't reach the Waffle Board. Try again."};
 function pfFail(r){$('pfErr').textContent=PFERR[r]||"Couldn't reach the Waffle Board. Try again.";$('pfErr').hidden=false}
-$('pfForgot').onclick=()=>{$('pfErr').textContent='Open Bonkd on a phone where you\'re still logged in and pick a new PIN under Settings → Profile.';$('pfErr').hidden=false};
 $('pfForm').addEventListener('submit',async e=>{
   e.preventDefault(); if(!SB)return;
-  const m=PF[pfMode], nick=$('pfName').value.trim(), pin=$('pfPin').value.trim();
-  if(m.pin&&!/^[0-9]{4}$/.test(pin))return pfFail('bad_pin');
+  const nick=$('pfName').value.trim(), code=$('pfPin').value.trim();
+  if(pfMode==='login'&&code.replace(/\s/g,'').length!==6)return pfFail('bad_code');
   $('pfGo').disabled=true;
   try{
     if(pfMode==='login'){
-      let {data,error}=await SB.rpc('login_profile',{p_nick:nick,p_pin:pin}); if(error)throw error;
-      if(data&&data.reason==='switch_needed'){await SB.auth.signOut();await newSession();({data,error}=await SB.rpc('login_profile',{p_nick:nick,p_pin:pin}));if(error)throw error}
+      let {data,error}=await SB.rpc('use_move_code',{p_code:code}); if(error)throw error;
+      if(data&&data.reason==='switch_needed'){await SB.auth.signOut();await newSession();({data,error}=await SB.rpc('use_move_code',{p_code:code}));if(error)throw error}
       if(!data.ok)return pfFail(data.reason);
       $('profile').hidden=true; pop('WELCOME BACK, '+data.nick.toUpperCase()+'!',W/2,H*.3,C.gold,30,1.8);
     }else{
-      const n=pfMode==='pin'?prof.nick:nick, p=(pfMode==='create'||pfMode==='pin')?pin:null;
-      const {data,error}=await SB.rpc('save_profile',{p_nick:n,p_pin:p}); if(error)throw error;
+      const {data,error}=await SB.rpc('save_profile',{p_nick:nick}); if(error)throw error;
       if(!data.ok)return pfFail(data.reason);
-      $('profile').hidden=true; pop({create:'PROFILE SAVED!',rename:'NAME CHANGED!',pin:'PIN CHANGED!'}[pfMode],W/2,H*.3,C.gold,30,1.6);
+      $('profile').hidden=true; pop(pfMode==='create'?'PROFILE SAVED!':'NAME CHANGED!',W/2,H*.3,C.gold,30,1.6);
     }
     await loadMe(); await loadTop(); renderBoard();
   }catch(_){pfFail('')}
