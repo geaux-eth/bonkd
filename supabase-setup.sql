@@ -73,6 +73,7 @@ begin
         last_run_at = now(),
         updated_at = now()
   returning * into r;
+  insert into public.waffle_runs (player, waffles, level) values (uid, total, p_level);
   return r;
 end;
 $$;
@@ -90,6 +91,11 @@ create extension if not exists pgcrypto with schema extensions;
 alter table public.waffle_board add column if not exists pfp text;
 alter table public.waffle_board add column if not exists move_code text;
 alter table public.waffle_board add column if not exists move_expires timestamptz;
+-- Waffle wallet: "waffles" = earned by playing (the only number on the board),
+-- "bought" = purchased waffles, "spent" = spent in the store.
+alter table public.waffle_board add column if not exists bought bigint not null default 0 check (bought >= 0);
+alter table public.waffle_board add column if not exists spent bigint not null default 0 check (spent >= 0);
+alter table public.waffle_board add column if not exists owned text[] not null default '{}';
 drop function if exists public.login_profile(text, text);
 drop function if exists public.set_nick(text);
 drop function if exists public.save_profile(text, text);
@@ -115,7 +121,8 @@ security definer
 set search_path = public
 as $$
   select coalesce(
-    (select jsonb_build_object('nick', nick, 'pfp', pfp, 'waffles', waffles, 'best', best, 'runs', runs)
+    (select jsonb_build_object('nick', nick, 'pfp', pfp, 'waffles', waffles, 'best', best, 'runs', runs,
+                               'wallet', waffles + bought - spent, 'bought', bought, 'owned', to_jsonb(owned))
        from public.waffle_board where id = auth.uid()),
     '{}'::jsonb);
 $$;
@@ -197,6 +204,7 @@ begin
          move_expires = null,
          updated_at = now()
    where id = r.id;
+  update public.waffle_runs set player = uid where player = r.id;
   return jsonb_build_object('ok', true, 'nick', r.nick, 'waffles', r.waffles + coalesce(m.waffles, 0));
 end;
 $$;
@@ -230,3 +238,97 @@ grant execute on function public.save_profile(text) to authenticated;
 grant execute on function public.get_move_code() to authenticated;
 grant execute on function public.use_move_code(text) to authenticated;
 grant execute on function public.set_pfp(text) to authenticated;
+
+-- ---------------------------------------------------------------------------
+-- Waffle Store: spend waffles on Super Duper Weapons. Prices live here, so the
+-- game can't be tricked into a discount. Spending never touches the board.
+-- ---------------------------------------------------------------------------
+create or replace function public.buy_item(p_item text)
+returns jsonb
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  uid uuid := auth.uid();
+  prices jsonb := '{"ivy":250,"porcu":750,"beans":2000}';
+  price bigint;
+  r public.waffle_board;
+begin
+  if uid is null then return jsonb_build_object('ok', false, 'reason', 'signed_out'); end if;
+  if not (prices ? p_item) then return jsonb_build_object('ok', false, 'reason', 'bad_item'); end if;
+  price := (prices->>p_item)::bigint;
+  select * into r from public.waffle_board where id = uid for update;
+  if not found then return jsonb_build_object('ok', false, 'reason', 'not_enough', 'wallet', 0); end if;
+  if p_item = any(r.owned) then
+    return jsonb_build_object('ok', true, 'wallet', r.waffles + r.bought - r.spent, 'owned', to_jsonb(r.owned));
+  end if;
+  if r.waffles + r.bought - r.spent < price then
+    return jsonb_build_object('ok', false, 'reason', 'not_enough', 'wallet', r.waffles + r.bought - r.spent);
+  end if;
+  update public.waffle_board set spent = spent + price, owned = array_append(owned, p_item), updated_at = now()
+   where id = uid returning * into r;
+  return jsonb_build_object('ok', true, 'wallet', r.waffles + r.bought - r.spent, 'owned', to_jsonb(r.owned));
+end;
+$$;
+revoke all on function public.buy_item(text) from public, anon;
+grant execute on function public.buy_item(text) to authenticated;
+
+-- ---------------------------------------------------------------------------
+-- 24-hour Waffle Tournaments: every run is logged, and a tournament ranks
+-- players by waffles earned between its start and end.
+-- ---------------------------------------------------------------------------
+create table if not exists public.waffle_runs (
+  id bigserial primary key,
+  player uuid not null references auth.users(id) on delete cascade,
+  waffles bigint not null,
+  level int not null,
+  created_at timestamptz not null default now()
+);
+create index if not exists waffle_runs_time on public.waffle_runs (created_at);
+alter table public.waffle_runs enable row level security;
+revoke all on public.waffle_runs from anon, authenticated;
+
+create table if not exists public.tournaments (
+  id serial primary key,
+  title text not null,
+  prize text,
+  starts_at timestamptz not null,
+  ends_at timestamptz not null
+);
+alter table public.tournaments enable row level security;
+drop policy if exists "Anyone can see tournaments" on public.tournaments;
+create policy "Anyone can see tournaments" on public.tournaments for select using (true);
+revoke insert, update, delete, truncate, references, trigger on public.tournaments from anon, authenticated;
+grant select on public.tournaments to anon, authenticated;
+
+-- The live tournament (or the most recent one), with its top 10.
+create or replace function public.tournament_board()
+returns jsonb
+language sql
+stable
+security definer
+set search_path = public
+as $$
+  with t as (
+    select * from public.tournaments
+    order by (now() between starts_at and ends_at) desc, ends_at desc
+    limit 1
+  ), top as (
+    select b.id, b.nick, b.pfp, sum(w.waffles) as waffles
+    from t
+    join public.waffle_runs w on w.created_at between t.starts_at and t.ends_at
+    join public.waffle_board b on b.id = w.player
+    group by b.id, b.nick, b.pfp
+    order by sum(w.waffles) desc
+    limit 10
+  )
+  select coalesce(
+    (select jsonb_build_object('id', t.id, 'title', t.title, 'prize', t.prize,
+              'starts_at', t.starts_at, 'ends_at', t.ends_at, 'live', now() between t.starts_at and t.ends_at,
+              'rows', coalesce((select jsonb_agg(to_jsonb(top)) from top), '[]'::jsonb))
+       from t),
+    '{}'::jsonb);
+$$;
+revoke all on function public.tournament_board() from public;
+grant execute on function public.tournament_board() to anon, authenticated;

@@ -131,6 +131,33 @@ canvas{display:block;width:100%;height:100%;touch-action:none;cursor:grab}
 .mute .x{display:none}.mute.off .x{display:inline}.mute.off .w{display:none}
 .mute:focus-visible{outline:3px dashed var(--ink);outline-offset:3px}
 #clear .card{width:min(300px,100%);padding:12px 16px 14px;gap:6px}
+.links{display:flex;gap:4px;align-items:center;justify-content:center}
+.title .dot{color:var(--paper);font-weight:800;text-shadow:0 1px 2px rgba(0,0,0,.5)}
+.xbtn{background:#161616;color:#fff;text-decoration:none;-webkit-text-stroke:0}
+#storePage,#cardView{z-index:16}
+.store{text-align:left}
+.st-pre{text-align:center;font-size:22px;-webkit-text-stroke:2px var(--ink);text-shadow:2px 2px 0 var(--ink)}
+.st-logo{text-align:center;font-size:clamp(44px,12vmin,66px)}
+.wallet{margin:0;text-align:center;font-family:var(--display);font-size:18px;letter-spacing:.03em}
+.st-sec{display:grid;gap:6px;border-top:2px solid var(--ink);padding-top:10px}
+.st-h{margin:0;font-family:var(--display);font-weight:400;font-size:20px;letter-spacing:.03em;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.st-sub{margin:0;font-size:13.5px;line-height:1.4}
+.sticker{font-family:var(--display);font-size:12px;letter-spacing:.05em;padding:4px 8px 2px;background:var(--red);color:var(--paper);border:2px solid var(--ink);border-radius:8px;transform:rotate(-6deg);box-shadow:2px 2px 0 var(--ink)}
+.sticker.gold{background:var(--gold);color:var(--ink)}
+.st-list{display:grid;gap:8px}
+.st-item{display:grid;grid-template-columns:64px 1fr auto;gap:10px;align-items:center;padding:8px;border:2.5px solid var(--ink);border-radius:14px;background:var(--paper)}
+.st-item img{width:64px;height:64px}
+.st-item .nm{font-family:var(--display);font-size:16px;letter-spacing:.02em;line-height:1.1}
+.st-item p{margin:2px 0 0;font-size:12.5px;line-height:1.35}
+.st-item>div{min-width:0}
+.tier{display:inline-block;margin-top:3px;font-family:var(--display);font-size:11px;letter-spacing:.06em;padding:3px 6px 1px;border:2px solid var(--ink);border-radius:6px}
+.t-effective{background:#8ee26b}.t-omghost{background:#b48cff}.t-unbearable{background:var(--red);color:var(--paper)}
+.buy{white-space:nowrap}
+.buy.owned{background:var(--paper)}
+.st-row{display:flex;gap:10px;flex-wrap:wrap}
+.st-card{width:96px;display:grid;justify-items:center;gap:4px;font-size:12px;font-weight:800;text-align:center}
+.st-card img{width:84px;height:84px}
+.cardimg{width:100%;border:2.5px solid var(--ink);border-radius:12px;-webkit-touch-callout:default;user-select:auto}
 #profPage{z-index:14}#profile{z-index:15}
 .pf-pre{font-size:22px;-webkit-text-stroke:2px var(--ink);text-shadow:2px 2px 0 var(--ink)}
 .pf-logo{font-size:clamp(40px,11vmin,62px)}
@@ -176,7 +203,7 @@ canvas{display:block;width:100%;height:100%;touch-action:none;cursor:grab}
       <h1 class="logo" aria-label="Bonkd!"><span>B</span><span>O</span><span>N</span><span>K</span><span>D</span><span>!</span></h1>
       <button class="btn red go" id="playBtn"><img class="wicon" id="btnWaf" alt="">Get waffles!</button>
       <p class="sub outline" id="menuBest" hidden></p>
-      <button class="link" id="boardBtn">Waffle Board</button>
+      <div class="links"><button class="link" id="boardBtn">Waffle Board</button><span class="dot">·</span><button class="link" id="storeBtn">Waffle Store</button></div>
     </div>
   </div>
   <button class="mute" id="muteBtn" aria-label="Mute sound" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 9h4l5-4v14l-5-4H3z" fill="#ffd23f" stroke="#161616" stroke-width="1.8" stroke-linejoin="round"/><path class="w" d="M15.5 8.5a5 5 0 0 1 0 7M18 6a8.5 8.5 0 0 1 0 12" fill="none" stroke="#161616" stroke-width="1.8" stroke-linecap="round"/><path class="x" d="M15.5 9.5l5 5m0-5l-5 5" fill="none" stroke="#df3a4e" stroke-width="2.4" stroke-linecap="round"/></svg></button>
@@ -200,6 +227,7 @@ canvas{display:block;width:100%;height:100%;touch-action:none;cursor:grab}
       <h2 class="logo" aria-label="Clear!"><span>C</span><span>L</span><span>E</span><span>A</span><span>R</span><span>!</span></h2>
       <dl class="stats" id="clrStats"></dl>
       <div class="btns"><button class="btn red" id="nextBtn">Next level</button></div>
+      <a class="link" id="shareClear" href="#" target="_blank" rel="noopener" hidden>Brag about it on X</a>
     </div>
   </div>
 
@@ -215,8 +243,42 @@ canvas{display:block;width:100%;height:100%;touch-action:none;cursor:grab}
         <button class="btn red" id="againBtn">Again</button>
         <button class="btn plain" id="menuBtn">Menu</button>
         </div>
-      <div class="btns"><button class="link" id="boardBtn2">Waffle Board</button>
+      <div class="btns"><a class="btn small xbtn" id="shareRun" href="#" target="_blank" rel="noopener">Share on X</a><button class="btn small plain" id="shareCardBtn" type="button">Share my card</button></div>
+      <div class="btns"><button class="link" id="boardBtn2">Waffle Board</button><button class="link" id="storeBtn2">Waffle Store</button>
       </div>
+    </div>
+  </div>
+
+  <div class="overlay dim" id="storePage" hidden>
+    <div class="card wide store">
+      <p class="pre outline st-pre">The Waffle</p>
+      <h2 class="logo st-logo" aria-label="Store"><span>S</span><span>T</span><span>O</span><span>R</span><span>E</span></h2>
+      <p class="wallet" id="stWallet">0 waffles to spend</p>
+      <section class="st-sec">
+        <h3 class="st-h">Grumble Buster Store</h3>
+        <p class="st-sub"><b>Super Duper Weapons.</b> Buy one once and Booster can toss it to you in any game.</p>
+        <div class="st-list" id="stWeapons"></div>
+      </section>
+      <section class="st-sec">
+        <h3 class="st-h">Buddies <span class="sticker">Coming soon!</span></h3>
+        <p class="st-sub">New characters to play as, bought with waffles.</p>
+        <div class="st-row" id="stBuddies"></div>
+      </section>
+      <section class="st-sec">
+        <h3 class="st-h">Legends <span class="sticker gold">Coming soon!</span></h3>
+        <p class="st-sub">Legendary Nibbles can't be bought. Win a 24-hour Waffle Tournament to pick a Nibble and give it a name.</p>
+        <div class="st-row" id="stLegends"></div>
+      </section>
+      <p class="note" id="stMsg" hidden></p>
+      <div class="btns"><button class="btn plain small" id="stClose" type="button">Close</button></div>
+    </div>
+  </div>
+
+  <div class="overlay dim" id="cardView" hidden>
+    <div class="card wide">
+      <img id="cardImg" class="cardimg" alt="Your Bonkd player card">
+      <p class="note">Press and hold the card to save it, then add it to your post.</p>
+      <div class="btns"><a class="btn small xbtn" id="cardX" href="#" target="_blank" rel="noopener">Post on X</a><button class="btn plain small" id="cardClose" type="button">Close</button></div>
     </div>
   </div>
 
@@ -256,7 +318,7 @@ canvas{display:block;width:100%;height:100%;touch-action:none;cursor:grab}
         <p class="label">Profile picture</p>
         <div class="pp-who" id="ppWho" role="group" aria-label="Character"></div>
         <div class="pp-col" id="ppCol" role="group" aria-label="Background color"></div>
-        <div class="btns"><button class="seg" id="ppRename" type="button">Change name</button><button class="seg" id="ppPin" type="button">Move to another phone</button><button class="seg" id="ppSwitch" type="button">Use a move code</button></div>
+        <div class="btns"><button class="seg" id="ppRename" type="button">Change name</button><button class="seg" id="ppPin" type="button">Move to another phone</button><button class="seg" id="ppSwitch" type="button">Use a move code</button><button class="seg" id="ppShare" type="button">Share my card</button></div>
         <div class="movebox" id="ppMove" hidden><p class="label">Your move code</p><p class="code" id="ppCode"></p><p class="note">On your new phone, open Settings → Profile → Use a move code and type this in. It works once, for the next 15 minutes.</p></div>
       </div>
       <div class="btns"><button class="btn plain small" id="ppClose" type="button">Close</button></div>
@@ -282,6 +344,8 @@ canvas{display:block;width:100%;height:100%;touch-action:none;cursor:grab}
     <div class="card wide">
       <p class="pre">Waffle Board</p>
       <p class="note" id="boardNote">Grumble drops waffles every time he goes down. Rare waffles are worth more.</p>
+      <div class="hand" id="tTabs" hidden><button class="seg on" id="tAll" type="button">All-time</button><button class="seg" id="tLive" type="button">🏆 Tournament</button></div>
+      <p class="note" id="tInfo" hidden></p>
       <ol class="board" id="boardList"></ol>
       <p class="note" id="pfBoardWrap"><span id="pfBoardLine"></span> <button class="link" id="pfBoardEdit" type="button">Manage profile</button></p>
       <form class="nick" id="nickForm" hidden>
@@ -357,13 +421,27 @@ const PW={
   magnet:{name:'Junk Magnet',color:'#e8463f',w:12,tip:'METAL JUNK FLIES BACK!'},
   paddle:{name:'Ping Pong Paddle',color:'#e8463f',w:12,tip:'SWOT ANYTHING · 12 SECONDS'},
   snail:{name:'SLOWMO Snail',color:'#b48cff',w:8},
-  kit:{name:'Boo-Boo Kit',color:'#ffffff',w:12}
+  kit:{name:'Boo-Boo Kit',color:'#ffffff',w:12},
+  ivy:{name:'Poison Ivy Blanket Launcher',color:'#4fbf5a',w:7,tier:'effective'},
+  porcu:{name:'PORCU-POPPER',color:'#a86b3c',w:7,tier:'omghost'},
+  beans:{name:'MEGA BEANS',color:'#d64b3e',w:7,tier:'unbearable'}
 };
 const METAL={pan:1,anvil:1,safe:1};
 let SEEN={};try{SEEN=JSON.parse(localStorage.getItem('bonkd-seen')||'{}')||{}}catch(e){}
 const FIRST={pie:'IT FINDS GRUMBLE ALL BY ITSELF',banana:'HITS GRUMBLE TWICE',jello:'JUNK BOUNCES OFF IT',bun:'TAP LOB TO THROW · 3 PER SOCK',zooka:'TAP FIRE · 6 BARNYARD BLASTS',
-  bucket:'BLOCKS YOUR NEXT 2 BONKS',mitt:'CATCHES UP TO 3 PIECES OF JUNK · TAP THROW',magnet:'ONLY PULLS IN METAL JUNK',paddle:'12 SECONDS TO SWOT ANYTHING',snail:'EVERYTHING SLOWS DOWN',kit:'HEALS ALL YOUR BONKS'};
-const HAND={jello:1,bun:1,zooka:1,mitt:1,magnet:1,paddle:1};
+  bucket:'BLOCKS YOUR NEXT 2 BONKS',mitt:'CATCHES UP TO 3 PIECES OF JUNK · TAP THROW',magnet:'ONLY PULLS IN METAL JUNK',paddle:'12 SECONDS TO SWOT ANYTHING',snail:'EVERYTHING SLOWS DOWN',kit:'HEALS ALL YOUR BONKS',ivy:'TAP LAUNCH · GRUMBLE GETS ITCHY',porcu:'TAP POP · QUILL STORM!',beans:'TODD GOES GIANT · TAP SMASH TO HIT GRUMBLE'};
+const HAND={jello:1,bun:1,zooka:1,mitt:1,magnet:1,paddle:1,ivy:1,porcu:1,beans:1};
+const SUPER={ivy:{price:250,tier:'effective',label:'Effective',desc:'Smothers Grumble in a blanket. When he yanks it off he gets itchy, loses health and throws slower.'},
+  porcu:{price:750,tier:'omghost',label:'OMGhost',desc:'A porcupine that pops a storm of quills at Grumble. The whole screen goes POP!'},
+  beans:{price:2000,tier:'unbearable',label:'UNBEARABLE',desc:'Todd grows 3x giant for a few seconds, shrugs off junk, and SMASHES Grumble directly.'}};
+const SUPER_BASE={effective:.45,omghost:.7,unbearable:1.1};
+function superDmg(tier){return SUPER_BASE[tier]*Math.max(.35,1-(level-1)*.08)*ghost.max}
+/* waffle wallet: local by default; the website version swaps in the shared one */
+let wallet={
+  bal(){return Math.max(0,store('bonkd-waffles')-store('bonkd-spent'))},
+  owned(){try{return new Set(JSON.parse(localStorage.getItem('bonkd-owned')||'[]'))}catch(e){return new Set()}},
+  async buy(k){const p=SUPER[k].price,o=this.owned();if(o.has(k))return{ok:true};if(this.bal()<p)return{ok:false,reason:'not_enough'};store('bonkd-spent',store('bonkd-spent')+p);o.add(k);try{localStorage.setItem('bonkd-owned',JSON.stringify([...o]))}catch(e){};return{ok:true}}
+};
 const PONG=['PING!','PONG!'];
 const WT=[
   {k:'plain',name:'WAFFLE',v:1,w:44},
@@ -389,7 +467,9 @@ const MAXH=4;
 
 /* ---------- state ---------- */
 let rng=Math.random;
-const bear={x:0,tx:0,vx:0,walk:0,hits:0,hitT:0,inv:0,ko:false,koT:0,helmet:0,swing:0,lumpPop:0,weapon:null,jello:null,aim:-1.2,face:1,faceS:1};
+const bear={x:0,tx:0,vx:0,walk:0,hits:0,hitT:0,inv:0,ko:false,koT:0,helmet:0,swing:0,lumpPop:0,weapon:null,jello:null,aim:-1.2,face:1,faceS:1,gs:1};
+let stompT=0,fx=null,runTop=null,lvTop=null;
+function setFx(kind,dur){fx={kind,t:dur,dur}}
 const ghost={x:0,y:0,yOff:0,t:0,hp:10,max:10,throwT:2,squash:0,hitT:0,splat:0,ko:false,koT:0,say:null,sayT:3,face:1,faceS:1,px:0};
 let state='menu',mode='free',level=1,lvlTime=0;
 let items=[],pops=[],sparks=[],shots=[],gifts=[],buns=[],animals=[],impacts=[],splats=[],wafs=[],angel=null,angelT=7;
@@ -492,6 +572,12 @@ const sfx={
   cow(){tone('sawtooth',170,110,.55,.14)},
   sheep(){tone('triangle',520,480,.12,.15);tone('triangle',520,470,.12,.15,.13);tone('triangle',520,460,.14,.15,.26)},
   waffle(){tone('triangle',660,990,.1,.18);tone('triangle',990,1320,.12,.14,.08)},
+  grow(){tone('sine',120,600,.6,.3);tone('square',200,900,.5,.08,.1)},
+  shrink(){tone('sine',700,140,.5,.25)},
+  stomp(){tone('sine',90,40,.18,.45)},
+  pop(){tone('square',600,120,.12,.16);tone('sine',1400,500,.1,.12)},
+  ping(){tone('triangle',1800,1500,.05,.05)},
+  rip(){tone('sawtooth',900,200,.2,.12)},
   boosterIn(){tone('sine',420,1250,.32,.16);[1318,1568,2093].forEach((f,i)=>tone('triangle',f,f,.12,.08,.18+i*.07))},
   boosterOut(){tone('sine',1300,380,.38,.14)},
   poof(){tone('sawtooth',300,60,.3,.12);tone('sine',900,200,.25,.1)},
@@ -521,7 +607,7 @@ const keys={};
 addEventListener('keydown',e=>{
   keys[e.key]=true;
   if(e.target&&e.target.tagName==='INPUT')return;
-  if(e.key==='p'||e.key==='P'||e.key==='Escape'){if(!$('profile').hidden){$('profile').hidden=true;return}if(!$('profPage').hidden){$('profPage').hidden=true;return}if(!$('settings').hidden){$('settings').hidden=true;return}if(!$('boardPanel').hidden){$('boardPanel').hidden=true;return}setPause(!paused);return}
+  if(e.key==='p'||e.key==='P'||e.key==='Escape'){if(!$('cardView').hidden){$('cardView').hidden=true;return}if(!$('storePage').hidden){$('storePage').hidden=true;return}if(!$('profile').hidden){$('profile').hidden=true;return}if(!$('profPage').hidden){$('profPage').hidden=true;return}if(!$('settings').hidden){$('settings').hidden=true;return}if(!$('boardPanel').hidden){$('boardPanel').hidden=true;return}setPause(!paused);return}
   if(e.key===' '||e.key==='Enter'){e.preventDefault();if(paused)return;if(state==='menu'||state==='over')start(mode);else if(state==='clear')nextLevel();else if(state==='play'&&!e.repeat)act()}
 });
 addEventListener('keyup',e=>{keys[e.key]=false});
@@ -559,14 +645,14 @@ $('nextBtn').onclick=()=>nextLevel();
 document.addEventListener('visibilitychange',()=>{if(document.hidden)setPause(true)});
 
 function resetBoard(){items=[];pops=[];sparks=[];shots=[];gifts=[];buns=[];animals=[];impacts=[];splats=[];wafs=[];angel=null;slowT=0}
-function setGhost(){ghost.max=10+(level-1)*5;ghost.hp=ghost.max;ghost.ko=false;ghost.koT=0;ghost.yOff=-280*S;ghost.splat=0;ghost.throwT=1.6;ghost.say=null;ghost.sayT=2.5;lvStats={hits:0,bonks:0,waffles:0};updateHp()}
+function setGhost(){lvTop=null;ghost.blanket=0;ghost.itch=0;ghost.quills=0;ghost.max=10+(level-1)*5;ghost.hp=ghost.max;ghost.ko=false;ghost.koT=0;ghost.yOff=-280*S;ghost.splat=0;ghost.throwT=1.6;ghost.say=null;ghost.sayT=2.5;lvStats={hits:0,bonks:0,waffles:0};updateHp()}
 function updateHp(){const el=$('hp');el.style.width=Math.max(0,ghost.hp/ghost.max*100)+'%';el.style.background=ghost.hp/ghost.max<.35?'#df3a4e':'#8ee26b';$('lvl').textContent='LV '+level}
 
 function start(m){
   audio();
   mode=m; rng=m==='daily'?mulberry(dayNum()*9973+7):Math.random;
   resetBoard(); t=0; score=0; shownScore=-1; level=1; lvlTime=0; angelT=2.5; bgKey=''; paused=false; runWaffles=0; runCounts={}; updateWaf();
-  Object.assign(bear,{x:W/2,tx:W/2,hits:0,hitT:0,inv:0,ko:false,koT:0,helmet:0,weapon:null,jello:null,swing:0,face:1,faceS:1});
+  Object.assign(bear,{x:W/2,tx:W/2,hits:0,hitT:0,inv:0,ko:false,koT:0,helmet:0,weapon:null,jello:null,swing:0,face:1,faceS:1,gs:1}); fx=null; runTop=null; lvTop=null;
   setGhost(); ghost.x=W/2;
   state='play'; playLevel(theme()); ['menu','over','pause','clear','boardPanel','settings'].forEach(k=>$(k).hidden=true); $('hud').hidden=false; renderMeter();
   pop("DON'T GET",W/2,H*.44,C.white,34,1.9); pop('BONKD!',W/2,H*.44+42*S,C.gold,68,1.9);
@@ -595,8 +681,8 @@ function ghostThrow(){
   const fast=Math.max(.42,1.4-level*.14-lvlTime*.008);
   ghost.throwT=fast*(.75+rng()*.5);
 }
-const HELP={pie:1,banana:1,jello:1,bun:1,zooka:1,mitt:1,magnet:1,paddle:1};
-function pickPower(){const cur=bear.jello?'jello':bear.weapon&&bear.weapon.type, armed=!!cur;if(bear.hits>=2&&rng()<.45)return 'kit';const pool=Object.keys(PW).filter(k=>k!==cur&&(armed||HELP[k])&&(k!=='kit'||bear.hits>0)&&(k!=='bucket'||!bear.helmet)&&(k!=='snail'||slowT<=0));const tot=pool.reduce((a,k)=>a+PW[k].w,0);let r=rng()*tot;for(const k of pool){r-=PW[k].w;if(r<=0)return k}return pool[0]}
+const HELP={pie:1,banana:1,jello:1,bun:1,zooka:1,mitt:1,magnet:1,paddle:1,ivy:1,porcu:1,beans:1};
+function pickPower(){const cur=bear.jello?'jello':bear.weapon&&bear.weapon.type, armed=!!cur;if(bear.hits>=2&&rng()<.45)return 'kit';const own=wallet.owned();const pool=Object.keys(PW).filter(k=>k!==cur&&(!SUPER[k]||own.has(k))&&(armed||HELP[k])&&(k!=='kit'||bear.hits>0)&&(k!=='bucket'||!bear.helmet)&&(k!=='snail'||slowT<=0));const tot=pool.reduce((a,k)=>a+PW[k].w,0);let r=rng()*tot;for(const k of pool){r-=PW[k].w;if(r<=0)return k}return pool[0]}
 function spawnAngel(){const side=rng()<.5?-1:1;angel={side,x:side<0?-80*S:W+80*S,y:H*.46,phase:'in',t:0,fs:-side};sfx.boosterIn()}
 function tossGift(){
   const type=pickPower(), g=760*S, T=1.05, ax=angel.x, ay=angel.y+10*S;
@@ -621,6 +707,9 @@ function activate(type,x,y){
   if(type==='snail')slowT=6;
   if(type==='bucket')bear.helmet=2;
   if(type==='kit'){bear.hits=0;renderMeter();pop('YAY HEALTH!',hp.x,hp.y-70*S,C.pink,30)}
+  if(type==='ivy')bear.weapon={type:'ivy',ammo:2};
+  if(type==='porcu')bear.weapon={type:'porcu',ammo:4};
+  if(type==='beans'){bear.weapon={type:'beans',t:9};pop('GULP!',hp.x,hp.y-60*S,C.white,34,.8);sfx.grow();setFx('rainbow',9)}
 }
 
 /* ---------- tap actions ---------- */
@@ -637,13 +726,16 @@ $('actBtn').addEventListener('pointerdown',e=>{e.preventDefault();e.stopPropagat
 $('actBtn').addEventListener('click',e=>{if(e.detail===0&&state==='play'&&!paused)act()});
 let actKey='';
 function updateAct(){
-  const w=bear.weapon, usable=!!w&&(w.type==='bun'||w.type==='zooka'||w.type==='paddle'||(w.type==='mitt'&&w.held.length>0));
+  const w=bear.weapon, usable=!!w&&(w.type==='bun'||w.type==='zooka'||w.type==='paddle'||w.type==='ivy'||w.type==='porcu'||w.type==='beans'||(w.type==='mitt'&&w.held.length>0));
   const show=usable&&(state==='play'||state==='levelup'||state==='clear');
   let lbl='SWOT',n='',col='#df3a4e';
   if(w){if(w.type==='bun'){lbl='LOB';n='×'+w.ammo;col=PW.bun.color}
     else if(w.type==='zooka'){lbl='FIRE';n='×'+w.ammo;col=PW.zooka.color}
     else if(w.type==='paddle'){lbl='SWOT';n=Math.ceil(w.t)+'s';col='#ff7a45'}
-    else if(w.type==='mitt'&&w.held.length){lbl='THROW';n='×'+w.held.length;col=PW.mitt.color}}
+    else if(w.type==='mitt'&&w.held.length){lbl='THROW';n='×'+w.held.length;col=PW.mitt.color}
+    else if(w.type==='ivy'){lbl='LAUNCH';n='×'+w.ammo;col=PW.ivy.color}
+    else if(w.type==='porcu'){lbl='POP';n='×'+w.ammo;col=PW.porcu.color}
+    else if(w.type==='beans'){lbl='SMASH';n=Math.ceil(w.t)+'s';col=PW.beans.color}}
   const key=show+lbl+n+col; if(key===actKey)return; actKey=key;
   const b=$('actBtn'); b.hidden=!show; $('actLbl').textContent=lbl; $('actN').textContent=n; $('actN').hidden=!n; b.style.background=col; b.setAttribute('aria-label',lbl+(n?' '+n:''));
 }
@@ -652,6 +744,12 @@ function tap(x,y){
   if(w&&w.type==='bun'){lobBun(x,y);if(--w.ammo<=0)bear.weapon=null;return}
   if(w&&w.type==='zooka'){fireAnimal(x,y);if(--w.ammo<=0)bear.weapon=null;return}
   if(w&&w.type==='mitt'&&w.held.length){throwHeld(w);return}
+  if(w&&w.type==='ivy'){const h=handPos();shots.push({kind:'ivy',x:h.x,y:h.y,vx:0,vy:-700*S,dmg:superDmg('effective')*.15,speed:650,rot:0,left:1,cool:0});bear.swing=.28;sfx.toss();pop('FWOOMP!',h.x,h.y-30*S,'#4fbf5a',30,.7);if(--w.ammo<=0)bear.weapon=null;return}
+  if(w&&w.type==='porcu'){const h=handPos();for(let i=0;i<9;i++){const a=-Math.PI/2+(i-4)*.22+(Math.random()-.5)*.1,v=900*S;shots.push({kind:'quill',x:h.x,y:h.y-10*S,vx:Math.cos(a)*v,vy:Math.sin(a)*v,dmg:superDmg('omghost')/36,speed:900,rot:a,left:1,cool:.12})}
+    shake=Math.max(shake,.45);setFx('invert',.12);pop('POP!',h.x,h.y-40*S,C.white,46,.6);sfx.pop();if(--w.ammo<=0)bear.weapon=null;return}
+  if(w&&w.type==='beans'){if(swotCool<=0){swotCool=.45;bear.swing=.3;
+    if(Math.abs(ghost.x-bear.x)<190*S&&ghost.yOff>-30*S&&!ghost.ko){hitGhost({kind:'smash',dmg:superDmg('unbearable')/4,x:ghost.x,y:ghost.y+ghost.yOff});shake=.8}
+    else{pop('MISS!',bear.x,H*.3,C.white,30,.5);sfx.whoosh()}}return}
   if(w&&w.type==='paddle'){if(swotCool<=0){swotCool=.3;bear.swing=.28;paddleT=.24;sfx.whoosh();paddleHit()}return}
 }
 function paddleHit(){
@@ -729,10 +827,13 @@ function hitGhost(s){
   ghost.hp-=s.dmg; lvStats.hits++; ghost.hitT=.35; ghost.squash=.3; score+=s.dmg*25;
   const gy=ghost.y+ghost.yOff;
   impact(s.x,s.y);
-  if(s.kind==='pie'){ghost.splat=3.5;pop('SPLAT!',ghost.x,gy-74*S,'#ff8fb1',46);sfx.splat()}
+  if(s.kind==='quill'){ghost.quills=Math.min(24,(ghost.quills||0)+1);sfx.ping()}
+  else if(s.kind==='ivy'){ghost.blanket=1.3;ghost.itch=8;ghost.itchRate=superDmg('effective')*.35/8;pop('BLANKETED!',ghost.x,gy-74*S,'#4fbf5a',40);setFx('ivy',2.4);sfx.splat()}
+  else if(s.kind==='smash'){pop('SMASH!',ghost.x,gy-74*S,C.red,56);sfx.clang();impact(ghost.x,gy)}
+  else if(s.kind==='pie'){ghost.splat=3.5;pop('SPLAT!',ghost.x,gy-74*S,'#ff8fb1',46);sfx.splat()}
   else if(s.kind==='banana'){pop('THWACK!',ghost.x,gy-74*S,C.gold,40);sfx.ghostHit()}
   else if(s.kind!=='bun'){pop('OOF!',ghost.x+rnd(-30,30)*S,gy-74*S,C.white,40);sfx.ghostHit()}
-  if(Math.random()<.5)ghost.say={txt:grawlix(),t:.9};
+  if(s.kind!=='quill'&&Math.random()<.5)ghost.say={txt:grawlix(),t:.9};
   updateHp();
   if(ghost.hp<=0)ghostDown();
 }
@@ -761,6 +862,7 @@ function showClear(){
   const dl=$('clrStats'); dl.textContent='';
   for(const [k,v] of rows){const dt=document.createElement('dt'),dd=document.createElement('dd');dt.textContent=k;dd.textContent=v;dl.append(dt,dd)}
   $('clrPre').textContent='Level '+level;
+  if(lvTop&&lvTop.v>=100){$('shareClear').href=xURL('Grumble just poofed into a '+tc(lvTop.name)+' for me in Bonkd! 🧇 Level '+level+' cleared. Don\'t get BONKD!');$('shareClear').hidden=false}else $('shareClear').hidden=true;
   $('clear').hidden=false;
   setTimeout(()=>{try{$('nextBtn').focus({preventScroll:true})}catch(e){}},50);
   if(typeof window.onLevelClear==='function')window.onLevelClear(level);
@@ -785,7 +887,7 @@ function update(dt){
     for(const m of menuWafs){m.y+=m.v*dt;m.rot+=m.vr*dt;m.x+=Math.sin(now*.8+m.p)*12*S*dt;if(m.y>GY-12*S){m.y=-30*S;m.x=rnd(.4,.98)*W;m.t='plain'}}}
   if(canMove()){if(keys.ArrowLeft||keys.a)bear.tx=bear.x-140*S;if(keys.ArrowRight||keys.d)bear.tx=bear.x+140*S}
   if(!bear.ko){
-    bear.tx=clamp(bear.tx,44*S,W-44*S);
+    bear.tx=clamp(bear.tx,44*S*bear.gs,W-44*S*bear.gs);
     const nx=bear.x+(bear.tx-bear.x)*Math.min(1,dt*12);
     bear.vx=(nx-bear.x)/Math.max(dt,1e-3); bear.x=nx;
   } else bear.vx*=.9;
@@ -794,7 +896,10 @@ function update(dt){
   bear.walk+=(Math.min(1,Math.abs(bear.vx)/260)*14+1.5)*dt;
   bear.hitT=Math.max(0,bear.hitT-dt); bear.inv=Math.max(0,bear.inv-dt); bear.swing=Math.max(0,bear.swing-dt); if(paddleT>0){paddleT-=dt;paddleHit()} bear.lumpPop=Math.max(0,bear.lumpPop-dt);
   if(bear.jello){bear.jello.t-=dt;bear.jello.q=Math.max(0,bear.jello.q-dt);if(bear.jello.t<=0||(bear.jello.b<=0&&bear.jello.q<=0)){bear.jello=null;pop('SPLOOSH',bear.x,GY-210*S,'#ff9a3c',22,.6)}}
-  if(bear.weapon&&(bear.weapon.type==='magnet'||bear.weapon.type==='paddle')){bear.weapon.t-=dt;if(bear.weapon.t<=0)bear.weapon=null}
+  bear.gs+=((bear.weapon&&bear.weapon.type==='beans'?3:1)-bear.gs)*Math.min(1,dt*5);
+  if(bear.gs>2&&Math.abs(bear.vx)>60){stompT-=dt;if(stompT<=0){stompT=.32;shake=Math.max(shake,.18);sfx.stomp()}}
+  if(bear.weapon&&bear.weapon.type==='beans'&&bear.weapon.t-dt<=0){pop('PFFFT!',bear.x,GY-120*S,C.white,30,.8);sfx.shrink()}
+  if(bear.weapon&&(bear.weapon.type==='magnet'||bear.weapon.type==='paddle'||bear.weapon.type==='beans')){bear.weapon.t-=dt;if(bear.weapon.t<=0)bear.weapon=null}
   if(quip){quip.t-=dt;if(quip.t<=0)quip=null}
   if(bear.ko){bear.koT+=dt;if(state==='ko'&&bear.koT>1.3)showOver()}
   shake=Math.max(0,shake-dt*1.6);
@@ -810,10 +915,14 @@ function update(dt){
   ghost.y=ghostBaseY()+Math.sin(ghost.t*2.2)*8*S;
   if(ghost.ko)ghost.koT+=dt;
   if(ghost.say){ghost.say.t-=dt;if(ghost.say.t<=0)ghost.say=null}
+  if(ghost.blanket>0){ghost.blanket-=dt;if(ghost.blanket<=0){pop('RIIIP!',ghost.x,ghost.y+ghost.yOff-70*S,C.white,34,.8);burst(ghost.x,ghost.y+ghost.yOff,'#4fbf5a',10);sfx.rip()}}
+  if(ghost.itch>0&&state==='play'&&!ghost.ko&&ghost.blanket<=0){ghost.itch-=dt;ghost.hp-=ghost.itchRate*dt;updateHp();ghost.scratchT=(ghost.scratchT||0)-dt;
+    if(ghost.scratchT<=0){ghost.scratchT=.9;pop(Math.random()<.5?'SCRATCH!':'ITCHY!',ghost.x+rnd(-50,50)*S,ghost.y+ghost.yOff-60*S,'#ff6a5e',22,.6)}
+    if(ghost.hp<=0)ghostDown()}
 
   if(state==='play'){
     t+=dt; lvlTime+=dt; score+=dt*10;
-    if(ghost.yOff>-30*S){ghost.throwT-=dt*(ghost.splat>0?.5:1)*(slowT>0?.6:1);if(ghost.throwT<=0)ghostThrow()}
+    if(ghost.yOff>-30*S){ghost.throwT-=dt*(ghost.splat>0?.5:1)*(slowT>0?.6:1)*(ghost.blanket>0?0:ghost.itch>0?.5:1);if(ghost.throwT<=0)ghostThrow()}
     if(level>=2){ghost.sayT-=dt;if(ghost.sayT<=0){ghost.say={txt:grawlix(),t:1.1};ghost.sayT=rnd(3.5,6)/(1+(level-2)*.2)}}
     const armed=!!bear.weapon||!!bear.jello, busy=!!angel||gifts.length>0||ghost.yOff<-30*S;
     if(!armed&&!busy)angelT=Math.min(angelT,1.6+rng()*1.4);
@@ -853,6 +962,7 @@ function update(dt){
     if((canMove()||w.home)&&!bear.ko&&near){w.gone=true;const T=WTK[w.t]||WT[0];runWaffles+=T.v;runCounts[T.k]=(runCounts[T.k]||0)+1;lvStats.waffles+=T.v;updateWaf();
       const big=T.v>=10;pop('+'+T.v+' '+T.name,clamp(w.x,140*S,W-140*S),w.y-34*S,big?'#ffd23f':'#f2b544',big?30:22,big?1.4:.8);
       if(QUIP[w.t])quip={txt:QUIP[w.t],t:2.2};
+      if(!runTop||T.v>runTop.v)runTop=T; if(!lvTop||T.v>lvTop.v)lvTop=T;
       if(big){sfx.win();burst(w.x,w.y,'#ffd23f',T.v>=333?28:14);if(T.v>=333){shake=.5;pop(T.v>=2000?'JACKPOT!':'WHOA!',W/2,H*.4,C.red,T.v>=2000?72:52,1.8)}}else{sfx.waffle();burst(w.x,w.y,'#f2b544',5)}}
 
   }
@@ -861,7 +971,7 @@ function update(dt){
   // bear projectiles that home on Grumble
   const gx=ghost.x, gy=ghost.y+ghost.yOff;
   for(const s of shots){
-    s.rot+=(s.kind==='banana'?16:s.kind==='junk'?10:4)*dt;
+    if(s.kind==='quill')s.rot=Math.atan2(s.vy,s.vx);else s.rot+=(s.kind==='banana'?16:s.kind==='junk'?10:s.kind==='ivy'?6:4)*dt;
     if(s.cool>0){s.cool-=dt;s.vy+=900*S*dt}
     else{const dx=gx-s.x,dy=gy-s.y,d=Math.hypot(dx,dy)||1,sp=s.speed*S;s.vx+=(dx/d*sp-s.vx)*Math.min(1,dt*6);s.vy+=(dy/d*sp-s.vy)*Math.min(1,dt*6)}
     s.x+=s.vx*dt; s.y+=s.vy*dt;
@@ -918,6 +1028,7 @@ function update(dt){
     if(bear.jello&&bear.jello.b>0&&it.vy>0&&Math.abs(it.x-bear.x)<66*S&&it.y>jy-r&&it.y<jy+34*S){
       it.stuck=.16; it.off=clamp(it.x-bear.x,-40*S,40*S); it.inVx=it.vx; it.vy=0; it.vx=0; bear.jello.q=.35; bear.jello.b--; continue;
     }
+    if(bear.gs>1.6&&Math.abs(it.x-bear.x)<70*S*bear.gs&&it.y>GY-190*S*bear.gs){it.loose=true;it.vy=-650*S;it.vx=(it.x<bear.x?-1:1)*420*S;it.g=1500*S;pop('BOINK!',it.x,it.y-20*S,C.gold,30,.6);sfx.clonk();continue}
     const touching=Math.hypot(it.x-hp.x,it.y-hp.y)<r+36*S||Math.hypot(it.x-bear.x,it.y-by)<r+40*S;
     if(touching&&W8&&W8.type==='mitt'&&W8.catches>0){it.dead=true;W8.catches--;W8.held.push(it.type);pop('YOINK!',it.x,it.y-30*S,C.gold,36,.7);sfx.clonk();continue}
     if((Math.hypot(it.x-hp.x,it.y-hp.y)<r+36*S||Math.hypot(it.x-bear.x,it.y-by)<r+40*S)&&bear.inv<=0)hitBear(it);
@@ -958,51 +1069,12 @@ function showOver(){
   $('overWaf').textContent='Waffles this run: '+runWaffles; $('overWaf').hidden=false;
   $('saveNote').hidden=true;
   $('hud').hidden=true; $('over').hidden=false; $('chips').innerHTML=''; chipKey='';
+  store('bonkd-bestlvl',Math.max(level,store('bonkd-bestlvl')));
+  $('shareRun').href=xURL(runBrag());
   saveRun();
 }
 
-/* ---------- Waffle Board + profiles (Supabase, free tier) ---------- */
-const SUPABASE_URL='https://jmiesqhrpcmrthrquqpq.supabase.co';
-const SUPABASE_KEY='sb_publishable_e7oqQbX2PJ5qV5ge2vUSbg_H9t0A9-d';
-let SB=null,myId=null,prof={},boardRows=[],boardErr=false,dbTried=false,pfMode='create';
-let askedSession=false;
-const localWaf=()=>store('bonkd-waffles');
-async function newSession(){const r=await SB.auth.signInAnonymously();if(r.error)throw r.error;myId=r.data.session.user.id}
-async function loadMe(){try{const {data}=await SB.rpc('my_profile');prof=data||{}}catch(e){}renderProfile()}
-async function loadTop(){
-  if(!SB)return;
-  const {data,error}=await SB.from('waffle_board').select('id,nick,pfp,waffles').order('waffles',{ascending:false}).limit(10);
-  boardErr=!!error; if(data)boardRows=data;
-}
-(async()=>{
-  try{
-    if(window.supabase){
-      SB=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
-      const {data:{session}}=await SB.auth.getSession();
-      if(session)myId=session.user.id; else await newSession();
-      await loadMe(); await loadTop();
-    }
-  }catch(e){SB=null;console.warn('Waffle Board offline:',e)}
-  dbTried=true; renderBoard(); renderProfile();
-})();
-async function saveRun(){
-  store('bonkd-waffles',localWaf()+runWaffles);
-  if(!SB||!myId)return;
-  if(runWaffles>0||!prof.best||level>prof.best){
-    try{
-      const {data,error}=await SB.rpc('submit_run',{p_counts:runCounts,p_level:level,p_seconds:Math.round(t)});
-      if(error)throw error;
-      prof.waffles=data.waffles;prof.best=data.best;
-      if(runWaffles){$('saveNote').textContent=(prof.nick?prof.nick+"'s":'Your')+' Waffle Board total: '+(+data.waffles).toLocaleString()+'.';$('saveNote').hidden=false}
-      loadTop();
-    }catch(e){
-      const m=String(e&&e.message||'');
-      $('saveNote').textContent=/slow down/.test(m)?'Easy, speedy! Wait a few seconds between runs for the Waffle Board to count them.':(/too|unknown|range/.test(m)?"That run didn't pass the waffle check, so it wasn't added to the board.":"Couldn't reach the Waffle Board. Your waffles are still counted on this device.");
-      $('saveNote').hidden=false;
-    }
-  }
-}
-/* ---------- profile pictures: a character on a colored circle ---------- */
+/* ---------- profile pictures (shared by the board, profile page and player card) ---------- */
 const AVC={red:'#df3a4e',gold:'#ffd23f',sky:'#7fd3ff',mint:'#8ee26b',pink:'#f48aa8',purple:'#b48cff'};
 const WHO=['todd','booster','grumble','waffle'];
 const avCache={};
@@ -1023,6 +1095,131 @@ function avatarURL(key){
   return avCache[key]=c.toDataURL();
 }
 function setImg(el,key){const u=avatarURL(key);if(u)el.src=u;else setTimeout(()=>setImg(el,key),300)}
+
+/* ---------- Waffle Store ---------- */
+const ICONS={};
+function iconURL(draw,k){const c=document.createElement('canvas');c.width=c.height=128;const real=ctx;ctx=c.getContext('2d');ctx.translate(64,72);ctx.scale(k,k);draw();ctx=real;return c.toDataURL()}
+function setMystery(img,col,legend){
+  const spr=SPR.bear; if(!spr){setTimeout(()=>setMystery(img,col,legend),300);return}
+  const c=document.createElement('canvas');c.width=c.height=120;const x=c.getContext('2d');
+  x.fillStyle=AVC[col];x.beginPath();x.arc(60,64,52,0,TAU);x.fill();
+  x.save();x.beginPath();x.arc(60,64,50,0,TAU);x.clip();
+  const t=document.createElement('canvas');t.width=spr.img.naturalWidth;t.height=spr.img.naturalHeight;const tx=t.getContext('2d');tx.drawImage(spr.img,0,0);tx.globalCompositeOperation='source-in';tx.fillStyle='#161616';tx.fillRect(0,0,t.width,t.height);
+  const w=118,h=w/spr.r;x.drawImage(t,60-w*.53,18,w,h);x.restore();
+  x.lineWidth=4;x.strokeStyle='#161616';x.beginPath();x.arc(60,64,51,0,TAU);x.stroke();
+  x.font="46px 'Luckiest Guy', Impact, sans-serif";x.textAlign='center';x.textBaseline='middle';x.lineWidth=7;x.strokeStyle='#161616';x.strokeText('?',60,70);x.fillStyle=legend?'#ffd23f':'#ffffff';x.fillText('?',60,70);
+  if(legend){x.beginPath();x.moveTo(36,22);x.lineTo(42,4);x.lineTo(52,16);x.lineTo(60,0);x.lineTo(68,16);x.lineTo(78,4);x.lineTo(84,22);x.closePath();x.fillStyle='#ffd23f';x.fill();x.lineWidth=3;x.stroke()}
+  img.src=c.toDataURL();
+}
+let stConfirm=null;
+function renderStore(){
+  $('stWallet').textContent=wallet.bal().toLocaleString()+' waffles to spend';
+  const own=wallet.owned(), box=$('stWeapons'); box.textContent='';
+  for(const k of['ivy','porcu','beans']){const it=SUPER[k];
+    const row=document.createElement('div');row.className='st-item';
+    const img=document.createElement('img');img.alt='';img.src=ICONS[k]||(ICONS[k]=iconURL(k==='ivy'?()=>{ctx.rotate(-.5);ctx.translate(0,14);drawIvyGun()}:k==='porcu'?drawPorcu:drawBeans,k==='porcu'?1.9:2));
+    const mid=document.createElement('div');const nm=document.createElement('div');nm.className='nm';nm.textContent=PW[k].name;
+    const tier=document.createElement('span');tier.className='tier t-'+it.tier;tier.textContent=it.label;const p=document.createElement('p');p.textContent=it.desc;mid.append(nm,tier,p);
+    const b=document.createElement('button');b.type='button';b.className='btn small buy';
+    if(own.has(k)){b.textContent='Owned ✓';b.classList.add('owned');b.disabled=true}
+    else{b.textContent=stConfirm===k?'Buy for '+it.price.toLocaleString()+'?':it.price.toLocaleString()+' 🧇';if(stConfirm===k)b.classList.add('red');b.onclick=()=>buyItem(k)}
+    row.append(img,mid,b);box.append(row)}
+  if(!$('stBuddies').childElementCount){
+    for(const [c,price] of[['sky','1,000'],['pink','2,500'],['mint','5,000']]){const d=document.createElement('div');d.className='st-card';const i=document.createElement('img');i.alt='Mystery Buddy';setMystery(i,c,false);const t=document.createElement('span');t.textContent=price+' 🧇';d.append(i,t);$('stBuddies').append(d)}
+    for(const c of['gold','purple','red']){const d=document.createElement('div');d.className='st-card';const i=document.createElement('img');i.alt='Mystery Legend';setMystery(i,c,true);const t=document.createElement('span');t.textContent='Tournament prize';d.append(i,t);$('stLegends').append(d)}}
+}
+async function buyItem(k){
+  if(stConfirm!==k){stConfirm=k;renderStore();return}
+  stConfirm=null; const r=await wallet.buy(k); const m=$('stMsg');
+  if(r&&r.ok){m.textContent='Got it! Booster can now toss you the '+PW[k].name+'.';sfx.power()}
+  else m.textContent=r&&r.reason==='not_enough'?'Not enough waffles yet. Keep bonking Grumble!':"Couldn't reach the store. Try again.";
+  m.hidden=false; renderStore();
+}
+function openStore(){audio();stConfirm=null;$('stMsg').hidden=true;$('storePage').hidden=false;renderStore()}
+$('storeBtn').onclick=openStore; $('storeBtn2').onclick=openStore;
+$('stClose').onclick=()=>{$('storePage').hidden=true};
+
+/* ---------- sharing on X ---------- */
+const GAME_URL='https://geaux-eth.github.io/bonkd/';
+const xURL=t=>'https://x.com/intent/post?text='+encodeURIComponent(t)+'&url='+encodeURIComponent(GAME_URL);
+const tc=n=>n.toLowerCase().replace(/\b\w/g,c=>c.toUpperCase()).replace(/\b(Of|And)\b/g,w=>w.toLowerCase());
+function runBrag(){
+  if(runTop&&runTop.v>=25)return 'I just grabbed a '+tc(runTop.name)+' in Bonkd! 🧇 Made it to Level '+level+' with '+runWaffles.toLocaleString()+' waffles. Don\'t get BONKD!';
+  return 'I made it to Level '+level+' in Bonkd and grabbed '+runWaffles.toLocaleString()+' waffles! 🧇 Think you can beat me? Don\'t get BONKD!';
+}
+let cardInfo=()=>({name:'',pfp:'todd:gold',waffles:store('bonkd-waffles'),best:Math.max(level,store('bonkd-bestlvl'))});
+function loadImg(src){return new Promise(r=>{const i=new Image();i.onload=()=>r(i);i.onerror=()=>r(null);i.src=src})}
+async function makeCard(){
+  const info=cardInfo(), c=document.createElement('canvas'); c.width=1200;c.height=630; const x=c.getContext('2d');
+  const g=x.createLinearGradient(0,0,0,630);g.addColorStop(0,'#8fdcf8');g.addColorStop(1,'#d4f4ff');x.fillStyle=g;x.fillRect(0,0,1200,630);
+  x.strokeStyle='#161616';x.lineWidth=5;
+  x.beginPath();x.moveTo(0,630);x.lineTo(0,520);for(let i=0;i<=8;i++)x.quadraticCurveTo(i*150+75,480+(i%2)*20,i*150+150,520);x.lineTo(1200,630);x.closePath();x.fillStyle='#8fd16a';x.fill();x.stroke();
+  x.beginPath();x.rect(-10,560,1220,80);x.fillStyle='#d9995a';x.fill();x.stroke();
+  const av=await loadImg(avatarURL(info.pfp)); if(av){x.drawImage(av,90,135,330,330)}
+  x.textAlign='left';x.textBaseline='alphabetic';x.lineJoin='round';
+  const big=(t,px,y,col,lw,fs)=>{x.font=fs+"px 'Luckiest Guy', Impact, sans-serif";x.lineWidth=lw;x.strokeStyle='#161616';x.strokeText(t,px,y);x.fillStyle=col;x.fillText(t,px,y)};
+  big("Don't get",480,150,'#ffffff',10,48); big('BONKD!',470,260,'#ffd23f',16,120);
+  big(info.name||'A Bonkd player',480,345,'#ffffff',10,56);
+  big((+info.waffles||0).toLocaleString()+' waffles',480,420,'#ffd23f',10,52);
+  big('Best: Level '+(info.best||1),480,485,'#ffffff',9,40);
+  x.font="800 26px 'Baloo 2', system-ui, sans-serif";x.fillStyle='#161616';x.fillText(GAME_URL.replace('https://',''),480,610);
+  return new Promise(r=>c.toBlob(r,'image/png'));
+}
+async function shareCard(){
+  const info=cardInfo(), text='My Bonkd card: '+(+info.waffles||0).toLocaleString()+' waffles and counting! 🧇 Don\'t get BONKD!';
+  const blob=await makeCard(); if(!blob)return;
+  try{const file=new File([blob],'bonkd-card.png',{type:'image/png'});
+    if(navigator.canShare&&navigator.canShare({files:[file]})){await navigator.share({files:[file],text:text+' '+GAME_URL});return}}
+  catch(e){if(e&&e.name==='AbortError')return}
+  $('cardImg').src=URL.createObjectURL(blob); $('cardX').href=xURL(text); $('cardView').hidden=false;
+}
+$('shareCardBtn').onclick=()=>shareCard();
+$('cardClose').onclick=()=>{$('cardView').hidden=true};
+
+/* ---------- Waffle Board + profiles (Supabase, free tier) ---------- */
+const SUPABASE_URL='https://jmiesqhrpcmrthrquqpq.supabase.co';
+const SUPABASE_KEY='sb_publishable_e7oqQbX2PJ5qV5ge2vUSbg_H9t0A9-d';
+let tour=null,boardMode='all',SB=null,myId=null,prof={},boardRows=[],boardErr=false,dbTried=false,pfMode='create';
+let askedSession=false;
+const localWaf=()=>store('bonkd-waffles');
+async function newSession(){const r=await SB.auth.signInAnonymously();if(r.error)throw r.error;myId=r.data.session.user.id}
+async function loadMe(){try{const {data}=await SB.rpc('my_profile');prof=data||{}}catch(e){}renderProfile()}
+async function loadTop(){
+  if(!SB)return;
+  const {data,error}=await SB.from('waffle_board').select('id,nick,pfp,waffles').order('waffles',{ascending:false}).limit(10);
+  boardErr=!!error; if(data)boardRows=data;
+}
+(async()=>{
+  try{
+    if(window.supabase){
+      SB=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+      const {data:{session}}=await SB.auth.getSession();
+      if(session)myId=session.user.id; else await newSession();
+      await loadMe(); await loadTop();
+      wallet={bal(){return Math.max(0,+prof.wallet||0)},owned(){return new Set(prof.owned||[])},
+        async buy(k){try{const {data,error}=await SB.rpc('buy_item',{p_item:k});if(error)throw error;if(data.ok){prof.wallet=data.wallet;prof.owned=data.owned}return data}catch(e){return{ok:false,reason:'offline'}}}};
+      cardInfo=()=>({name:prof.nick||'',pfp:prof.pfp||'todd:gold',waffles:+prof.waffles||0,best:Math.max(+prof.best||1,level)});
+    }
+  }catch(e){SB=null;console.warn('Waffle Board offline:',e)}
+  dbTried=true; renderBoard(); renderProfile();
+})();
+async function saveRun(){
+  store('bonkd-waffles',localWaf()+runWaffles);
+  if(!SB||!myId)return;
+  if(runWaffles>0||!prof.best||level>prof.best){
+    try{
+      const {data,error}=await SB.rpc('submit_run',{p_counts:runCounts,p_level:level,p_seconds:Math.round(t)});
+      if(error)throw error;
+      prof.waffles=data.waffles;prof.best=data.best;prof.wallet=(+data.waffles||0)+(+data.bought||0)-(+data.spent||0);prof.owned=data.owned||prof.owned;
+      if(runWaffles){$('saveNote').textContent=(prof.nick?prof.nick+"'s":'Your')+' Waffle Board total: '+(+data.waffles).toLocaleString()+'.';$('saveNote').hidden=false}
+      loadTop();
+    }catch(e){
+      const m=String(e&&e.message||'');
+      $('saveNote').textContent=/slow down/.test(m)?'Easy, speedy! Wait a few seconds between runs for the Waffle Board to count them.':(/too|unknown|range/.test(m)?"That run didn't pass the waffle check, so it wasn't added to the board.":"Couldn't reach the Waffle Board. Your waffles are still counted on this device.");
+      $('saveNote').hidden=false;
+    }
+  }
+}
 function renderProfile(){
   const has=!!!!prof.nick, key=prof.pfp||'waffle:gold';
   $('pfShow').textContent=has?prof.nick:(SB?'No profile yet':'Offline'); $('pfEdit').hidden=!SB;
@@ -1044,14 +1241,21 @@ async function pickPfp(w,c){
   prof.pfp=key; renderProfile();
   try{const {data,error}=await SB.rpc('set_pfp',{p_pfp:key});if(error||!data.ok)throw 0;loadTop().then(renderBoard)}catch(e){}
 }
+async function loadTour(){if(!SB)return;try{const {data}=await SB.rpc('tournament_board');tour=data&&data.id?data:null}catch(e){tour=null}}
+function tourInfo(){if(!tour)return'';const end=new Date(tour.ends_at),ms=end-Date.now();
+  if(tour.live){const h=Math.floor(ms/36e5),m=Math.floor(ms%36e5/6e4);return tour.title+' · ends in '+h+'h '+m+'m'+(tour.prize?' · Prize: '+tour.prize:'')}
+  const w=tour.rows&&tour.rows[0];return tour.title+' is over'+(w?' · Winner: '+(w.nick||'Mystery Waffler'):'')}
 function renderBoard(){
   if($('boardPanel').hidden)return;
   const list=$('boardList'), note=$('boardNote');
   list.textContent='';
+  $('tTabs').hidden=!tour; $('tInfo').hidden=!(tour&&boardMode==='tour'); $('tInfo').textContent=tourInfo();
+  $('tAll').classList.toggle('on',boardMode==='all'); $('tLive').classList.toggle('on',boardMode==='tour');
+  const rows=boardMode==='tour'&&tour?(tour.rows||[]):boardRows;
   if(!SB){note.textContent=dbTried?"The Waffle Board isn't connected right now. Waffles you earn still count on this device: "+localWaf()+' so far.':'Loading the Waffle Board…';return}
   note.textContent=boardErr?"Couldn't load the board right now. Try again in a bit.":'Beat Grumble and he poofs into waffles. Rare waffles are worth more.';
-  if(!boardRows.length){const li=document.createElement('li');li.textContent='No waffles yet. Be the first!';list.append(li);return}
-  boardRows.forEach((r,i)=>{
+  if(!rows.length){const li=document.createElement('li');li.textContent='No waffles yet. Be the first!';list.append(li);return}
+  rows.forEach((r,i)=>{
     const li=document.createElement('li'); if(r.id===myId)li.className='me';
     const rk=document.createElement('span');rk.className='rk';rk.textContent=i+1;
     const av=document.createElement('img');av.className='av';av.alt='';setImg(av,r.pfp);
@@ -1060,7 +1264,9 @@ function renderBoard(){
     li.append(rk,av,nm,wf); list.append(li);
   });
 }
-function openBoard(){$('boardPanel').hidden=false;renderProfile();renderBoard();loadTop().then(renderBoard)}
+function openBoard(){$('boardPanel').hidden=false;renderProfile();renderBoard();Promise.all([loadTop(),loadTour()]).then(()=>{if(tour&&tour.live&&boardMode==='all'&&!openBoard.seen){boardMode='tour';openBoard.seen=1}renderBoard()})}
+$('tAll').onclick=()=>{boardMode='all';renderBoard()};$('tLive').onclick=()=>{boardMode='tour';renderBoard()};
+$('ppShare').onclick=()=>shareCard();
 $('boardBtn').onclick=openBoard; $('boardBtn2').onclick=openBoard;
 $('boardClose').onclick=()=>{$('boardPanel').hidden=true};
 function openPage(){if(!SB)return;$('ppMove').hidden=true;$('profPage').hidden=false;renderProfile();loadMe()}
@@ -1229,7 +1435,7 @@ function hose(x0,y0,x1,y1,bend){ctx.beginPath();ctx.moveTo(x0,y0);ctx.quadraticC
 
 function drawBear(){
   const b=bear, sp=SPR.bear;
-  ctx.save();ctx.translate(b.x,GY+4*S);ctx.scale(S,S);ctx.scale(b.faceS,1);
+  ctx.save();ctx.translate(b.x,GY+4*S);ctx.scale(S*b.gs,S*b.gs);ctx.scale(b.faceS,1);
   if(b.ko){const k=Math.min(1,b.koT/.45),e=1-Math.pow(1-k,3);ctx.translate(0,-e*4);ctx.rotate(-e*1.42+Math.sin(b.koT*18)*.04*(1-k))}
   if(state==='play'&&b.inv>0&&b.hitT===0&&Math.floor(b.inv*12)%2)ctx.globalAlpha=.55;
   const mv=Math.min(1,Math.abs(b.vx)/250), w=b.walk;
@@ -1296,6 +1502,8 @@ function drawHeld(w,gx,gy){
   ctx.save();ctx.translate(gx,gy);
   if(w.type==='bun'&&!swinging){ctx.translate(0,-14);drawBun(.8)}
   else if(w.type==='zooka'){let a=bear.face>0?bear.aim:Math.PI-bear.aim;while(a>Math.PI)a-=TAU;while(a<=-Math.PI)a+=TAU;ctx.rotate(clamp(a,-2.6,-.5)+Math.PI/2);drawZooka()}
+  else if(w.type==='ivy'){ctx.rotate(-.35);drawIvyGun()}
+  else if(w.type==='porcu'){ctx.translate(0,-14);drawPorcu()}
   else if(w.type==='paddle'){ctx.rotate(Math.atan2(gy+74,gx-50)+Math.PI/2+(swinging?0:.3));
     cel(()=>rr(-4.5,-18,9,24,3),'#d9a35e','#b47d3a',1,0,1.8);
     cel(()=>ctx.ellipse(0,-38,19,22,0,0,TAU),'#e8463f','#b8302a',3,2,2);
@@ -1312,6 +1520,12 @@ function drawHeld(w,gx,gy){
     ctx.strokeStyle='#ffe066';ctx.lineWidth=2;ctx.beginPath();for(const s of[-1,1]){const p=(now*6)%1;ctx.moveTo(s*12,18+p*6);ctx.lineTo(s*16,24+p*6);ctx.lineTo(s*10,28+p*6)}ctx.stroke()}
   ctx.restore();
 }
+function leaf(x,y,k){ctx.save();ctx.translate(x,y);ctx.scale(k,k);cel(()=>{ctx.moveTo(0,8);ctx.quadraticCurveTo(-10,0,0,-10);ctx.quadraticCurveTo(10,0,0,8)},'#6fcf5a','#4fa83f',1,1,1.6);ctx.beginPath();ctx.moveTo(0,7);ctx.lineTo(0,-7);stroke(1);ctx.restore()}
+function drawIvyGun(){cel(()=>rr(-8,-40,16,46,5),'#4fbf5a','#3f9a3f',3,0);cel(()=>ctx.ellipse(0,-40,11,5,0,0,TAU),'#2f7a34','#2f7a34',0,0,1.8);ctx.beginPath();ctx.moveTo(-8,-26);ctx.lineTo(8,-26);ctx.moveTo(-8,-12);ctx.lineTo(8,-12);stroke(1.4);leaf(10,-30,.7);leaf(-11,-16,.6)}
+function drawPorcu(){ctx.lineCap='round';for(let i=0;i<11;i++){const a=Math.PI+(i/10)*Math.PI;ctx.beginPath();ctx.moveTo(Math.cos(a)*14,Math.sin(a)*12-6);ctx.lineTo(Math.cos(a)*26,Math.sin(a)*22-6);ctx.strokeStyle=INK;ctx.lineWidth=3.6;ctx.stroke();ctx.strokeStyle='#f3e2c4';ctx.lineWidth=1.6;ctx.stroke()}
+  cel(()=>ctx.ellipse(0,-4,19,14,0,0,TAU),'#a86b3c','#84512a',3,2);cel(()=>ctx.ellipse(15,0,9,7,0,0,TAU),'#e9c39a','#d4a57a',1,1,1.8);ctx.fillStyle=INK;ctx.beginPath();ctx.arc(22,-1,2.2,0,TAU);ctx.arc(13,-4,1.8,0,TAU);ctx.fill()}
+function drawBeans(){cel(()=>rr(-14,-20,28,36,4),'#d64b3e','#a83a30',3,0);cel(()=>ctx.ellipse(0,-20,14,4,0,0,TAU),'#d4dae2','#aab2be',0,1,1.8);cel(()=>rr(-14,-8,28,14,2),'#ffd23f','#e8a915',2,0,1.6);ctx.fillStyle='#8a4a1e';for(const [bx,by] of[[-6,-24],[2,-26],[8,-23]]){ctx.beginPath();ctx.ellipse(bx,by,3.6,2.4,.4,0,TAU);ctx.fill()}
+  ctx.fillStyle=INK;ctx.font="9px 'Luckiest Guy', Impact, sans-serif";ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText('MEGA',0,-1)}
 function drawJello(x,y,q){
   ctx.save();ctx.translate(x,y);const k=q>0?Math.sin(q/.35*Math.PI*2)*.12:0;ctx.scale(1+k,1-k);
   cel(()=>{ctx.moveTo(-62,4);ctx.lineTo(62,4);ctx.quadraticCurveTo(64,20,50,21);ctx.lineTo(-50,21);ctx.quadraticCurveTo(-64,20,-62,4);ctx.closePath()},'#fff4e0','#ead7b6',-3,2);
@@ -1361,6 +1575,13 @@ function drawGhost(){
   ctx.scale(1+q,1-q+Math.sin(now*2.4)*.015);
   const hh=122, ww=hh*sp.r;
   ctx.drawImage(sp.img,-ww*.6,-hh*.5,ww,hh);
+  if(g.quills){ctx.lineCap='round';for(let i=0;i<g.quills;i++){const a=i*2.4+.3,r1=34+(i%3)*6,x0=Math.cos(a)*r1*.9,y0=Math.sin(a)*r1*.7;ctx.beginPath();ctx.moveTo(x0,y0);ctx.lineTo(x0+Math.cos(a)*14,y0+Math.sin(a)*14);ctx.strokeStyle=INK;ctx.lineWidth=3.4;ctx.stroke();ctx.strokeStyle='#f3e2c4';ctx.lineWidth=1.6;ctx.stroke()}}
+  if(g.itch>0&&g.blanket<=0){ctx.fillStyle='#ff6a5e';for(let i=0;i<7;i++){const a=i*1.9+1,r1=22+(i%3)*9;ctx.beginPath();ctx.arc(Math.cos(a)*r1,Math.sin(a)*r1*.8,2.6,0,TAU);ctx.fill()}
+    ctx.beginPath();for(const sx of[-1,1]){const o=Math.sin(now*30)*3;ctx.moveTo(sx*58,-8+o);ctx.lineTo(sx*66,-2-o);ctx.lineTo(sx*58,4+o);ctx.lineTo(sx*66,10-o)}stroke(2)}
+  if(g.blanket>0){const k=Math.min(1,(1.3-g.blanket)*6);ctx.save();ctx.scale(k,k);ctx.rotate(Math.sin(now*24)*.06);
+    const bl=()=>{ctx.moveTo(-70,-60);ctx.quadraticCurveTo(0,-90,70,-60);ctx.lineTo(74,40);for(let i=0;i<7;i++){ctx.lineTo(74-i*21-10,52+(i%2)*10)}ctx.lineTo(-74,40);ctx.closePath()};
+    cel(bl,'#5fbf5a','#3f9a3f',4,3);ctx.save();ctx.beginPath();bl();ctx.clip();ctx.strokeStyle='#2f7a34';ctx.lineWidth=3;ctx.beginPath();for(let x=-80;x<90;x+=18){ctx.moveTo(x,-90);ctx.lineTo(x,60)}for(let y=-80;y<60;y+=18){ctx.moveTo(-80,y);ctx.lineTo(80,y)}ctx.globalAlpha=.4;ctx.stroke();ctx.restore();
+    for(const [lx,ly] of[[-30,-30],[20,-10],[-10,20],[40,24]])leaf(lx,ly,1);ctx.restore()}
   if(g.squash>0&&g.hitT===0){ctx.beginPath();for(const s of[-1,1])for(let i=0;i<3;i++){const a=-.5+i*.5;ctx.moveTo(s*(70+Math.cos(a)*4),Math.sin(a)*30);ctx.lineTo(s*(84+Math.cos(a)*8),Math.sin(a)*38)}stroke(2.2)}
   if(g.splat>0){
     ctx.save();ctx.globalAlpha=Math.min(1,g.splat);ctx.scale(.8,.8);
@@ -1474,7 +1695,10 @@ const SOCK={
   banana:{c:'#ffd23f',p:'spots',pc:'#8a5a2a',cuff:'#6b4a2a'},
   bucket:{c:'#b8c0cc',p:'argyle',pc:'#8e97a6',cuff:'#4f7df5'},
   snail:{c:'#b48cff',p:'swirl',pc:'#ffffff',cuff:'#e6d8ff'},
-  kit:{c:'#ffffff',p:'cross',pc:'#e8463f',cuff:'#e8463f'}
+  kit:{c:'#ffffff',p:'cross',pc:'#e8463f',cuff:'#e8463f'},
+  ivy:{c:'#5fbf5a',p:'plaid',pc:'#2f7a34',cuff:'#ffd23f'},
+  porcu:{c:'#a86b3c',p:'stitch',pc:'#f3e2c4',cuff:'#ffd23f'},
+  beans:{c:'#d64b3e',p:'spots',pc:'#f2c27a',cuff:'#ffd23f'}
 };
 function sockPath(){ctx.moveTo(-9,-18);ctx.lineTo(-10,8);ctx.quadraticCurveTo(-11,21,2,21);ctx.lineTo(14,21);ctx.quadraticCurveTo(24,21,24,14);ctx.quadraticCurveTo(24,7,15,6);ctx.lineTo(10,5);ctx.lineTo(9,-18);ctx.closePath()}
 function sockPattern(p,pc){
@@ -1503,6 +1727,9 @@ function sockPeek(type){
     case 'banana':ctx.rotate(-.5);cel(()=>{ctx.moveTo(-3,4);ctx.quadraticCurveTo(-4,-8,3,-12);ctx.quadraticCurveTo(2,-4,4,4);ctx.closePath()},'#ffd23f','#e8a915',1,1,1.8);break;
     case 'bucket':ctx.beginPath();ctx.arc(0,2,9,Math.PI,0);stroke(1.8);break;
     case 'snail':cel(()=>ctx.arc(0,-2,8,0,TAU),'#ffb02e','#e08a10',1,1,1.8);ctx.beginPath();for(let q=0;q<9;q+=.4){const r=q*.75;ctx.lineTo(Math.cos(q)*r,-2+Math.sin(q)*r)}ctx.strokeStyle=INK;ctx.lineWidth=1.2;ctx.stroke();break;
+    case 'ivy':leaf(0,-4,1);break;
+    case 'porcu':ctx.scale(.45,.45);ctx.translate(0,8);drawPorcu();break;
+    case 'beans':ctx.fillStyle='#8a4a1e';for(const [bx,by] of[[-4,0],[3,-3],[1,3]]){ctx.beginPath();ctx.ellipse(bx,by,4,2.8,.4,0,TAU);ctx.fill()}break;
     case 'kit':ctx.rotate(.4);cel(()=>rr(-4,-10,8,16,4),'#f3c99b','#d9aa74',1,0,1.6);break;
   }
   ctx.restore();
@@ -1618,6 +1845,8 @@ function drawShot(s){
   ctx.save();ctx.translate(s.x,s.y);ctx.scale(S,S);ctx.rotate(s.rot);
   if(s.kind==='junk')drawJunk(s.type);
   else if(s.kind==='pie'){cel(()=>ctx.ellipse(0,4,22,9,0,0,TAU),'#e7b46a','#c9924a',2,2);cel(()=>ctx.ellipse(0,-2,19,8,0,0,TAU),'#fff3df','#ead7b6',2,2,1.8);cel(()=>ctx.ellipse(0,-4,9,4,0,0,TAU),'#ff8fb1','#e86d92',1,1,1.6)}
+  else if(s.kind==='quill'){ctx.beginPath();ctx.moveTo(-12,0);ctx.lineTo(12,0);ctx.lineCap='round';ctx.strokeStyle=INK;ctx.lineWidth=4.5;ctx.stroke();ctx.strokeStyle='#f3e2c4';ctx.lineWidth=2.2;ctx.stroke();ctx.fillStyle=INK;ctx.beginPath();ctx.moveTo(12,-2.6);ctx.lineTo(18,0);ctx.lineTo(12,2.6);ctx.fill()}
+  else if(s.kind==='ivy'){cel(()=>rr(-20,-9,40,18,9),'#5fbf5a','#3f9a3f',2,2);ctx.beginPath();ctx.moveTo(-8,-9);ctx.lineTo(-8,9);ctx.moveTo(6,-9);ctx.lineTo(6,9);stroke(1.4);leaf(14,-12,.6)}
   else if(s.kind==='banana'){cel(()=>{ctx.moveTo(-20,-6);ctx.quadraticCurveTo(0,22,22,-6);ctx.quadraticCurveTo(0,8,-20,-6);ctx.closePath()},'#ffd23f','#e8a915',2,3);ctx.fillStyle='#6b4a2a';ctx.fillRect(18,-10,5,5)}
   ctx.restore();
 }
@@ -1663,6 +1892,11 @@ function render(){
   drawPops();
   for(const p of poofs){p.age+=1/60;const k=p.age/.6;ctx.save();ctx.globalAlpha=Math.max(0,1-k);for(let i=0;i<7;i++){const a=i*TAU/7,r=(20+k*70)*S;puff(p.x+Math.cos(a)*r-26*S*(.6+k*.5),p.y+Math.sin(a)*r*.7,(.5+k*.5)*S,'#ffffff')}ctx.restore()}
   poofs=poofs.filter(p=>p.age<.6);
+  if(fx){fx.t-=1/60;const k=Math.max(0,Math.min(1,fx.t/Math.min(.5,fx.dur)));ctx.save();
+    if(fx.kind==='ivy'){ctx.globalCompositeOperation='color';ctx.globalAlpha=.55*k;ctx.fillStyle='#3fcf5a';ctx.fillRect(0,0,W,H)}
+    else if(fx.kind==='invert'){ctx.globalCompositeOperation='difference';ctx.fillStyle='#fff';ctx.fillRect(0,0,W,H)}
+    else if(fx.kind==='rainbow'){if(!(bear.weapon&&bear.weapon.type==='beans'))fx.t=Math.min(fx.t,.4);ctx.globalCompositeOperation='hue';ctx.globalAlpha=.6*k;ctx.fillStyle=`hsl(${(now*200)%360},100%,50%)`;ctx.fillRect(0,0,W,H)}
+    ctx.restore();if(fx.t<=0)fx=null}
   if(flashT>0){ctx.fillStyle=`rgba(255,255,255,${flashT*1.6})`;ctx.fillRect(0,0,W,H)}
   ctx.restore();
 }
