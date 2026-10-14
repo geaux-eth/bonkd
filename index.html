@@ -261,7 +261,7 @@ canvas{display:block;width:100%;height:100%;touch-action:none;cursor:grab}
       </section>
       <section class="st-sec">
         <h3 class="st-h">Buddies <span class="sticker">Coming soon!</span></h3>
-        <p class="st-sub">New characters to play as, bought with waffles.</p>
+        <p class="st-sub">New characters to play as. Every Buddy costs the same.</p>
         <div class="st-row" id="stBuddies"></div>
       </section>
       <section class="st-sec">
@@ -1111,6 +1111,7 @@ function setMystery(img,col,legend){
   if(legend){x.beginPath();x.moveTo(36,22);x.lineTo(42,4);x.lineTo(52,16);x.lineTo(60,0);x.lineTo(68,16);x.lineTo(78,4);x.lineTo(84,22);x.closePath();x.fillStyle='#ffd23f';x.fill();x.lineWidth=3;x.stroke()}
   img.src=c.toDataURL();
 }
+const BUDDY_PRICE=1500;
 let stConfirm=null;
 function renderStore(){
   $('stWallet').textContent=wallet.bal().toLocaleString()+' waffles to spend';
@@ -1125,7 +1126,7 @@ function renderStore(){
     else{b.textContent=stConfirm===k?'Buy for '+it.price.toLocaleString()+'?':it.price.toLocaleString()+' 🧇';if(stConfirm===k)b.classList.add('red');b.onclick=()=>buyItem(k)}
     row.append(img,mid,b);box.append(row)}
   if(!$('stBuddies').childElementCount){
-    for(const [c,price] of[['sky','1,000'],['pink','2,500'],['mint','5,000']]){const d=document.createElement('div');d.className='st-card';const i=document.createElement('img');i.alt='Mystery Buddy';setMystery(i,c,false);const t=document.createElement('span');t.textContent=price+' 🧇';d.append(i,t);$('stBuddies').append(d)}
+    for(const c of['sky','pink','mint']){const price=BUDDY_PRICE.toLocaleString();const d=document.createElement('div');d.className='st-card';const i=document.createElement('img');i.alt='Mystery Buddy';setMystery(i,c,false);const t=document.createElement('span');t.textContent=price+' 🧇';d.append(i,t);$('stBuddies').append(d)}
     for(const c of['gold','purple','red']){const d=document.createElement('div');d.className='st-card';const i=document.createElement('img');i.alt='Mystery Legend';setMystery(i,c,true);const t=document.createElement('span');t.textContent='Tournament prize';d.append(i,t);$('stLegends').append(d)}}
 }
 async function buyItem(k){
