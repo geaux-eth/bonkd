@@ -105,6 +105,25 @@ canvas{display:block;width:100%;height:100%;touch-action:none;cursor:grab}
 .seg{font-family:var(--display);font-size:13px;letter-spacing:.03em;padding:6px 10px 3px;border:2px solid var(--ink);border-radius:999px;background:var(--paper);color:var(--ink);cursor:pointer}
 .seg.on{background:var(--gold);box-shadow:2px 2px 0 var(--ink)}
 .seg:focus-visible{outline:3px dashed var(--ink);outline-offset:2px}
+.title{pointer-events:auto;display:grid;justify-items:center;gap:10px;text-align:center}
+.title .pre{font-size:28px;-webkit-text-stroke:2.5px var(--ink);text-shadow:3px 3px 0 var(--ink)}
+.title .logo{font-size:clamp(64px,19vmin,120px)}
+.go{font-size:24px;padding:13px 22px 9px;display:inline-flex;align-items:center;gap:10px;margin-top:6px}
+.go .wicon{width:30px;height:30px;flex:none;-webkit-text-stroke:0}
+.sub{margin:0;font-size:15px;letter-spacing:.04em;-webkit-text-stroke:1.2px var(--ink);text-shadow:2px 2px 0 var(--ink)}
+.link{background:none;border:none;padding:4px 6px;font-family:var(--body);font-weight:800;font-size:13px;letter-spacing:.05em;text-transform:uppercase;color:var(--ink);text-decoration:underline;text-underline-offset:3px;cursor:pointer;opacity:.75}
+.title .link{color:var(--paper);text-shadow:0 1px 2px rgba(0,0,0,.5);opacity:.9}
+.link:focus-visible{outline:3px dashed var(--ink);outline-offset:2px}
+.gear{position:absolute;top:12px;right:14px;width:42px;height:42px;padding:6px;border:2.5px solid var(--ink);border-radius:50%;background:var(--red);box-shadow:3px 3px 0 var(--ink);cursor:pointer;display:flex}
+.gear svg{width:100%;height:100%}
+.gear:focus-visible{outline:3px dashed var(--ink);outline-offset:3px}
+.settings{text-align:left}
+.settings .pre{text-align:center}
+.set-row{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;font-weight:800;font-size:15px}
+.info{display:grid;gap:6px;border-top:2px solid var(--ink);padding-top:8px}
+.info h3{margin:4px 0 0;font-family:var(--display);font-weight:400;font-size:16px;letter-spacing:.04em}
+.info p{margin:0;font-size:13.5px;line-height:1.4}
+.info .ver{opacity:.6;font-size:12px}
 @media (prefers-reduced-motion:reduce){.logo span{animation:none}}
 </style>
 
@@ -122,23 +141,15 @@ canvas{display:block;width:100%;height:100%;touch-action:none;cursor:grab}
   <button class="act" id="actBtn" hidden aria-label="Swot"><span id="actLbl">SWOT</span><small id="actN" hidden></small></button>
 
   <div class="overlay left" id="menu">
-    <div class="card">
-      <p class="turn" id="turnHint" hidden>Turn your phone sideways ↻</p>
-      <p class="pre">Don't get</p>
+    <div class="title">
+      <p class="pre outline">Don't get</p>
       <h1 class="logo" aria-label="Bonkd!"><span>B</span><span>O</span><span>N</span><span>K</span><span>D</span><span>!</span></h1>
-      <p class="tag">Grumble the ghost is chucking junk at Todd's head. Catch Booster's gifts and send that junk right back.</p>
-      <p class="how">Drag to move · <b>Swot button</b> to hit back</p>
-      <div class="hand" role="group" aria-label="Controls"><span>Controls</span><button class="seg" data-hand="right" type="button">Right-handed</button><button class="seg" data-hand="left" type="button">Left-handed</button></div>
-      <div class="btns">
-        <button class="btn red" id="playBtn">Play</button>
-        <button class="btn" id="dailyBtn">Daily Bonk</button>
-      </div>
-      <div class="btns">
-        <p class="best" id="menuBest">Best 0</p>
-        <button class="btn small waffle" id="boardBtn">Waffle Board</button>
-      </div>
+      <button class="btn red go" id="playBtn"><svg class="wicon" viewBox="0 0 24 24" aria-hidden="true"><rect x="2.5" y="3.5" width="19" height="17" rx="4" fill="#f2b544" stroke="#161616" stroke-width="2"/><path d="M8.5 4v16M15.5 4v16M3 9.5h18M3 15h18" stroke="#c98a22" stroke-width="1.6"/><path d="M8 11c0-3 2.2-4 4-4s4 1 4 4c0 1.4-8 1.4-8 0z" fill="#ffe14d" stroke="#161616" stroke-width="1.3"/></svg>Get waffles!</button>
+      <p class="sub outline" id="menuBest" hidden></p>
+      <button class="link" id="boardBtn">Waffle Board</button>
     </div>
   </div>
+  <button class="gear" id="gearBtn" aria-label="Settings"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 8.5a3.5 3.5 0 1 0 0 7 3.5 3.5 0 0 0 0-7zm8.2 4.6.1-1.1-.1-1.1 2-1.6-2-3.4-2.4 1a8 8 0 0 0-1.9-1.1L15.5 3h-4l-.4 2.6a8 8 0 0 0-1.9 1.1l-2.4-1-2 3.4 2 1.6-.1 1.1.1 1.1-2 1.6 2 3.4 2.4-1a8 8 0 0 0 1.9 1.1l.4 2.6h4l.4-2.6a8 8 0 0 0 1.9-1.1l2.4 1 2-3.4z" fill="#fff" stroke="#161616" stroke-width="1.6" stroke-linejoin="round"/></svg></button>
 
   <div class="overlay dim" id="pause" hidden>
     <div class="card">
@@ -148,7 +159,7 @@ canvas{display:block;width:100%;height:100%;touch-action:none;cursor:grab}
         <button class="btn plain" id="restartBtn">Restart</button>
         <button class="btn plain" id="quitBtn">Menu</button>
       </div>
-      <div class="hand" role="group" aria-label="Controls"><span>Controls</span><button class="seg" data-hand="right" type="button">Right-handed</button><button class="seg" data-hand="left" type="button">Left-handed</button></div>
+      <button class="link" id="pauseSettings">Settings</button>
     </div>
   </div>
 
@@ -166,7 +177,7 @@ canvas{display:block;width:100%;height:100%;touch-action:none;cursor:grab}
   <div class="overlay" id="over" hidden>
     <div class="card">
       <h2 class="logo red" aria-label="Bonkd!"><span>B</span><span>O</span><span>N</span><span>K</span><span>D</span><span>!</span></h2>
-      <p class="label" id="overMode">Free play</p>
+      <p class="label" id="overMode">Level 1</p>
       <p class="big" id="overScore">0</p>
       <p class="best" id="overNote">Best 0</p>
       <p class="best" id="overWaf" hidden></p>
@@ -174,8 +185,30 @@ canvas{display:block;width:100%;height:100%;touch-action:none;cursor:grab}
       <div class="btns">
         <button class="btn red" id="againBtn">Again</button>
         <button class="btn plain" id="menuBtn">Menu</button>
-        <button class="btn small waffle" id="boardBtn2">Waffle Board</button>
+        </div>
+      <div class="btns"><button class="link" id="boardBtn2">Waffle Board</button>
       </div>
+    </div>
+  </div>
+
+  <div class="overlay dim" id="settings" hidden>
+    <div class="card wide settings">
+      <p class="pre">Settings</p>
+      <div class="set-row"><span>Controls</span><div class="hand" role="group" aria-label="Controls"><button class="seg" data-hand="right" type="button">Right-handed</button><button class="seg" data-hand="left" type="button">Left-handed</button></div></div>
+      <div class="set-row"><span>Music</span><div class="hand"><button class="seg" id="musOn" type="button">On</button><button class="seg" id="musOff" type="button">Off</button></div></div>
+      <div class="set-row"><span>Sound effects</span><div class="hand"><button class="seg" id="sfxOn" type="button">On</button><button class="seg" id="sfxOff" type="button">Off</button></div></div>
+      <div class="info">
+        <h3>How to play</h3>
+        <p>Drag anywhere to move Todd. Tap the swot button to knock junk back at Grumble. Catch Booster's tube socks for goofy weapons, bonk Grumble out of the sky, and grab the waffles he drops. Four bonks and Todd is out.</p>
+        <h3>Beta</h3>
+        <p>Bonkd is an app in development. Things will change, and some may break. Scores and the Waffle Board may be reset during testing.</p>
+        <h3>The fine print</h3>
+        <p>Waffles are just for fun. They have no cash value and can't be bought, sold or traded. There are no ads or purchases in this game.</p>
+        <p>To keep the Waffle Board, the game stores a random player ID on this device along with your board name and waffle totals. It does not collect your real name, email, contacts or location. Clearing your browser data starts you over with a new ID. Your board name is visible to everyone, so don't use your real name.</p>
+        <p>Characters and artwork belong to their owners and are used with permission. All rights reserved.</p>
+        <p class="ver">Bonkd beta 0.1</p>
+      </div>
+      <div class="btns"><button class="btn plain small" id="settingsClose">Close</button></div>
     </div>
   </div>
 
@@ -207,7 +240,6 @@ function resize(){
   ROT=matchMedia('(pointer:coarse)').matches&&vh>vw;
   stage.classList.toggle('rot',ROT);
   stage.style.width=(ROT?vh:vw)+'px'; stage.style.height=(ROT?vw:vh)+'px';
-  $('turnHint').hidden=!ROT;
   DPR=Math.min(2,window.devicePixelRatio||1);
   W=ROT?vh:vw; H=ROT?vw:vh;
   cv.width=Math.round(W*DPR); cv.height=Math.round(H*DPR);
@@ -226,8 +258,7 @@ function dayNum(){const n=new Date();return Math.floor((Date.UTC(n.getFullYear()
 function store(k,v){try{if(v===undefined)return +localStorage.getItem(k)||0;localStorage.setItem(k,String(v))}catch(e){return 0}}
 const bestKey=m=>m==='daily'?'bonkd-daily-'+dayNum():'bonkd-best';
 
-$('dailyBtn').textContent='Daily Bonk #'+dayNum();
-function refreshMenuBest(){$('menuBest').textContent='Best '+store(bestKey('free'))}
+function refreshMenuBest(){const b=store(bestKey('free')),wf=store('bonkd-waffles');$('menuBest').textContent=(wf?wf.toLocaleString()+' waffles · ':'')+'Best '+b.toLocaleString();$('menuBest').hidden=!b&&!wf}
 refreshMenuBest();
 const lumpSVG='<svg class="lump" viewBox="0 0 24 24"><path d="M7.5 21.5C6.5 13 8 3 12 3s5.5 10 4.5 18.5z"/></svg>';
 const starSVG='<svg class="star" viewBox="0 0 24 24"><path d="M12 2.2l2.9 6.5 7.1.7-5.4 4.7 1.6 7-6.2-3.8-6.2 3.8 1.6-7L2 9.4l7.1-.7z"/></svg>';
@@ -293,6 +324,7 @@ let items=[],pops=[],sparks=[],shots=[],gifts=[],buns=[],animals=[],impacts=[],s
 let paused=false,runWaffles=0,runCounts={},lvStats={hits:0,bonks:0,waffles:0};
 let t=0,score=0,shake=0,now=0,slowT=0,swotCool=0,levelT=0,shownScore=-1,chipKey='',flashT=0,boltT=4,bolt=null;
 const clouds=[0,1,2,3].map(i=>({x:Math.random(),y:.36+i*.07+Math.random()*.03,s:.55+Math.random()*.45,v:.006+Math.random()*.008}));
+const menuWafs=Array.from({length:7},(_,i)=>({x:(.42+i*.08)*innerWidth,y:Math.random()*300,v:40+Math.random()*30,rot:Math.random()*6,vr:Math.random()*2-1,p:Math.random()*6,t:i===3?'chicken':i===5?'unicorn':'plain'}));
 const flies=Array.from({length:16},()=>({x:Math.random(),y:.35+Math.random()*.5,p:Math.random()*TAU}));
 const rain=Array.from({length:60},()=>({x:Math.random(),y:Math.random(),v:.9+Math.random()*.6}));
 bear.x=bear.tx=W/2; ghost.x=W/2;
@@ -301,8 +333,66 @@ const theme=()=>(level-1)%5;
 
 /* ---------- audio ---------- */
 let AC=null;
-function audio(){try{AC=AC||new (window.AudioContext||window.webkitAudioContext)();if(AC.state==='suspended')AC.resume()}catch(e){}}
-function tone(type,f0,f1,dur,vol,delay){if(!AC)return;const o=AC.createOscillator(),g=AC.createGain(),n=AC.currentTime+(delay||0);o.type=type;o.frequency.setValueAtTime(f0,n);o.frequency.exponentialRampToValueAtTime(f1,n+dur);g.gain.setValueAtTime(vol,n);g.gain.exponentialRampToValueAtTime(.001,n+dur);o.connect(g);g.connect(AC.destination);o.start(n);o.stop(n+dur+.03)}
+let musGain=null,sfxGain=null;
+function audio(){try{
+  if(!AC){AC=new (window.AudioContext||window.webkitAudioContext)();musGain=AC.createGain();sfxGain=AC.createGain();musGain.connect(AC.destination);sfxGain.connect(AC.destination);applyAudioPrefs();music(curSong===null?'menu':curSong,true)}
+  if(AC.state==='suspended'&&!paused)AC.resume()}catch(e){}}
+function tone(type,f0,f1,dur,vol,delay){if(!AC)return;const o=AC.createOscillator(),g=AC.createGain(),n=AC.currentTime+(delay||0);o.type=type;o.frequency.setValueAtTime(f0,n);o.frequency.exponentialRampToValueAtTime(f1,n+dur);g.gain.setValueAtTime(vol,n);g.gain.exponentialRampToValueAtTime(.001,n+dur);o.connect(g);g.connect(sfxGain||AC.destination);o.start(n);o.stop(n+dur+.03)}
+/* ---------- music: little rubber-hose tunes, one per level theme ---------- */
+const NOTE=n=>{const m=/^([A-G])(#|b)?(\d)$/.exec(n);const b={C:0,D:2,E:4,F:5,G:7,A:9,B:11}[m[1]]+(m[2]==='#'?1:m[2]==='b'?-1:0);return 440*Math.pow(2,(b+12*(+m[3]+1)-69)/12)};
+const CH=c=>{const m=/^([A-G](#|b)?)(m?)(7?)$/.exec(c);const root=m[1];const r=NOTE(root+'3');const third=m[3]?3:4;const iv=[0,third,7].concat(m[4]?[m[3]?10:10]:[]);return{root:r,tones:iv.map(i=>r*Math.pow(2,i/12))}};
+const SONGS={
+ menu:{bpm:150,sw:.6,lead:'square',bass:'triangle',drums:1,ch:['C','A7','Dm','G7','C','A7','D7','G7'],
+  mel:'E5 . G5 . C6 - G5 E5|C#5 . E5 . A5 - G5 E5|F5 . A5 . D6 - A5 F5|B4 . D5 F5 G5 - . .|E5 G5 C6 G5 E5 G5 C6 .|A5 G5 E5 C#5 E5 - . .|F#5 . A5 . C6 . A5 F#5|G5 F5 D5 B4 C5 . . .'},
+ 0:{bpm:140,sw:.58,lead:'square',bass:'triangle',drums:1,ch:['G','G','C','G','D7','D7','G','D7'],
+  mel:'D5 . B4 D5 G5 . D5 .|B4 D5 G5 A5 B5 - A5 G5|E5 . C5 E5 G5 . E5 .|D5 . B4 . G4 - . .|A4 . C5 . F#5 . A5 .|G5 F#5 E5 D5 C5 - A4 .|B4 D5 G5 . B5 . G5 .|A5 G5 F#5 E5 D5 - . .'},
+ 1:{bpm:176,sw:.5,lead:'square',bass:'square',drums:1,ch:['D','D','G','D','D','A7','D','A7'],
+  mel:'F#5 E5 D5 E5 F#5 A5 F#5 D5|E5 F#5 E5 D5 B4 D5 A4 .|B4 D5 G5 B5 A5 G5 F#5 E5|F#5 E5 D5 E5 F#5 - D5 .|F#5 A5 D6 A5 F#5 A5 D6 .|C#6 B5 A5 G5 F#5 E5 C#5 E5|D5 F#5 A5 F#5 B5 A5 F#5 D5|E5 . A4 . C#5 E5 A5 .'},
+ 2:{bpm:118,sw:.66,lead:'triangle',bass:'square',drums:1,ch:['Em','Em','Am','Em','B7','Am','Em','B7'],
+  mel:'E5 . G5 . A5 Bb5 B5 .|G5 E5 . D5 E5 - . .|A5 . C6 . A5 G5 E5 .|G5 . E5 D5 E5 - . .|F#5 . A5 . B5 - A5 F#5|E5 . G5 A5 C6 - A5 .|B5 A5 G5 E5 D5 E5 G5 .|F#5 - D#5 - B4 - . .'},
+ 3:{bpm:132,sw:.5,lead:'triangle',bass:'triangle',drums:2,ch:['Am','Am','Dm','Am','E7','E7','Am','E7'],
+  mel:'A5 . E5 . A5 . C6 .|B5 A5 G#5 A5 E5 - . .|D5 . F5 . A5 . D6 .|C6 B5 A5 G5 A5 - . .|G#5 . B5 . E6 . B5 .|D6 C6 B5 A5 G#5 - E5 .|A5 C6 E6 C6 A5 E5 C5 E5|B4 . E5 . G#5 . B5 .'},
+ 4:{bpm:168,sw:.5,lead:'sawtooth',bass:'square',drums:1,ch:['Cm','Cm','Ab','Ab','Fm','G7','Cm','G7'],
+  mel:'C5 Eb5 G5 C6 G5 Eb5 C5 Eb5|G5 . G5 . Ab5 G5 F5 Eb5|Ab5 . C6 . Eb6 . C6 Ab5|G5 F5 Eb5 D5 Eb5 - C5 .|F5 Ab5 C6 . Ab5 F5 C5 F5|B4 D5 F5 G5 B5 - . .|C6 G5 Eb5 C5 G5 Eb5 C5 G4|B4 . D5 . F5 . G5 .'}
+};
+for(const k in SONGS){const sg=SONGS[k];sg.steps=sg.mel.split('|').join(' ').split(/\s+/);sg.chords=sg.ch.map(CH)}
+let curSong=null,songT0=0,songStep=0,nextT=0,musTimer=null,noiseBuf=null;
+function noise(){if(noiseBuf)return noiseBuf;noiseBuf=AC.createBuffer(1,AC.sampleRate*.3,AC.sampleRate);const d=noiseBuf.getChannelData(0);for(let i=0;i<d.length;i++)d[i]=Math.random()*2-1;return noiseBuf}
+function mnote(type,f,t,dur,vol,vib){const o=AC.createOscillator(),g=AC.createGain(),lp=AC.createBiquadFilter();lp.type='lowpass';lp.frequency.value=type==='sawtooth'?2200:3200;o.type=type;o.frequency.setValueAtTime(f,t);
+  if(vib){const l=AC.createOscillator(),lg=AC.createGain();l.frequency.value=5.5;lg.gain.value=f*.012;l.connect(lg);lg.connect(o.frequency);l.start(t);l.stop(t+dur+.05)}
+  g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(vol,t+.01);g.gain.setTargetAtTime(vol*.55,t+.03,.06);g.gain.setTargetAtTime(0,t+dur*.85,.03);
+  o.connect(lp);lp.connect(g);g.connect(musGain);o.start(t);o.stop(t+dur+.2)}
+function mdrum(kind,t){
+  if(kind==='k'){const o=AC.createOscillator(),g=AC.createGain();o.frequency.setValueAtTime(140,t);o.frequency.exponentialRampToValueAtTime(45,t+.12);g.gain.setValueAtTime(.5,t);g.gain.exponentialRampToValueAtTime(.001,t+.16);o.connect(g);g.connect(musGain);o.start(t);o.stop(t+.2);return}
+  const s=AC.createBufferSource(),g=AC.createGain(),f=AC.createBiquadFilter();s.buffer=noise();
+  if(kind==='s'){f.type='bandpass';f.frequency.value=1800;g.gain.setValueAtTime(.28,t);g.gain.exponentialRampToValueAtTime(.001,t+.12)}
+  else if(kind==='w'){f.type='bandpass';f.frequency.value=900;f.Q.value=8;g.gain.setValueAtTime(.5,t);g.gain.exponentialRampToValueAtTime(.001,t+.05)}
+  else{f.type='highpass';f.frequency.value=7000;g.gain.setValueAtTime(.09,t);g.gain.exponentialRampToValueAtTime(.001,t+.04)}
+  s.connect(f);f.connect(g);g.connect(musGain);s.start(t);s.stop(t+.15)}
+function schedule(){
+  if(!AC||curSong===null||AC.state!=='running')return;
+  const sg=SONGS[curSong], d=60/sg.bpm/2;
+  while(nextT<AC.currentTime+.15){
+    const i=songStep%sg.steps.length, inBar=i%8, pair=Math.floor(i/2), off=(i%2)?2*d*sg.sw:0, t=songT0+pair*2*d+off+Math.floor(songStep/sg.steps.length)*sg.steps.length*d;
+    if(t>=AC.currentTime-.05){
+      const tok=sg.steps[i];
+      if(tok!=='.'&&tok!=='-'){let len=1;while(sg.steps[(i+len)%sg.steps.length]==='-'&&len<8)len++;mnote(sg.lead,NOTE(tok),t,d*len*1.1,.13,len>1)}
+      const c=sg.chords[Math.floor(i/8)%sg.chords.length];
+      if(inBar===0)mnote(sg.bass,c.root/2,t,d*1.6,.32);
+      if(inBar===4)mnote(sg.bass,c.root/2*1.5,t,d*1.6,.28);
+      if(inBar===2||inBar===6)for(const f of c.tones)mnote('triangle',f,t,d*.7,.05);
+      if(sg.drums===1){if(inBar===0||inBar===4)mdrum('k',t);if(inBar===2||inBar===6)mdrum('s',t);if(i%2)mdrum('h',t)}
+      else{if(inBar%2===0)mdrum('w',t);if(inBar===6)mdrum('s',t)}
+    }
+    songStep++; const ni=songStep%sg.steps.length, np=Math.floor(ni/2), loops=Math.floor(songStep/sg.steps.length);
+    nextT=songT0+loops*sg.steps.length*d+np*2*d+((ni%2)?2*d*sg.sw:0);
+  }
+}
+function music(name,force){
+  if(name===curSong&&!force)return; curSong=name; if(!AC)return;
+  songStep=0; songT0=AC.currentTime+.08; nextT=songT0;
+  if(!musTimer)musTimer=setInterval(schedule,30);
+}
 const sfx={
   bonk(){tone('sine',560,80,.25,.5);tone('square',200,60,.07,.12)},
   clang(){tone('triangle',1400,900,.35,.22);tone('sine',300,70,.2,.4)},
@@ -340,17 +430,32 @@ const keys={};
 addEventListener('keydown',e=>{
   keys[e.key]=true;
   if(e.target&&e.target.tagName==='INPUT')return;
-  if(e.key==='p'||e.key==='P'||e.key==='Escape'){if(!$('boardPanel').hidden){$('boardPanel').hidden=true;return}setPause(!paused);return}
+  if(e.key==='p'||e.key==='P'||e.key==='Escape'){if(!$('settings').hidden){$('settings').hidden=true;return}if(!$('boardPanel').hidden){$('boardPanel').hidden=true;return}setPause(!paused);return}
   if(e.key===' '||e.key==='Enter'){e.preventDefault();if(paused)return;if(state==='menu'||state==='over')start(mode);else if(state==='clear')nextLevel();else if(state==='play'&&!e.repeat)act()}
 });
 addEventListener('keyup',e=>{keys[e.key]=false});
 $('playBtn').onclick=()=>start('free');
-$('dailyBtn').onclick=()=>start('daily');
+document.addEventListener('pointerdown',()=>audio(),{once:true,capture:true});
 $('againBtn').onclick=()=>start(mode);
-function goMenu(){state='menu';paused=false;['over','pause','clear'].forEach(k=>$(k).hidden=true);$('hud').hidden=true;$('menu').hidden=false;resetBoard();Object.assign(bear,{hits:0,ko:false,koT:0,hitT:0,helmet:0,weapon:null,jello:null});level=1;bgKey='';refreshMenuBest();if(AC&&AC.state==='suspended')AC.resume()}
+function goMenu(){music('menu');state='menu';paused=false;['over','pause','clear'].forEach(k=>$(k).hidden=true);$('hud').hidden=true;$('menu').hidden=false;resetBoard();Object.assign(bear,{hits:0,ko:false,koT:0,hitT:0,helmet:0,weapon:null,jello:null});level=1;bgKey='';refreshMenuBest();if(AC&&AC.state==='suspended')AC.resume()}
 $('menuBtn').onclick=goMenu;
 function setPause(v){if(v&&!(state==='play'||state==='levelup'))return;paused=v;$('pause').hidden=!v;try{if(AC)v?AC.suspend():AC.resume()}catch(e){}}
 $('pauseBtn').onclick=()=>setPause(true);
+function syncGear(){$('gearBtn').hidden=state!=='menu'}
+$('gearBtn').onclick=()=>{audio();$('settings').hidden=false};
+$('pauseSettings').onclick=()=>{$('settings').hidden=false};
+$('settingsClose').onclick=()=>{$('settings').hidden=true};
+let MUS=true,SFX=true;try{MUS=localStorage.getItem('bonkd-music')!=='off';SFX=localStorage.getItem('bonkd-sfx')!=='off'}catch(e){}
+function applyAudioPrefs(){
+  $('musOn').classList.toggle('on',MUS);$('musOff').classList.toggle('on',!MUS);$('sfxOn').classList.toggle('on',SFX);$('sfxOff').classList.toggle('on',!SFX);
+  if(musGain)musGain.gain.value=MUS?.55:0; if(sfxGain)sfxGain.gain.value=SFX?1:0;
+}
+const setPref=(k,v)=>{try{localStorage.setItem(k,v)}catch(e){}};
+$('musOn').onclick=()=>{MUS=true;setPref('bonkd-music','on');audio();applyAudioPrefs()};
+$('musOff').onclick=()=>{MUS=false;setPref('bonkd-music','off');applyAudioPrefs()};
+$('sfxOn').onclick=()=>{SFX=true;setPref('bonkd-sfx','on');applyAudioPrefs()};
+$('sfxOff').onclick=()=>{SFX=false;setPref('bonkd-sfx','off');applyAudioPrefs()};
+applyAudioPrefs();
 $('resumeBtn').onclick=()=>setPause(false);
 $('restartBtn').onclick=()=>{setPause(false);start(mode)};
 $('quitBtn').onclick=goMenu;
@@ -367,7 +472,7 @@ function start(m){
   resetBoard(); t=0; score=0; shownScore=-1; level=1; lvlTime=0; angelT=5; bgKey=''; paused=false; runWaffles=0; runCounts={}; updateWaf();
   Object.assign(bear,{x:W/2,tx:W/2,hits:0,hitT:0,inv:0,ko:false,koT:0,helmet:0,weapon:null,jello:null,swing:0,face:1,faceS:1});
   setGhost(); ghost.x=W/2;
-  state='play'; ['menu','over','pause','clear','boardPanel'].forEach(k=>$(k).hidden=true); $('hud').hidden=false; renderMeter();
+  state='play'; music(theme()); ['menu','over','pause','clear','boardPanel','settings'].forEach(k=>$(k).hidden=true); $('hud').hidden=false; renderMeter();
   pop("DON'T GET",W/2,H*.44,C.white,34,1.9); pop('BONKD!',W/2,H*.44+42*S,C.gold,68,1.9);
   pop('DRAG TO MOVE · HIT THE SWOT BUTTON',W/2,H*.44+92*S,C.white,18,2.4);
 }
@@ -561,7 +666,7 @@ function showClear(){
 function nextLevel(){
   if(state!=='clear')return;
   $('clear').hidden=true;
-  level++; lvlTime=0; setGhost(); angelT=5; state='play'; bgKey='';
+  level++; lvlTime=0; setGhost(); angelT=5; state='play'; bgKey=''; music(theme());
   bear.hits=Math.max(0,bear.hits-1); renderMeter(); updateWaf();
   pop('LEVEL '+level,W/2,H*.42,C.red,58,2);
   pop(THEMES[theme()],W/2,H*.42+44*S,C.white,24,2);
@@ -574,7 +679,8 @@ function update(dt){
   for(const c of clouds){c.x+=c.v*dt;if(c.x>1.25)c.x=-.25}
   const sdt=slowT>0?dt*.45:dt;
   slowT=Math.max(0,slowT-dt); swotCool=Math.max(0,swotCool-dt);
-  if(state==='menu'){bear.tx=W*.74+Math.sin(now*.8)*W*.12;bear.hits=3}
+  if(state==='menu'){const ti=document.querySelector('#menu .title');const lo=ti?ti.offsetLeft+ti.offsetWidth+70*S:W*.45,hi=W-70*S;bear.tx=(lo+hi)/2+Math.sin(now*.7)*Math.max(0,(hi-lo)/2);bear.hits=3;
+    for(const m of menuWafs){m.y+=m.v*dt;m.rot+=m.vr*dt;m.x+=Math.sin(now*.8+m.p)*12*S*dt;if(m.y>GY+20*S){m.y=-30*S;m.x=rnd(.4,.98)*W;m.t=Math.random()<.7?'plain':pickWaffle()}}}
   if(canMove()){if(keys.ArrowLeft||keys.a)bear.tx=bear.x-140*S;if(keys.ArrowRight||keys.d)bear.tx=bear.x+140*S}
   if(!bear.ko){
     bear.tx=clamp(bear.tx,44*S,W-44*S);
@@ -734,10 +840,10 @@ function update(dt){
 }
 
 function showOver(){
-  state='over';
+  state='over'; curSong=null;
   const s=Math.floor(score), k=bestKey(mode), best=store(k), nb=s>best;
   if(nb)store(k,s);
-  $('overMode').textContent=(mode==='daily'?'Daily Bonk #'+dayNum():'Free play')+' · Level '+level;
+  $('overMode').textContent='Made it to Level '+level;
   $('overScore').textContent=s;
   $('overNote').textContent=nb?'New best!':'Best '+best;
   $('overWaf').textContent='Waffles this run: '+runWaffles; $('overWaf').hidden=false;
@@ -958,9 +1064,11 @@ function drawBear(){
   const cy=sy+hh*.087;
   // bonk progression: lump, then stars
   if(b.hits>=1&&!b.helmet){
-    const pp=b.lumpPop>0?1+Math.sin(b.lumpPop/.35*Math.PI)*.35:1, L=26*pp;
-    cel(()=>{ctx.moveTo(-11,cy+6);ctx.lineTo(-11,cy-L+11);ctx.arc(0,cy-L+11,11,Math.PI,0);ctx.lineTo(11,cy+6)},C.pink,C.pinkSh,-4,0);
-    ctx.beginPath();ctx.moveTo(-5,cy-L+2);ctx.lineTo(-2,cy-L+7);ctx.moveTo(2,cy-L+1);ctx.lineTo(4,cy-L+6);stroke(1.4);
+    const pp=b.lumpPop>0?1+Math.sin(b.lumpPop/.35*Math.PI)*.3:1, L=13*pp;
+    ctx.save();ctx.translate(2,cy+4);ctx.rotate(.12);
+    cel(()=>{ctx.moveTo(-8,2);ctx.quadraticCurveTo(-8.5,-L*.55,-5,-L);ctx.quadraticCurveTo(0,-L-4,5,-L);ctx.quadraticCurveTo(8.5,-L*.55,8,2)},C.pink,C.pinkSh,-3,0,2);
+    ctx.beginPath();ctx.moveTo(-3,-L-1);ctx.lineTo(-1.5,-L+3);ctx.moveTo(2,-L-1.5);ctx.lineTo(3,-L+2.5);stroke(1.3);
+    ctx.restore();
   }
   const n=Math.min(3,b.hits-1);
   if(n>0||b.ko){
@@ -1343,6 +1451,7 @@ function render(){
   ctx.drawImage(bgCan,0,0,W,H);
   drawLiveBG();
   if(state!=='menu')drawGhost();
+  else for(const m of menuWafs){ctx.save();ctx.translate(m.x,m.y);ctx.scale(S*1.3,S*1.3);ctx.rotate(m.rot);drawWaffle(m.t,now);ctx.restore()}
   drawAngel();
   drawBear();
   for(const it of items)drawItem(it);
@@ -1362,7 +1471,7 @@ function render(){
 }
 
 let last=performance.now();
-function frame(ts){const dt=Math.min(.05,(ts-last)/1000);last=ts;if(!paused){now+=dt;update(dt)}render();requestAnimationFrame(frame)}
+let gearState=null;function frame(ts){if(gearState!==state){gearState=state;syncGear()}const dt=Math.min(.05,(ts-last)/1000);last=ts;if(!paused){now+=dt;update(dt)}render();requestAnimationFrame(frame)}
 requestAnimationFrame(frame);
 })();
 </script>
