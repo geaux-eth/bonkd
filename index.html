@@ -108,7 +108,7 @@ canvas{display:block;width:100%;height:100%;touch-action:none;cursor:grab}
 .seg:focus-visible{outline:3px dashed var(--ink);outline-offset:2px}
 .title{pointer-events:auto;display:grid;justify-items:center;gap:10px;text-align:center}
 .title .pre{font-size:28px;-webkit-text-stroke:2.5px var(--ink);text-shadow:3px 3px 0 var(--ink)}
-.title .logo{font-size:clamp(64px,19vmin,120px)}
+.title .logo{font-size:clamp(64px,calc(19vmin / var(--uiz,1)),120px)}
 .go{font-size:24px;padding:13px 22px 9px;display:inline-flex;align-items:center;gap:10px;margin-top:6px}
 .go .wicon{width:38px;height:30px;flex:none;object-fit:contain}
 .sub{margin:0;font-size:15px;letter-spacing:.04em;-webkit-text-stroke:1.2px var(--ink);text-shadow:2px 2px 0 var(--ink)}
@@ -174,6 +174,17 @@ body.keys .act::after{content:'SPACE';position:absolute;bottom:-18px;left:50%;tr
 .ovstats .wicon{width:22px;height:18px;object-fit:contain}
 #stNo{z-index:17}
 .st-card .own{color:#1c7a2c}
+.logo{line-height:1}
+.pre+.logo{margin-top:.14em}
+.logo+*{margin-top:.1em}
+.title{gap:0}
+.title .pre{margin-bottom:0}
+.title .pre+.logo{margin-top:.24em}
+.title .logo{margin-bottom:.04em}
+.title .go{margin-top:0}
+.title .go+*{margin-top:10px}
+.title .howto,.title .links{margin-top:8px}
+.title .sub+.howto{margin-top:6px}
 #profPage{z-index:14}#profile{z-index:15}
 .pf-pre{font-size:22px;-webkit-text-stroke:2px var(--ink);text-shadow:2px 2px 0 var(--ink)}
 .pf-logo{font-size:clamp(40px,11vmin,62px)}
