@@ -189,8 +189,12 @@ body.keys .act::after{content:'SPACE';position:absolute;bottom:-18px;left:50%;tr
 .xclose svg{width:100%;height:100%}
 .xclose:active{transform:translate(3px,3px);box-shadow:0 0 0 var(--ink)}
 .xclose:focus-visible{outline:3px dashed var(--ink);outline-offset:3px}
-#over .card>.logo{margin-top:.3em}
-.lvn{font-family:var(--display);font-weight:400;font-size:1.9em;letter-spacing:.02em;color:var(--gold);-webkit-text-stroke:1.4px var(--ink);paint-order:stroke fill;text-shadow:2px 2px 0 var(--ink);vertical-align:-.14em;margin-left:3px}
+#over .card{padding-top:16px}
+.ov-pre{font-size:22px;-webkit-text-stroke:2px var(--ink);text-shadow:2px 2px 0 var(--ink);margin-top:2px}
+#overScore{font-size:52px;color:var(--gold);-webkit-text-stroke:2.4px var(--ink);paint-order:stroke fill;text-shadow:3px 3px 0 var(--ink);letter-spacing:.02em}
+.sharex{font-family:var(--body);font-weight:800;font-size:16px;letter-spacing:.02em;color:var(--ink);text-decoration:none;justify-self:center;padding:2px 6px;margin-top:2px}
+.sharex:hover{text-decoration:underline;text-underline-offset:3px}
+.sharex:focus-visible{outline:3px dashed var(--ink);outline-offset:2px}
 #profPage{z-index:14}#profile{z-index:15}
 .pf-pre{font-size:22px;-webkit-text-stroke:2px var(--ink);text-shadow:2px 2px 0 var(--ink)}
 .pf-logo{font-size:clamp(40px,11vmin,62px)}
@@ -267,13 +271,14 @@ body.keys .act::after{content:'SPACE';position:absolute;bottom:-18px;left:50%;tr
 
   <div class="overlay" id="over" hidden>
     <div class="card">
+      <p class="pre outline ov-pre">You got</p>
       <h2 class="logo red" aria-label="Bonkd!"><span>B</span><span>O</span><span>N</span><span>K</span><span>D</span><span>!</span></h2>
       <p class="label" id="overMode">Level 1</p>
       <p class="big" id="overScore">0</p>
       <div class="ovstats"><span id="overNote">Best 0</span><span id="overWaf"><img class="wicon" alt=""><b id="overWafN">+0</b></span></div>
       <p class="note" id="saveNote" hidden></p>
       <div class="btns"><button class="btn red" id="againBtn">Replay</button><button class="btn plain" id="menuBtn">Menu</button></div>
-      <div class="btns"><a class="btn small xbtn" id="shareRun" href="#" target="_blank" rel="noopener">Share on X</a></div>
+      <a class="sharex" id="shareRun" href="#" target="_blank" rel="noopener">Share on X</a>
       <div class="links"><button class="link" id="boardBtn2">Leaderboard</button><span class="dot">·</span><button class="link" id="storeBtn2">Waffle Store</button></div>
     </div>
   </div>
@@ -787,7 +792,6 @@ function start(m){
   const big=Math.min(W*.55/3.7,H*.3)/S, run=++runId; store('bonkd-runs',store('bonkd-runs')+1);
   pop("DON'T GET",W/2,H*.47-big*.92*S,C.white,big*.42,1.9); pop('BONKD!',W/2,H*.47,C.gold,big,1.9);
   pops[pops.length-1].rot=-.04; pops[pops.length-2].rot=-.05;
-  if(store('bonkd-runs')<=3)setTimeout(()=>{if(state==='play'&&runId===run)pop(INPUT==='keys'?"ARROW KEYS TO MOVE · CATCH BOOSTER'S SOCKS":"DRAG TO MOVE · CATCH BOOSTER'S SOCKS",W/2,H*.42,C.white,Math.max(20,H*.06)/S,3.2)},2000);
 }
 
 /* ---------- spawning ---------- */
@@ -1239,7 +1243,7 @@ function showOver(){
   state='over'; curSong=null;
   const s=Math.floor(score), k=bestKey(mode), best=store(k), nb=s>best;
   if(nb)store(k,s);
-  $('overMode').innerHTML='Made it to Level <b class="lvn">'+level+'</b>';
+  $('overMode').textContent='Made it to Level '+level;
   $('overScore').textContent=s;
   $('overNote').textContent=nb?'New best!':'Best '+best;
   $('overWafN').textContent='+'+runWaffles.toLocaleString()+' waffles';
