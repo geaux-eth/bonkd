@@ -130,6 +130,11 @@ canvas{display:block;width:100%;height:100%;touch-action:none;cursor:grab}
 .mute .x{display:none}.mute.off .x{display:inline}.mute.off .w{display:none}
 .mute:focus-visible{outline:3px dashed var(--ink);outline-offset:3px}
 #clear .card{width:min(300px,100%);padding:12px 16px 14px;gap:6px}
+#profile{z-index:15}
+.pf{display:grid;gap:8px}
+.pf input{font:inherit;font-weight:800;font-size:16px;padding:9px 12px;border:2.5px solid var(--ink);border-radius:12px;background:var(--paper);color:var(--ink);text-align:center}
+.pf input:focus-visible{outline:3px dashed var(--ink);outline-offset:2px}
+.err{margin:0;color:var(--red);font-weight:800;font-size:14px}
 @media (prefers-reduced-motion:reduce){.logo span{animation:none}}
 </style>
 
@@ -202,6 +207,7 @@ canvas{display:block;width:100%;height:100%;touch-action:none;cursor:grab}
       <div class="set-row"><span>Controls</span><div class="hand" role="group" aria-label="Controls"><button class="seg" data-hand="right" type="button">Right-handed</button><button class="seg" data-hand="left" type="button">Left-handed</button></div></div>
       <div class="set-row"><span>Music</span><div class="hand"><button class="seg" id="musOn" type="button">On</button><button class="seg" id="musOff" type="button">Off</button></div></div>
       <div class="set-row"><span>Sound effects</span><div class="hand"><button class="seg" id="sfxOn" type="button">On</button><button class="seg" id="sfxOff" type="button">Off</button></div></div>
+      <div class="set-row"><span>Waffle Board</span><span class="hand"><b id="pfShow">No profile yet</b><button class="seg" id="pfEdit" type="button">Create profile</button></span></div>
       <div class="info">
         <h3>How to play</h3>
         <p>Drag anywhere to move Todd and dodge Grumble's junk. Catch the tube socks Booster tosses you: each one holds a goofy weapon. When a weapon needs you, the action button appears on your weapon side. Bonk Grumble out of the sky and he poofs into waffles. Four bonks and Todd is out.</p>
@@ -209,11 +215,25 @@ canvas{display:block;width:100%;height:100%;touch-action:none;cursor:grab}
         <p>Bonkd is an app in development. Things will change, and some may break. Scores and the Waffle Board may be reset during testing.</p>
         <h3>The fine print</h3>
         <p>Waffles are just for fun. They have no cash value and can't be bought, sold or traded. There are no ads or purchases in this game.</p>
-        <p>To keep the Waffle Board, the game stores a random player ID on this device along with your board name and waffle totals. It does not collect your real name, email, contacts or location. Clearing your browser data starts you over with a new ID. Your board name is visible to everyone, so don't use your real name.</p>
+        <p>To keep the Waffle Board, the game stores a random player ID on this device along with your board name, a scrambled copy of your PIN, and your waffle totals. It does not collect your real name, email, contacts or location. If you clear your browser data or switch phones, log back in with your name and PIN. Your board name is visible to everyone, so don't use your real name.</p>
         <p>Characters and artwork belong to their owners and are used with permission. All rights reserved.</p>
         <p class="ver">Bonkd beta 0.1</p>
       </div>
       <div class="btns"><button class="btn plain small" id="settingsClose">Close</button></div>
+    </div>
+  </div>
+
+  <div class="overlay dim" id="profile" hidden>
+    <div class="card">
+      <p class="pre" id="pfTitle">Save your waffles!</p>
+      <p class="note" id="pfText"></p>
+      <form class="pf" id="pfForm">
+        <input id="pfName" maxlength="14" autocomplete="nickname" autocapitalize="words" placeholder="Board name" aria-label="Board name">
+        <input id="pfPin" type="password" inputmode="numeric" pattern="[0-9]*" maxlength="4" autocomplete="off" placeholder="4-digit PIN" aria-label="4-digit PIN">
+        <p class="err" id="pfErr" role="alert" hidden></p>
+        <div class="btns"><button class="btn red" id="pfGo" type="submit">Save</button><button class="btn plain small" id="pfCancel" type="button">Not now</button></div>
+      </form>
+      <button class="link" id="pfSwap" type="button">Already have a profile? Log in</button>
     </div>
   </div>
 
@@ -222,7 +242,8 @@ canvas{display:block;width:100%;height:100%;touch-action:none;cursor:grab}
       <p class="pre">Waffle Board</p>
       <p class="note" id="boardNote">Grumble drops waffles every time he goes down. Rare waffles are worth more.</p>
       <ol class="board" id="boardList"></ol>
-      <form class="nick" id="nickForm">
+      <p class="note" id="pfBoardWrap"><span id="pfBoardLine"></span> <button class="link" id="pfBoardEdit" type="button">Create profile</button></p>
+      <form class="nick" id="nickForm" hidden>
         <input id="nick" maxlength="14" autocomplete="off" placeholder="Your name on the board" aria-label="Your name on the board">
         <button class="btn small" id="nickBtn" type="submit">Save</button>
       </form>
@@ -459,7 +480,7 @@ const keys={};
 addEventListener('keydown',e=>{
   keys[e.key]=true;
   if(e.target&&e.target.tagName==='INPUT')return;
-  if(e.key==='p'||e.key==='P'||e.key==='Escape'){if(!$('settings').hidden){$('settings').hidden=true;return}if(!$('boardPanel').hidden){$('boardPanel').hidden=true;return}setPause(!paused);return}
+  if(e.key==='p'||e.key==='P'||e.key==='Escape'){if(!$('profile').hidden){$('profile').hidden=true;return}if(!$('settings').hidden){$('settings').hidden=true;return}if(!$('boardPanel').hidden){$('boardPanel').hidden=true;return}setPause(!paused);return}
   if(e.key===' '||e.key==='Enter'){e.preventDefault();if(paused)return;if(state==='menu'||state==='over')start(mode);else if(state==='clear')nextLevel();else if(state==='play'&&!e.repeat)act()}
 });
 addEventListener('keyup',e=>{keys[e.key]=false});
@@ -898,54 +919,62 @@ function showOver(){
   saveRun();
 }
 
-/* ---------- Waffle Board (Supabase, free tier) ---------- */
-// Paste your Supabase project URL and anon (public) key here. Leave as-is to run without a shared board.
+/* ---------- Waffle Board + profiles (Supabase, free tier) ---------- */
 const SUPABASE_URL='https://jmiesqhrpcmrthrquqpq.supabase.co';
 const SUPABASE_KEY='sb_publishable_e7oqQbX2PJ5qV5ge2vUSbg_H9t0A9-d';
-let SB=null,myId=null,myDoc=null,boardRows=[],boardErr=false,dbTried=false;
+let SB=null,myId=null,prof={},boardRows=[],boardErr=false,dbTried=false,pfMode='create';
+let asked=false;try{asked=localStorage.getItem('bonkd-asked')==='1'}catch(e){}
 const localWaf=()=>store('bonkd-waffles');
-try{const n=localStorage.getItem('bonkd-nick');if(n)$('nick').value=n}catch(e){}
-(async()=>{
-  try{
-    if(/^https:\/\//.test(SUPABASE_URL)&&SUPABASE_KEY.length>20&&window.supabase){
-      const sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
-      let {data:{session}}=await sb.auth.getSession();
-      if(!session){const r=await sb.auth.signInAnonymously();if(r.error)throw r.error;session=r.data.session}
-      myId=session.user.id; SB=sb;
-      const {data}=await SB.from('waffle_board').select('*').eq('id',myId).maybeSingle(); myDoc=data||null;
-      if(myDoc&&myDoc.nick)$('nick').value=myDoc.nick;
-      await loadTop();
-    }
-  }catch(e){SB=null;console.warn('Waffle Board offline:',e)}
-  dbTried=true; renderBoard();
-})();
+async function newSession(){const r=await SB.auth.signInAnonymously();if(r.error)throw r.error;myId=r.data.session.user.id}
+async function loadMe(){try{const {data}=await SB.rpc('my_profile');prof=data||{}}catch(e){}renderProfile()}
 async function loadTop(){
   if(!SB)return;
   const {data,error}=await SB.from('waffle_board').select('id,nick,waffles').order('waffles',{ascending:false}).limit(10);
   boardErr=!!error; if(data)boardRows=data;
 }
+(async()=>{
+  try{
+    if(window.supabase){
+      SB=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+      const {data:{session}}=await SB.auth.getSession();
+      if(session)myId=session.user.id; else await newSession();
+      await loadMe(); await loadTop();
+    }
+  }catch(e){SB=null;console.warn('Waffle Board offline:',e)}
+  dbTried=true; renderBoard(); renderProfile();
+})();
 async function saveRun(){
   store('bonkd-waffles',localWaf()+runWaffles);
   if(!SB||!myId)return;
-  if(runWaffles===0&&myDoc&&level<=(+myDoc.best||0))return;
-  try{
-    const {data,error}=await SB.rpc('submit_run',{p_counts:runCounts,p_level:level,p_seconds:Math.round(t)});
-    if(error)throw error;
-    myDoc=data;
-    if(runWaffles){$('saveNote').textContent='Added '+runWaffles+' to the Waffle Board. Your total: '+(+data.waffles).toLocaleString()+'.';$('saveNote').hidden=false}
-    loadTop();
-  }catch(e){
-    const m=String(e&&e.message||'');
-    $('saveNote').textContent=/slow down/.test(m)?'Easy, speedy! Wait a few seconds between runs for the Waffle Board to count them.':(/too|unknown|range/.test(m)?"That run didn't pass the waffle check, so it wasn't added to the board.":"Couldn't reach the Waffle Board. Your waffles are still counted on this device.");
-    $('saveNote').hidden=false;
+  if(runWaffles>0||!prof.best||level>prof.best){
+    try{
+      const {data,error}=await SB.rpc('submit_run',{p_counts:runCounts,p_level:level,p_seconds:Math.round(t)});
+      if(error)throw error;
+      prof.waffles=data.waffles;prof.best=data.best;
+      if(runWaffles){$('saveNote').textContent=(prof.nick?prof.nick+"'s":'Your')+' Waffle Board total: '+(+data.waffles).toLocaleString()+'.';$('saveNote').hidden=false}
+      loadTop();
+    }catch(e){
+      const m=String(e&&e.message||'');
+      $('saveNote').textContent=/slow down/.test(m)?'Easy, speedy! Wait a few seconds between runs for the Waffle Board to count them.':(/too|unknown|range/.test(m)?"That run didn't pass the waffle check, so it wasn't added to the board.":"Couldn't reach the Waffle Board. Your waffles are still counted on this device.");
+      $('saveNote').hidden=false;
+    }
   }
+  if(!prof.has_pin&&!asked){asked=true;try{localStorage.setItem('bonkd-asked','1')}catch(e){};setTimeout(()=>{if(state==='over')openProfile('create')},900)}
+}
+function renderProfile(){
+  const has=!!prof.has_pin;
+  $('pfShow').textContent=has?prof.nick:(SB?'No profile yet':'Offline');
+  $('pfEdit').textContent=has?'Change name':'Create profile'; $('pfEdit').hidden=!SB;
+  $('pfBoardLine').textContent=has?'Playing as '+prof.nick+'.':'You don\'t have a profile yet.';
+  $('pfBoardEdit').textContent=has?'Change name':'Create profile';
+  $('pfBoardWrap').hidden=!SB;
 }
 function renderBoard(){
   if($('boardPanel').hidden)return;
   const list=$('boardList'), note=$('boardNote');
-  list.textContent=''; $('nickForm').hidden=!SB;
-  if(!SB){note.textContent=dbTried?"The Waffle Board isn't connected yet. Waffles you earn still count on this device: "+localWaf()+' so far.':'Loading the Waffle Board…';return}
-  note.textContent=boardErr?"Couldn't load the board right now. Try again in a bit.":'Grumble drops waffles every time he goes down. Rare waffles are worth more.';
+  list.textContent='';
+  if(!SB){note.textContent=dbTried?"The Waffle Board isn't connected right now. Waffles you earn still count on this device: "+localWaf()+' so far.':'Loading the Waffle Board…';return}
+  note.textContent=boardErr?"Couldn't load the board right now. Try again in a bit.":'Beat Grumble and he poofs into waffles. Rare waffles are worth more.';
   if(!boardRows.length){const li=document.createElement('li');li.textContent='No waffles yet. Be the first!';list.append(li);return}
   boardRows.forEach((r,i)=>{
     const li=document.createElement('li'); if(r.id===myId)li.className='me';
@@ -955,18 +984,48 @@ function renderBoard(){
     li.append(rk,nm,wf); list.append(li);
   });
 }
-function openBoard(){$('boardPanel').hidden=false;renderBoard();loadTop().then(renderBoard)}
+function openBoard(){$('boardPanel').hidden=false;renderProfile();renderBoard();loadTop().then(renderBoard)}
 $('boardBtn').onclick=openBoard; $('boardBtn2').onclick=openBoard;
 $('boardClose').onclick=()=>{$('boardPanel').hidden=true};
-$('nickForm').addEventListener('submit',async e=>{
-  e.preventDefault();
-  const nick=$('nick').value.trim().slice(0,14);
-  try{localStorage.setItem('bonkd-nick',nick)}catch(_){}
-  if(!SB||!myId)return;
-  const base=myDoc||{waffles:0,best:0,runs:0};
-  try{const {data,error}=await SB.rpc('set_nick',{p_nick:nick});if(error)throw error;myDoc=data;$('nickBtn').textContent='Saved';setTimeout(()=>{$('nickBtn').textContent='Save'},1200);await loadTop();renderBoard()}
-  catch(_){$('boardNote').textContent="Couldn't save your name. Try again in a bit."}
+/* profile screen: create (name + PIN), log in, or change name — all in-game */
+const PF={
+  create:{title:'Save your waffles!',text:'Pick a name for the Waffle Board and a 4-digit PIN. Use them to log in on another phone and keep your waffles.',go:'Save',cancel:'Not now',swap:'Already have a profile? Log in',pin:true},
+  login:{title:'Welcome back!',text:'Log in with your board name and PIN. Waffles you earned on this phone get added to your profile.',go:'Log in',cancel:'Cancel',swap:'New here? Create a profile',pin:true},
+  rename:{title:'Change your name',text:'Your waffles and PIN stay the same.',go:'Save',cancel:'Cancel',swap:'Log in as someone else',pin:false}
+};
+function openProfile(mode){
+  if(!SB)return; pfMode=mode; const m=PF[mode];
+  $('pfTitle').textContent=m.title;$('pfText').textContent=m.text;$('pfGo').textContent=m.go;$('pfCancel').textContent=m.cancel;$('pfSwap').textContent=m.swap;
+  $('pfPin').hidden=!m.pin;$('pfPin').value='';$('pfErr').hidden=true;
+  $('pfName').value=mode==='rename'?(prof.nick||''):(mode==='create'?(prof.nick||''):'');
+  $('profile').hidden=false; setTimeout(()=>{try{$('pfName').focus({preventScroll:true})}catch(e){}},60);
+}
+const PFERR={name_taken:"That name's taken. Try another!",bad_name:'Use 2–14 letters, numbers or spaces.',bad_pin:'Your PIN needs to be 4 numbers.',wrong_pin:"That PIN doesn't match.",locked:'Too many tries. Wait 15 minutes and try again.',no_profile:'No profile with that name.',signed_out:"Couldn't reach the Waffle Board. Try again."};
+function pfFail(r){$('pfErr').textContent=PFERR[r]||"Couldn't reach the Waffle Board. Try again.";$('pfErr').hidden=false}
+$('pfForm').addEventListener('submit',async e=>{
+  e.preventDefault(); if(!SB)return;
+  const nick=$('pfName').value.trim(), pin=$('pfPin').value.trim();
+  if(PF[pfMode].pin&&!/^[0-9]{4}$/.test(pin))return pfFail('bad_pin');
+  $('pfGo').disabled=true;
+  try{
+    if(pfMode==='login'){
+      let {data,error}=await SB.rpc('login_profile',{p_nick:nick,p_pin:pin}); if(error)throw error;
+      if(data&&data.reason==='switch_needed'){await SB.auth.signOut();await newSession();({data,error}=await SB.rpc('login_profile',{p_nick:nick,p_pin:pin}));if(error)throw error}
+      if(!data.ok)return pfFail(data.reason);
+      $('profile').hidden=true; pop('WELCOME BACK, '+data.nick.toUpperCase()+'!',W/2,H*.3,C.gold,30,1.8);
+    }else{
+      const {data,error}=await SB.rpc('save_profile',{p_nick:nick,p_pin:pfMode==='create'?pin:null}); if(error)throw error;
+      if(!data.ok)return pfFail(data.reason);
+      $('profile').hidden=true; pop(pfMode==='create'?'PROFILE SAVED!':'NAME CHANGED!',W/2,H*.3,C.gold,30,1.6);
+    }
+    await loadMe(); await loadTop(); renderBoard();
+  }catch(_){pfFail('')}
+  finally{$('pfGo').disabled=false}
 });
+$('pfCancel').onclick=()=>{$('profile').hidden=true};
+$('pfSwap').onclick=()=>openProfile(pfMode==='login'?'create':'login');
+$('pfEdit').onclick=()=>openProfile(prof.has_pin?'rename':'create');
+$('pfBoardEdit').onclick=()=>openProfile(prof.has_pin?'rename':'create');
 
 /* ---------- drawing helpers (thin ink, two-tone cel shading like the art) ---------- */
 function stroke(lw){ctx.lineWidth=lw||LW;ctx.strokeStyle=INK;ctx.lineJoin='round';ctx.lineCap='round';ctx.stroke()}
