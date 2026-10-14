@@ -125,16 +125,32 @@ canvas{display:block;width:100%;height:100%;touch-action:none;cursor:grab}
 .info h3{margin:4px 0 0;font-family:var(--display);font-weight:400;font-size:16px;letter-spacing:.04em}
 .info p{margin:0;font-size:13.5px;line-height:1.4}
 .info .ver{opacity:.6;font-size:12px}
+.info a{color:var(--ink);font-weight:800;word-break:break-word}
 .mute{position:absolute;z-index:20;top:var(--top,10px);right:14px;width:38px;height:38px;padding:7px;border:2.5px solid var(--ink);border-radius:50%;background:var(--paper);box-shadow:3px 3px 0 var(--ink);cursor:pointer;display:flex;touch-action:manipulation}
 .mute svg{width:100%;height:100%}
 .mute .x{display:none}.mute.off .x{display:inline}.mute.off .w{display:none}
 .mute:focus-visible{outline:3px dashed var(--ink);outline-offset:3px}
 #clear .card{width:min(300px,100%);padding:12px 16px 14px;gap:6px}
-#profile{z-index:15}
+#profPage{z-index:14}#profile{z-index:15}
+.pf-pre{font-size:22px;-webkit-text-stroke:2px var(--ink);text-shadow:2px 2px 0 var(--ink)}
+.pf-logo{font-size:clamp(40px,11vmin,62px)}
 .pf{display:grid;gap:8px}
 .pf input{font:inherit;font-weight:800;font-size:16px;padding:9px 12px;border:2.5px solid var(--ink);border-radius:12px;background:var(--paper);color:var(--ink);text-align:center}
 .pf input:focus-visible{outline:3px dashed var(--ink);outline-offset:2px}
 .err{margin:0;color:var(--red);font-weight:800;font-size:14px}
+.av{width:26px;height:26px;border-radius:50%;flex:none;display:block}
+.av.big{width:64px;height:64px}
+.pp-head{display:flex;gap:12px;align-items:center;justify-content:center}
+.pp-id{display:grid;text-align:left;font-size:18px}
+.pp-id span{font-size:13px;font-weight:800;opacity:.75}
+.pp-who,.pp-col{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
+.pp-who button{padding:0;border:3px solid transparent;border-radius:50%;background:none;cursor:pointer}
+.pp-who button.on{border-color:var(--ink)}
+.pp-who img{width:50px;height:50px;display:block}
+.sw{width:30px;height:30px;padding:0;border-radius:50%;border:2.5px solid var(--ink);cursor:pointer}
+.sw.on{box-shadow:0 0 0 3px var(--paper),0 0 0 5.5px var(--ink)}
+.pp-who button:focus-visible,.sw:focus-visible{outline:3px dashed var(--ink);outline-offset:3px}
+.board .av{width:24px;height:24px}
 @media (prefers-reduced-motion:reduce){.logo span{animation:none}}
 </style>
 
@@ -207,25 +223,46 @@ canvas{display:block;width:100%;height:100%;touch-action:none;cursor:grab}
       <div class="set-row"><span>Controls</span><div class="hand" role="group" aria-label="Controls"><button class="seg" data-hand="right" type="button">Right-handed</button><button class="seg" data-hand="left" type="button">Left-handed</button></div></div>
       <div class="set-row"><span>Music</span><div class="hand"><button class="seg" id="musOn" type="button">On</button><button class="seg" id="musOff" type="button">Off</button></div></div>
       <div class="set-row"><span>Sound effects</span><div class="hand"><button class="seg" id="sfxOn" type="button">On</button><button class="seg" id="sfxOff" type="button">Off</button></div></div>
-      <div class="set-row"><span>Waffle Board</span><span class="hand"><b id="pfShow">No profile yet</b><button class="seg" id="pfEdit" type="button">Create profile</button></span></div>
+      <div class="set-row"><span>Profile</span><span class="hand"><img class="av" id="setAv" alt=""><b id="pfShow">No profile yet</b><button class="seg" id="pfEdit" type="button">Manage</button></span></div>
       <div class="info">
         <h3>How to play</h3>
-        <p>Drag anywhere to move Todd and dodge Grumble's junk. Catch the tube socks Booster tosses you: each one holds a goofy weapon. When a weapon needs you, the action button appears on your weapon side. Bonk Grumble out of the sky and he poofs into waffles. Four bonks and Todd is out.</p>
+        <p>Todd wants Grumble's waffles! Drag him left and right to avoid getting BONKD by Grumble's junk. Be careful: 4 bonks and Todd dies.</p>
+        <p>Catch the tube socks tossed by Booster the Guardian Angel. Each tube sock contains a power-up or a weapon. Weapons have different action buttons that appear on the opposite side of the controls. Use the weapons to help Todd get Grumble's waffles!</p>
         <h3>Beta</h3>
         <p>Bonkd is an app in development. Things will change, and some may break. Scores and the Waffle Board may be reset during testing.</p>
         <h3>The fine print</h3>
         <p>Waffles are just for fun. They have no cash value and can't be bought, sold or traded. There are no ads or purchases in this game.</p>
-        <p>To keep the Waffle Board, the game stores a random player ID on this device along with your board name, a scrambled copy of your PIN, and your waffle totals. It does not collect your real name, email, contacts or location. If you clear your browser data or switch phones, log back in with your name and PIN. Your board name is visible to everyone, so don't use your real name.</p>
-        <p>Characters and artwork belong to their owners and are used with permission. All rights reserved.</p>
+        <p>To keep the Waffle Board, the game stores a random player ID on this device along with your board name, picture choice, a scrambled copy of your PIN, and your waffle totals. It does not collect your real name, email, contacts or location. If you clear your browser data or switch phones, log back in with your name and PIN. Your board name is visible to everyone, so don't use your real name.</p>
+        <p>Characters and artwork are owned by geaux.eth but are a part of The Nibbles, an 8,888 NFT collection within the Franky The Frog ecosystem by Lonely Lily Studios.</p>
+        <p>The Nibbles: <a href="https://opensea.io/collection/the-nibbles" target="_blank" rel="noopener">opensea.io/collection/the-nibbles</a><br>Franky The Frog: <a href="https://frankythefrog.com/hub" target="_blank" rel="noopener">frankythefrog.com/hub</a></p>
         <p class="ver">Bonkd beta 0.1</p>
       </div>
       <div class="btns"><button class="btn plain small" id="settingsClose">Close</button></div>
     </div>
   </div>
 
+  <div class="overlay dim" id="profPage" hidden>
+    <div class="card wide pp">
+      <p class="pre">Profile</p>
+      <div class="pp-head"><img class="av big" id="ppAv" alt=""><div class="pp-id"><b id="ppName">No profile yet</b><span id="ppWaf"></span></div></div>
+      <div id="ppNone">
+        <p class="note">Create a profile to put your name on the Waffle Board and keep your waffles on any phone.</p>
+        <div class="btns"><button class="btn red" id="ppCreate" type="button">Create profile</button><button class="link" id="ppLogin" type="button">Log in</button></div>
+      </div>
+      <div id="ppHas" hidden>
+        <p class="label">Profile picture</p>
+        <div class="pp-who" id="ppWho" role="group" aria-label="Character"></div>
+        <div class="pp-col" id="ppCol" role="group" aria-label="Background color"></div>
+        <div class="btns"><button class="seg" id="ppRename" type="button">Change name</button><button class="seg" id="ppPin" type="button">Change PIN</button><button class="seg" id="ppSwitch" type="button">Log in as someone else</button></div>
+      </div>
+      <div class="btns"><button class="btn plain small" id="ppClose" type="button">Close</button></div>
+    </div>
+  </div>
+
   <div class="overlay dim" id="profile" hidden>
     <div class="card">
-      <p class="pre" id="pfTitle">Save your waffles!</p>
+      <p class="pre pf-pre outline" id="pfPre">Save your</p>
+      <h2 class="logo pf-logo" id="pfLogo"></h2>
       <p class="note" id="pfText"></p>
       <form class="pf" id="pfForm">
         <input id="pfName" maxlength="14" autocomplete="nickname" autocapitalize="words" placeholder="Board name" aria-label="Board name">
@@ -233,6 +270,7 @@ canvas{display:block;width:100%;height:100%;touch-action:none;cursor:grab}
         <p class="err" id="pfErr" role="alert" hidden></p>
         <div class="btns"><button class="btn red" id="pfGo" type="submit">Save</button><button class="btn plain small" id="pfCancel" type="button">Not now</button></div>
       </form>
+      <button class="link" id="pfForgot" type="button" hidden>Forgot your PIN?</button>
       <button class="link" id="pfSwap" type="button">Already have a profile? Log in</button>
     </div>
   </div>
@@ -242,7 +280,7 @@ canvas{display:block;width:100%;height:100%;touch-action:none;cursor:grab}
       <p class="pre">Waffle Board</p>
       <p class="note" id="boardNote">Grumble drops waffles every time he goes down. Rare waffles are worth more.</p>
       <ol class="board" id="boardList"></ol>
-      <p class="note" id="pfBoardWrap"><span id="pfBoardLine"></span> <button class="link" id="pfBoardEdit" type="button">Create profile</button></p>
+      <p class="note" id="pfBoardWrap"><span id="pfBoardLine"></span> <button class="link" id="pfBoardEdit" type="button">Manage profile</button></p>
       <form class="nick" id="nickForm" hidden>
         <input id="nick" maxlength="14" autocomplete="off" placeholder="Your name on the board" aria-label="Your name on the board">
         <button class="btn small" id="nickBtn" type="submit">Save</button>
@@ -480,7 +518,7 @@ const keys={};
 addEventListener('keydown',e=>{
   keys[e.key]=true;
   if(e.target&&e.target.tagName==='INPUT')return;
-  if(e.key==='p'||e.key==='P'||e.key==='Escape'){if(!$('profile').hidden){$('profile').hidden=true;return}if(!$('settings').hidden){$('settings').hidden=true;return}if(!$('boardPanel').hidden){$('boardPanel').hidden=true;return}setPause(!paused);return}
+  if(e.key==='p'||e.key==='P'||e.key==='Escape'){if(!$('profile').hidden){$('profile').hidden=true;return}if(!$('profPage').hidden){$('profPage').hidden=true;return}if(!$('settings').hidden){$('settings').hidden=true;return}if(!$('boardPanel').hidden){$('boardPanel').hidden=true;return}setPause(!paused);return}
   if(e.key===' '||e.key==='Enter'){e.preventDefault();if(paused)return;if(state==='menu'||state==='over')start(mode);else if(state==='clear')nextLevel();else if(state==='play'&&!e.repeat)act()}
 });
 addEventListener('keyup',e=>{keys[e.key]=false});
@@ -722,6 +760,7 @@ function showClear(){
   $('clrPre').textContent='Level '+level;
   $('clear').hidden=false;
   setTimeout(()=>{try{$('nextBtn').focus({preventScroll:true})}catch(e){}},50);
+  if(typeof window.onLevelClear==='function')window.onLevelClear(level);
 }
 function nextLevel(){
   if(state!=='clear')return;
@@ -740,7 +779,7 @@ function update(dt){
   const sdt=slowT>0?dt*.45:dt;
   slowT=Math.max(0,slowT-dt); swotCool=Math.max(0,swotCool-dt);
   if(state==='menu'){const ti=document.querySelector('#menu .title');const lo=ti?ti.offsetLeft+ti.offsetWidth+70*S:W*.45,hi=W-70*S;bear.tx=(lo+hi)/2+Math.sin(now*.7)*Math.max(0,(hi-lo)/2);bear.hits=3;
-    for(const m of menuWafs){m.y+=m.v*dt;m.rot+=m.vr*dt;m.x+=Math.sin(now*.8+m.p)*12*S*dt;if(m.y>GY+20*S){m.y=-30*S;m.x=rnd(.4,.98)*W;m.t='plain'}}}
+    for(const m of menuWafs){m.y+=m.v*dt;m.rot+=m.vr*dt;m.x+=Math.sin(now*.8+m.p)*12*S*dt;if(m.y>GY-12*S){m.y=-30*S;m.x=rnd(.4,.98)*W;m.t='plain'}}}
   if(canMove()){if(keys.ArrowLeft||keys.a)bear.tx=bear.x-140*S;if(keys.ArrowRight||keys.d)bear.tx=bear.x+140*S}
   if(!bear.ko){
     bear.tx=clamp(bear.tx,44*S,W-44*S);
@@ -805,7 +844,7 @@ function update(dt){
     if(w.home){const tx=bear.x,ty=GY-96*S;w.x+=(tx-w.x)*Math.min(1,dt*6);w.y+=(ty-w.y)*Math.min(1,dt*6);w.rot+=8*dt}
     else if(!w.land){w.vy+=w.g*dt;w.x+=w.vx*dt;w.y+=w.vy*dt;w.rot+=w.vr*dt;
       if(w.x<20*S||w.x>W-20*S){w.vx*=-.7;w.x=clamp(w.x,20*S,W-20*S)}
-      if(w.y>GY-8*S){w.y=GY-8*S;w.land=true;w.landT=0;w.rot=0}}
+      if(w.y>GY-10*S){w.y=GY-10*S;w.land=true;w.landT=0;w.rot=0}}
     else w.landT+=dt;
     const near=w.home?Math.hypot(w.x-bear.x,w.y-(GY-96*S))<30*S:w.land?Math.abs(w.x-bear.x)<54*S:Math.hypot(w.x-bear.x,w.y-(GY-96*S))<72*S;
     if((canMove()||w.home)&&!bear.ko&&near){w.gone=true;const T=WTK[w.t]||WT[0];runWaffles+=T.v;runCounts[T.k]=(runCounts[T.k]||0)+1;lvStats.waffles+=T.v;updateWaf();
@@ -923,13 +962,13 @@ function showOver(){
 const SUPABASE_URL='https://jmiesqhrpcmrthrquqpq.supabase.co';
 const SUPABASE_KEY='sb_publishable_e7oqQbX2PJ5qV5ge2vUSbg_H9t0A9-d';
 let SB=null,myId=null,prof={},boardRows=[],boardErr=false,dbTried=false,pfMode='create';
-let asked=false;try{asked=localStorage.getItem('bonkd-asked')==='1'}catch(e){}
+let askedSession=false;
 const localWaf=()=>store('bonkd-waffles');
 async function newSession(){const r=await SB.auth.signInAnonymously();if(r.error)throw r.error;myId=r.data.session.user.id}
 async function loadMe(){try{const {data}=await SB.rpc('my_profile');prof=data||{}}catch(e){}renderProfile()}
 async function loadTop(){
   if(!SB)return;
-  const {data,error}=await SB.from('waffle_board').select('id,nick,waffles').order('waffles',{ascending:false}).limit(10);
+  const {data,error}=await SB.from('waffle_board').select('id,nick,pfp,waffles').order('waffles',{ascending:false}).limit(10);
   boardErr=!!error; if(data)boardRows=data;
 }
 (async()=>{
@@ -959,15 +998,48 @@ async function saveRun(){
       $('saveNote').hidden=false;
     }
   }
-  if(!prof.has_pin&&!asked){asked=true;try{localStorage.setItem('bonkd-asked','1')}catch(e){};setTimeout(()=>{if(state==='over')openProfile('create')},900)}
 }
+/* ---------- profile pictures: a character on a colored circle ---------- */
+const AVC={red:'#df3a4e',gold:'#ffd23f',sky:'#7fd3ff',mint:'#8ee26b',pink:'#f48aa8',purple:'#b48cff'};
+const WHO=['todd','booster','grumble','waffle'];
+const avCache={};
+function avatarURL(key){
+  key=key&&/^(todd|booster|grumble|waffle):(red|gold|sky|mint|pink|purple)$/.test(key)?key:'waffle:gold';
+  if(avCache[key])return avCache[key];
+  const [who,col]=key.split(':');
+  const spr=who==='todd'?SPR.bear:who==='booster'?SPR.angel:who==='grumble'?SPR.ghost:null;
+  if(who!=='waffle'&&!spr)return '';
+  const c=document.createElement('canvas');c.width=c.height=96;const x=c.getContext('2d');
+  x.fillStyle=AVC[col];x.beginPath();x.arc(48,48,46,0,TAU);x.fill();
+  x.save();x.beginPath();x.arc(48,48,44,0,TAU);x.clip();
+  if(who==='waffle'){const real=ctx;ctx=x;ctx.translate(48,52);ctx.scale(2.3,2.3);drawWaffle('plain',0);ctx=real}
+  else if(who==='todd'){const w=104,h=w/spr.r;x.drawImage(spr.img,48-w*.53,8,w,h)}
+  else if(who==='booster'){const w=100,h=w/spr.r;x.drawImage(spr.img,48-w*.5,4,w,h)}
+  else{const h=104,w=h*spr.r;x.drawImage(spr.img,48-w*.6,0,w,h)}
+  x.restore();x.lineWidth=4;x.strokeStyle='#161616';x.beginPath();x.arc(48,48,45,0,TAU);x.stroke();
+  return avCache[key]=c.toDataURL();
+}
+function setImg(el,key){const u=avatarURL(key);if(u)el.src=u;else setTimeout(()=>setImg(el,key),300)}
 function renderProfile(){
-  const has=!!prof.has_pin;
-  $('pfShow').textContent=has?prof.nick:(SB?'No profile yet':'Offline');
-  $('pfEdit').textContent=has?'Change name':'Create profile'; $('pfEdit').hidden=!SB;
-  $('pfBoardLine').textContent=has?'Playing as '+prof.nick+'.':'You don\'t have a profile yet.';
-  $('pfBoardEdit').textContent=has?'Change name':'Create profile';
+  const has=!!prof.has_pin, key=prof.pfp||'waffle:gold';
+  $('pfShow').textContent=has?prof.nick:(SB?'No profile yet':'Offline'); $('pfEdit').hidden=!SB;
+  setImg($('setAv'),key); $('setAv').hidden=!has;
+  $('pfBoardLine').textContent=has?'Playing as '+prof.nick+'.':"You don't have a profile yet.";
   $('pfBoardWrap').hidden=!SB;
+  $('ppName').textContent=has?prof.nick:'No profile yet';
+  $('ppWaf').textContent=has?(+prof.waffles||0).toLocaleString()+' waffles on the board':'';
+  setImg($('ppAv'),key);
+  $('ppNone').hidden=has; $('ppHas').hidden=!has;
+  const [who,col]=key.split(':');
+  const wb=$('ppWho'); if(!wb.childElementCount){for(const w of WHO){const b=document.createElement('button');b.type='button';b.dataset.who=w;b.setAttribute('aria-label',w);const i=document.createElement('img');i.alt='';b.append(i);b.onclick=()=>pickPfp(w,null);wb.append(b)}}
+  for(const b of wb.children){b.classList.toggle('on',b.dataset.who===who);b.setAttribute('aria-pressed',b.dataset.who===who);setImg(b.firstChild,b.dataset.who+':'+col)}
+  const cb=$('ppCol'); if(!cb.childElementCount){for(const k in AVC){const b=document.createElement('button');b.type='button';b.className='sw';b.dataset.col=k;b.style.background=AVC[k];b.setAttribute('aria-label',k);b.onclick=()=>pickPfp(null,k);cb.append(b)}}
+  for(const b of cb.children){b.classList.toggle('on',b.dataset.col===col);b.setAttribute('aria-pressed',b.dataset.col===col)}
+}
+async function pickPfp(w,c){
+  const [who,col]=(prof.pfp||'waffle:gold').split(':'); const key=(w||who)+':'+(c||col);
+  prof.pfp=key; renderProfile();
+  try{const {data,error}=await SB.rpc('set_pfp',{p_pfp:key});if(error||!data.ok)throw 0;loadTop().then(renderBoard)}catch(e){}
 }
 function renderBoard(){
   if($('boardPanel').hidden)return;
@@ -979,33 +1051,46 @@ function renderBoard(){
   boardRows.forEach((r,i)=>{
     const li=document.createElement('li'); if(r.id===myId)li.className='me';
     const rk=document.createElement('span');rk.className='rk';rk.textContent=i+1;
+    const av=document.createElement('img');av.className='av';av.alt='';setImg(av,r.pfp);
     const nm=document.createElement('span');nm.className='nm';nm.textContent=(r.nick||'Mystery Waffler')+(r.id===myId?' (you)':'');
     const wf=document.createElement('span');wf.className='wf';wf.textContent=(+r.waffles||0).toLocaleString()+' 🧇';
-    li.append(rk,nm,wf); list.append(li);
+    li.append(rk,av,nm,wf); list.append(li);
   });
 }
 function openBoard(){$('boardPanel').hidden=false;renderProfile();renderBoard();loadTop().then(renderBoard)}
 $('boardBtn').onclick=openBoard; $('boardBtn2').onclick=openBoard;
 $('boardClose').onclick=()=>{$('boardPanel').hidden=true};
-/* profile screen: create (name + PIN), log in, or change name — all in-game */
+function openPage(){if(!SB)return;$('profPage').hidden=false;renderProfile();loadMe()}
+$('pfEdit').onclick=openPage; $('pfBoardEdit').onclick=openPage; $('ppClose').onclick=()=>{$('profPage').hidden=true};
+$('ppCreate').onclick=()=>openProfile('create'); $('ppLogin').onclick=()=>openProfile('login');
+$('ppRename').onclick=()=>openProfile('rename'); $('ppPin').onclick=()=>openProfile('pin'); $('ppSwitch').onclick=()=>openProfile('login');
+/* one-time prompt per session, right after a level is cleared */
+window.onLevelClear=()=>{if(SB&&!prof.has_pin&&!askedSession){askedSession=true;setTimeout(()=>{if(state==='clear')openProfile('create')},700)}};
+/* create / log in / change name / change PIN — all in-game */
 const PF={
-  create:{title:'Save your waffles!',text:'Pick a name for the Waffle Board and a 4-digit PIN. Use them to log in on another phone and keep your waffles.',go:'Save',cancel:'Not now',swap:'Already have a profile? Log in',pin:true},
-  login:{title:'Welcome back!',text:'Log in with your board name and PIN. Waffles you earned on this phone get added to your profile.',go:'Log in',cancel:'Cancel',swap:'New here? Create a profile',pin:true},
-  rename:{title:'Change your name',text:'Your waffles and PIN stay the same.',go:'Save',cancel:'Cancel',swap:'Log in as someone else',pin:false}
+  create:{pre:'Save your',logo:'WAFFLES!',text:'Pick a name for the Waffle Board and a 4-digit PIN. Use them to log in on another phone and keep your waffles.',go:'Save',cancel:'Not now',swap:'Already have a profile? Log in',name:true,pin:true},
+  login:{pre:'Welcome',logo:'BACK!',text:'Log in with your board name and PIN. Waffles you earned on this phone get added to your profile.',go:'Log in',cancel:'Cancel',swap:'New here? Create a profile',name:true,pin:true,forgot:true},
+  rename:{pre:'Change your',logo:'NAME',text:'Your waffles and PIN stay the same.',go:'Save',cancel:'Cancel',name:true,pin:false},
+  pin:{pre:'Change your',logo:'PIN',text:'Pick a new 4-digit PIN. You won\'t need the old one on this phone.',go:'Save',cancel:'Cancel',name:false,pin:true}
 };
+function logoSpans(el,txt){el.textContent='';el.setAttribute('aria-label',txt);for(const ch of txt){const sp=document.createElement('span');sp.textContent=ch;el.append(sp)}}
 function openProfile(mode){
   if(!SB)return; pfMode=mode; const m=PF[mode];
-  $('pfTitle').textContent=m.title;$('pfText').textContent=m.text;$('pfGo').textContent=m.go;$('pfCancel').textContent=m.cancel;$('pfSwap').textContent=m.swap;
-  $('pfPin').hidden=!m.pin;$('pfPin').value='';$('pfErr').hidden=true;
-  $('pfName').value=mode==='rename'?(prof.nick||''):(mode==='create'?(prof.nick||''):'');
-  $('profile').hidden=false; setTimeout(()=>{try{$('pfName').focus({preventScroll:true})}catch(e){}},60);
+  $('pfPre').textContent=m.pre; logoSpans($('pfLogo'),m.logo); $('pfText').textContent=m.text;
+  $('pfGo').textContent=m.go;$('pfCancel').textContent=m.cancel;
+  $('pfSwap').textContent=m.swap||'';$('pfSwap').hidden=!m.swap;$('pfForgot').hidden=!m.forgot;
+  $('pfName').hidden=!m.name;$('pfPin').hidden=!m.pin;$('pfPin').value='';$('pfErr').hidden=true;
+  $('pfPin').placeholder=mode==='pin'?'New 4-digit PIN':'4-digit PIN';
+  $('pfName').value=(mode==='rename'||mode==='create')?(prof.nick||''):'';
+  $('profile').hidden=false; setTimeout(()=>{try{(m.name?$('pfName'):$('pfPin')).focus({preventScroll:true})}catch(e){}},60);
 }
-const PFERR={name_taken:"That name's taken. Try another!",bad_name:'Use 2–14 letters, numbers or spaces.',bad_pin:'Your PIN needs to be 4 numbers.',wrong_pin:"That PIN doesn't match.",locked:'Too many tries. Wait 15 minutes and try again.',no_profile:'No profile with that name.',signed_out:"Couldn't reach the Waffle Board. Try again."};
+const PFERR={name_taken:"That name's taken! Try another.",bad_name:'Use 2–14 letters, numbers or spaces.',bad_pin:'Your PIN needs to be 4 numbers.',wrong_pin:"That PIN doesn't match.",locked:'Too many tries. Wait 15 minutes and try again.',no_profile:'No profile with that name.',signed_out:"Couldn't reach the Waffle Board. Try again."};
 function pfFail(r){$('pfErr').textContent=PFERR[r]||"Couldn't reach the Waffle Board. Try again.";$('pfErr').hidden=false}
+$('pfForgot').onclick=()=>{$('pfErr').textContent='Open Bonkd on a phone where you\'re still logged in and pick a new PIN under Settings → Profile.';$('pfErr').hidden=false};
 $('pfForm').addEventListener('submit',async e=>{
   e.preventDefault(); if(!SB)return;
-  const nick=$('pfName').value.trim(), pin=$('pfPin').value.trim();
-  if(PF[pfMode].pin&&!/^[0-9]{4}$/.test(pin))return pfFail('bad_pin');
+  const m=PF[pfMode], nick=$('pfName').value.trim(), pin=$('pfPin').value.trim();
+  if(m.pin&&!/^[0-9]{4}$/.test(pin))return pfFail('bad_pin');
   $('pfGo').disabled=true;
   try{
     if(pfMode==='login'){
@@ -1014,9 +1099,10 @@ $('pfForm').addEventListener('submit',async e=>{
       if(!data.ok)return pfFail(data.reason);
       $('profile').hidden=true; pop('WELCOME BACK, '+data.nick.toUpperCase()+'!',W/2,H*.3,C.gold,30,1.8);
     }else{
-      const {data,error}=await SB.rpc('save_profile',{p_nick:nick,p_pin:pfMode==='create'?pin:null}); if(error)throw error;
+      const n=pfMode==='pin'?prof.nick:nick, p=(pfMode==='create'||pfMode==='pin')?pin:null;
+      const {data,error}=await SB.rpc('save_profile',{p_nick:n,p_pin:p}); if(error)throw error;
       if(!data.ok)return pfFail(data.reason);
-      $('profile').hidden=true; pop(pfMode==='create'?'PROFILE SAVED!':'NAME CHANGED!',W/2,H*.3,C.gold,30,1.6);
+      $('profile').hidden=true; pop({create:'PROFILE SAVED!',rename:'NAME CHANGED!',pin:'PIN CHANGED!'}[pfMode],W/2,H*.3,C.gold,30,1.6);
     }
     await loadMe(); await loadTop(); renderBoard();
   }catch(_){pfFail('')}
@@ -1024,8 +1110,6 @@ $('pfForm').addEventListener('submit',async e=>{
 });
 $('pfCancel').onclick=()=>{$('profile').hidden=true};
 $('pfSwap').onclick=()=>openProfile(pfMode==='login'?'create':'login');
-$('pfEdit').onclick=()=>openProfile(prof.has_pin?'rename':'create');
-$('pfBoardEdit').onclick=()=>openProfile(prof.has_pin?'rename':'create');
 
 /* ---------- drawing helpers (thin ink, two-tone cel shading like the art) ---------- */
 function stroke(lw){ctx.lineWidth=lw||LW;ctx.strokeStyle=INK;ctx.lineJoin='round';ctx.lineCap='round';ctx.stroke()}
@@ -1050,7 +1134,7 @@ function ground(top,dirt,tuft){
   ctx.beginPath();ctx.moveTo(-30,GY+4*S);
   for(let x=-30;x<W+60;x+=50*S)ctx.quadraticCurveTo(x+25*S,GY-8*S,x+50*S,GY+4*S);
   ctx.lineTo(W+60,H+40);ctx.lineTo(-30,H+40);ctx.closePath();ctx.fillStyle=top;ctx.fill();stroke(LW*S);
-  const dy=GY+30*S;
+  const dy=GY+7*S;
   ctx.beginPath();ctx.moveTo(-30,dy);
   for(let x=-30;x<W+60;x+=70*S)ctx.quadraticCurveTo(x+35*S,dy+8*S,x+70*S,dy);
   ctx.lineTo(W+60,H+40);ctx.lineTo(-30,H+40);ctx.closePath();ctx.fillStyle=dirt;ctx.fill();stroke(LW*S);
@@ -1094,9 +1178,9 @@ const BG=[
       ctx.strokeStyle='#9cbf6e';ctx.lineWidth=2.4;ctx.beginPath();for(const mx of[-40,-24,-6,14,32,44]){ctx.moveTo(mx,-104);ctx.quadraticCurveTo(mx+5,-88,mx-2,-70-Math.abs(mx)%20)}ctx.stroke();
     });
     ground('#7a6a45','#5a4630',0);
-    ctx.fillStyle='#3f8a85';ctx.fillRect(0,GY+10*S,W,18*S);ctx.beginPath();ctx.moveTo(0,GY+10*S);ctx.lineTo(W,GY+10*S);ctx.moveTo(0,GY+28*S);ctx.lineTo(W,GY+28*S);stroke(1.8*S);
-    ctx.strokeStyle='#bfe3dc';ctx.lineWidth=2*S;ctx.beginPath();for(let x=20*S;x<W;x+=70*S){ctx.moveTo(x,GY+19*S);ctx.lineTo(x+22*S,GY+19*S)}ctx.stroke();
-    for(const x of[W*.3,W*.68])unit(x,GY+18*S,()=>{cel(()=>{ctx.ellipse(0,0,16,6,0,.3,TAU-.3);ctx.lineTo(0,0);ctx.closePath()},'#7cc35e','#5ea545')});
+    ctx.fillStyle='#3f8a85';ctx.fillRect(0,GY+18*S,W,18*S);ctx.beginPath();ctx.moveTo(0,GY+18*S);ctx.lineTo(W,GY+18*S);ctx.moveTo(0,GY+36*S);ctx.lineTo(W,GY+36*S);stroke(1.8*S);
+    ctx.strokeStyle='#bfe3dc';ctx.lineWidth=2*S;ctx.beginPath();for(let x=20*S;x<W;x+=70*S){ctx.moveTo(x,GY+27*S);ctx.lineTo(x+22*S,GY+27*S)}ctx.stroke();
+    for(const x of[W*.3,W*.68])unit(x,GY+26*S,()=>{cel(()=>{ctx.ellipse(0,0,16,6,0,.3,TAU-.3);ctx.lineTo(0,0);ctx.closePath()},'#7cc35e','#5ea545')});
   },
   function graveyard(){
     sky('#241f45','#5b4a8c');

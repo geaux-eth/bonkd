@@ -90,10 +90,11 @@ create extension if not exists pgcrypto with schema extensions;
 alter table public.waffle_board add column if not exists pin_hash text;
 alter table public.waffle_board add column if not exists pin_fails int not null default 0;
 alter table public.waffle_board add column if not exists locked_until timestamptz;
+alter table public.waffle_board add column if not exists pfp text;
 
 -- PINs stay private: players can read every column except the PIN ones.
 revoke select on public.waffle_board from anon, authenticated;
-grant select (id, nick, waffles, best, runs, updated_at) on public.waffle_board to anon, authenticated;
+grant select (id, nick, pfp, waffles, best, runs, updated_at) on public.waffle_board to anon, authenticated;
 
 -- One player per name (capital letters don't count as different).
 update public.waffle_board b set nick = left(b.nick, 9) || '-' || left(b.id::text, 4)
@@ -109,7 +110,7 @@ security definer
 set search_path = public
 as $$
   select coalesce(
-    (select jsonb_build_object('nick', nick, 'has_pin', pin_hash is not null, 'waffles', waffles, 'best', best, 'runs', runs)
+    (select jsonb_build_object('nick', nick, 'pfp', pfp, 'has_pin', pin_hash is not null, 'waffles', waffles, 'best', best, 'runs', runs)
        from public.waffle_board where id = auth.uid()),
     '{}'::jsonb);
 $$;
@@ -142,7 +143,7 @@ end;
 $$;
 
 -- Log in to an existing profile from this phone. Waffles earned here before
--- logging in are added to the profile. Five wrong PINs locks it for 15 minutes.
+-- logging in are added to the profile. Six wrong PINs in a row locks it for 15 minutes.
 create or replace function public.login_profile(p_nick text, p_pin text)
 returns jsonb
 language plpgsql
@@ -161,7 +162,7 @@ begin
   if r.pin_hash <> crypt(coalesce(p_pin, ''), r.pin_hash) then
     update public.waffle_board
        set pin_fails = pin_fails + 1,
-           locked_until = case when pin_fails + 1 >= 5 then now() + interval '15 minutes' else locked_until end
+           locked_until = case when pin_fails + 1 >= 6 then now() + interval '15 minutes' else locked_until end
      where id = r.id;
     return jsonb_build_object('ok', false, 'reason', 'wrong_pin');
   end if;
@@ -186,6 +187,27 @@ begin
   return jsonb_build_object('ok', true, 'nick', r.nick, 'waffles', r.waffles + coalesce(m.waffles, 0));
 end;
 $$;
+
+-- Profile picture: one of the game's characters on a colored background.
+create or replace function public.set_pfp(p_pfp text)
+returns jsonb
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare uid uuid := auth.uid();
+begin
+  if uid is null then return jsonb_build_object('ok', false, 'reason', 'signed_out'); end if;
+  if p_pfp !~ '^(todd|booster|grumble|waffle):(red|gold|sky|mint|pink|purple)$' then
+    return jsonb_build_object('ok', false, 'reason', 'bad_pfp');
+  end if;
+  insert into public.waffle_board as b (id, pfp) values (uid, p_pfp)
+  on conflict (id) do update set pfp = excluded.pfp, updated_at = now();
+  return jsonb_build_object('ok', true, 'pfp', p_pfp);
+end;
+$$;
+revoke all on function public.set_pfp(text) from public, anon;
+grant execute on function public.set_pfp(text) to authenticated;
 
 -- Older versions of the game called set_nick; it now follows the same name rules.
 drop function if exists public.set_nick(text);
