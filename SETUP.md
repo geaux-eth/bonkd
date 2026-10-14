@@ -3,7 +3,7 @@
 ## 1. Waffle Board database (Supabase, free, no card)
 1. Sign up at https://supabase.com and create a new project (Free plan).
 2. Authentication > Sign In / Providers: turn on **Allow anonymous sign-ins**.
-3. SQL Editor > New query: paste `supabase-setup.sql` and click Run.
+3. SQL Editor > New query: paste all of `supabase-setup.sql` and click Run. (Safe to run again after updates.)
 4. Project Settings > API: copy the **Project URL** and the **anon public** key.
 5. Put the Project URL and anon key into `SUPABASE_URL` and `SUPABASE_KEY` near the Waffle Board section of `index.html`.
    (The anon key is meant to be public; the database rules only let each player change their own row.)

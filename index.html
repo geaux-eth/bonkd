@@ -290,7 +290,7 @@ const bear={x:0,tx:0,vx:0,walk:0,hits:0,hitT:0,inv:0,ko:false,koT:0,helmet:0,swi
 const ghost={x:0,y:0,yOff:0,t:0,hp:10,max:10,throwT:2,squash:0,hitT:0,splat:0,ko:false,koT:0,say:null,sayT:3,face:1,faceS:1,px:0};
 let state='menu',mode='free',level=1,lvlTime=0;
 let items=[],pops=[],sparks=[],shots=[],gifts=[],buns=[],animals=[],impacts=[],splats=[],wafs=[],angel=null,angelT=7;
-let paused=false,runWaffles=0,lvStats={hits:0,bonks:0,waffles:0};
+let paused=false,runWaffles=0,runCounts={},lvStats={hits:0,bonks:0,waffles:0};
 let t=0,score=0,shake=0,now=0,slowT=0,swotCool=0,levelT=0,shownScore=-1,chipKey='',flashT=0,boltT=4,bolt=null;
 const clouds=[0,1,2,3].map(i=>({x:Math.random(),y:.36+i*.07+Math.random()*.03,s:.55+Math.random()*.45,v:.006+Math.random()*.008}));
 const flies=Array.from({length:16},()=>({x:Math.random(),y:.35+Math.random()*.5,p:Math.random()*TAU}));
@@ -364,7 +364,7 @@ function updateHp(){const el=$('hp');el.style.width=Math.max(0,ghost.hp/ghost.ma
 function start(m){
   audio();
   mode=m; rng=m==='daily'?mulberry(dayNum()*9973+7):Math.random;
-  resetBoard(); t=0; score=0; shownScore=-1; level=1; lvlTime=0; angelT=5; bgKey=''; paused=false; runWaffles=0; updateWaf();
+  resetBoard(); t=0; score=0; shownScore=-1; level=1; lvlTime=0; angelT=5; bgKey=''; paused=false; runWaffles=0; runCounts={}; updateWaf();
   Object.assign(bear,{x:W/2,tx:W/2,hits:0,hitT:0,inv:0,ko:false,koT:0,helmet:0,weapon:null,jello:null,swing:0,face:1,faceS:1});
   setGhost(); ghost.x=W/2;
   state='play'; ['menu','over','pause','clear','boardPanel'].forEach(k=>$(k).hidden=true); $('hud').hidden=false; renderMeter();
@@ -636,7 +636,7 @@ function update(dt){
       if(w.y>GY-8*S){w.y=GY-8*S;w.land=true;w.landT=0;w.rot=0}}
     else w.landT+=dt;
     const near=w.land?Math.abs(w.x-bear.x)<54*S:Math.hypot(w.x-bear.x,w.y-(GY-96*S))<72*S;
-    if(canMove()&&!bear.ko&&near){w.gone=true;const T=WTK[w.t]||WT[0];runWaffles+=T.v;lvStats.waffles+=T.v;updateWaf();
+    if(canMove()&&!bear.ko&&near){w.gone=true;const T=WTK[w.t]||WT[0];runWaffles+=T.v;runCounts[T.k]=(runCounts[T.k]||0)+1;lvStats.waffles+=T.v;updateWaf();
       const big=T.v>=10;pop('+'+T.v+' '+T.name,clamp(w.x,140*S,W-140*S),w.y-34*S,big?'#ffd23f':'#f2b544',big?30:22,big?1.4:.8);
       if(big){sfx.win();burst(w.x,w.y,'#ffd23f',T.v>=333?28:14);if(T.v>=333){shake=.5;pop(T.v>=2000?'JACKPOT!':'WHOA!',W/2,H*.4,C.red,T.v>=2000?72:52,1.8)}}else{sfx.waffle();burst(w.x,w.y,'#f2b544',5)}}
     if(w.land&&w.landT>3.5)w.gone=true;
@@ -772,18 +772,21 @@ async function loadTop(){
   const {data,error}=await SB.from('waffle_board').select('id,nick,waffles').order('waffles',{ascending:false}).limit(10);
   boardErr=!!error; if(data)boardRows=data;
 }
-async function writeMine(nd){
-  const row=Object.assign({id:myId,updated_at:new Date().toISOString()},nd);
-  const {error}=await SB.from('waffle_board').upsert(row); if(error)throw error; myDoc=Object.assign({},myDoc||{},nd);
-}
 async function saveRun(){
   store('bonkd-waffles',localWaf()+runWaffles);
   if(!SB||!myId)return;
-  const base=myDoc||{waffles:0,best:0,runs:0,nick:''};
-  if(runWaffles===0&&level<=(+base.best||0)&&myDoc)return;
-  const nd={nick:base.nick||$('nick').value.trim().slice(0,14)||null,waffles:(+base.waffles||0)+runWaffles,best:Math.max(+base.best||0,level),runs:(+base.runs||0)+1};
-  try{await writeMine(nd);if(runWaffles){$('saveNote').textContent='Added '+runWaffles+' to the Waffle Board. Your total: '+nd.waffles+'.';$('saveNote').hidden=false}loadTop()}
-  catch(e){$('saveNote').textContent="Couldn't reach the Waffle Board. Your waffles are still counted on this device.";$('saveNote').hidden=false}
+  if(runWaffles===0&&myDoc&&level<=(+myDoc.best||0))return;
+  try{
+    const {data,error}=await SB.rpc('submit_run',{p_counts:runCounts,p_level:level,p_seconds:Math.round(t)});
+    if(error)throw error;
+    myDoc=data;
+    if(runWaffles){$('saveNote').textContent='Added '+runWaffles+' to the Waffle Board. Your total: '+(+data.waffles).toLocaleString()+'.';$('saveNote').hidden=false}
+    loadTop();
+  }catch(e){
+    const m=String(e&&e.message||'');
+    $('saveNote').textContent=/slow down/.test(m)?'Easy, speedy! Wait a few seconds between runs for the Waffle Board to count them.':(/too|unknown|range/.test(m)?"That run didn't pass the waffle check, so it wasn't added to the board.":"Couldn't reach the Waffle Board. Your waffles are still counted on this device.");
+    $('saveNote').hidden=false;
+  }
 }
 function renderBoard(){
   if($('boardPanel').hidden)return;
@@ -809,7 +812,7 @@ $('nickForm').addEventListener('submit',async e=>{
   try{localStorage.setItem('bonkd-nick',nick)}catch(_){}
   if(!SB||!myId)return;
   const base=myDoc||{waffles:0,best:0,runs:0};
-  try{await writeMine({nick:nick||null,waffles:+base.waffles||0,best:+base.best||0,runs:+base.runs||0});$('nickBtn').textContent='Saved';setTimeout(()=>{$('nickBtn').textContent='Save'},1200);await loadTop();renderBoard()}
+  try{const {data,error}=await SB.rpc('set_nick',{p_nick:nick});if(error)throw error;myDoc=data;$('nickBtn').textContent='Saved';setTimeout(()=>{$('nickBtn').textContent='Save'},1200);await loadTop();renderBoard()}
   catch(_){$('boardNote').textContent="Couldn't save your name. Try again in a bit."}
 });
 
