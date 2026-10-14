@@ -202,7 +202,7 @@ body.keys .act::after{content:'SPACE';position:absolute;bottom:-18px;left:50%;tr
 .sharex{font-family:var(--body);font-weight:800;font-size:16px;letter-spacing:.02em;color:var(--ink);text-decoration:none;justify-self:center;padding:2px 6px;margin-top:2px}
 .sharex:hover{text-decoration:underline;text-underline-offset:3px}
 .sharex:focus-visible{outline:3px dashed var(--ink);outline-offset:2px}
-@media (pointer:fine){.chip{font-size:32px;-webkit-text-stroke:2.4px var(--ink);text-shadow:3px 3px 0 var(--ink)}}
+@media (pointer:fine){.chip{-webkit-text-stroke:.07em var(--ink);text-shadow:.05em .05em 0 var(--ink)}}
 #profPage{z-index:14}#profile{z-index:15}
 .pf-pre{font-size:22px;-webkit-text-stroke:2px var(--ink);text-shadow:2px 2px 0 var(--ink)}
 .pf-logo{font-size:clamp(40px,11vmin,62px)}
@@ -719,6 +719,7 @@ const sfx={
 /* ---------- input: drag moves, quick tap acts ---------- */
 let ptr=null, keyV=0;
 const KEYSPD=720;
+const FINE=matchMedia('(pointer:fine)').matches;
 let INPUT=matchMedia('(hover:hover) and (pointer:fine)').matches?'keys':'touch';
 const actWord=()=>INPUT==='keys'?'PRESS SPACE':'TAP THE BUTTON';
 function applyInput(){const k=INPUT==='keys';document.body.classList.toggle('keys',k);
@@ -951,7 +952,7 @@ function explode(x,y){
   for(const it of items){if(!it.dead&&!it.loose&&Math.hypot(it.x-x,it.y-y)<100*S){it.dead=true;burst(it.x,it.y,'#c98e5c',5)}}
   if(state==='play'&&Math.hypot(ghost.x-x,ghost.y+ghost.yOff-y)<120*S)hitGhost({kind:'bun',dmg:3,x,y});
 }
-const ZP=[30,-108];
+const ZP=[46,-104];
 function zAim(){return clamp(Math.atan2(Math.sin(bear.aim),bear.face*Math.cos(bear.aim)),-1.15,-.3)}
 function fireAnimal(x,y){
   faceTo(x);
@@ -1015,6 +1016,7 @@ function hitGhost(s){
 }
 function grawlix(){const g='#@%&$!*?';let s='';for(let i=0;i<4;i++)s+=g[Math.floor(Math.random()*g.length)];return s+'!'}
 function ghostDown(){
+  bear.weapon=null; bear.jello=null; bear.helmet=0; bear.zap=0; slowT=0; paddleT=0;
   state='levelup'; levelT=0; clrT=0; ghost.ko=true; ghost.koT=0; shake=.6; ghost.say=null;
   for(const it of items){it.loose=true;it.g=1500*S}
   shots=[];gifts=[];buns=[];angel=null;strike=null;
@@ -1112,12 +1114,11 @@ function update(dt){
   if(state==='levelup'){levelT+=dt;if(levelT>3&&!wafs.length&&!showCur&&!showQ.length){clrT+=dt;if(clrT>1.3)showClear()}else clrT=0}
   // special waffles take their bow one at a time: the name, then Todd's line, then the payoff
   if(!showCur&&showQ.length&&state!=='menu')showCur={T:showQ.shift(),t:0,stage:-1};
-  if(showCur){const c=showCur,T=c.T,y=H*.34;c.t+=dt;
-    if(c.stage<0){c.stage=0;pop(T.name+'!',W/2,y,'#ffd23f',T.v>=333?40:34,1.7);sfx.power()}
-    if(c.stage===0&&c.t>1.3){c.stage=1;if(QUIP[T.k])quip={txt:QUIP[T.k],t:2.2}}
-    if(c.stage===1&&c.t>3.5){c.stage=2;pop('+'+T.v.toLocaleString()+' WAFFLES',W/2,y,'#ffffff',T.v>=333?58:46,1.5);sfx.win();burst(W/2,y,'#ffd23f',T.v>=333?28:16);
-      if(T.v>=333){shake=.5;pop(T.v>=2000?'JACKPOT!':'WHOA!',W/2,y+60*S,C.red,T.v>=2000?72:52,1.6)}}
-    if(c.stage===2&&c.t>5)showCur=null}
+  if(showCur){const c=showCur,T=c.T,x=clamp(bear.x,230*S,W-230*S),y=GY-(300*bear.gs)*S;c.t+=dt;
+    if(c.stage<0){c.stage=0;pop(T.name+'!',x,y,'#ffd23f',T.v>=333?38:32,2);pop('+'+T.v.toLocaleString()+' WAFFLES',x,y+36*S,'#8ee26b',22,2);pops[pops.length-1].rot=0;sfx.win();burst(x,y,'#ffd23f',T.v>=333?28:16);
+      if(T.v>=333){shake=.5;pop(T.v>=2000?'JACKPOT!':'WHOA!',x,y-46*S,C.red,T.v>=2000?60:46,1.8)}}
+    if(c.stage===0&&c.t>1.4){c.stage=1;if(QUIP[T.k])quip={txt:QUIP[T.k],t:2.2}}
+    if(c.stage===1&&c.t>3.8)showCur=null}
 
   // weather (thunderhead)
   if(theme()===4&&state!=='menu'){boltT-=dt;if(boltT<=0){boltT=rnd(3,6);flashT=.25;bolt={x:rnd(.1,.9)*W,age:0}}}
@@ -1250,7 +1251,8 @@ function update(dt){
     if(slowT>0)ch.push([PW.snail.name,PW.snail.color]);
   }
   updateAct();
-  const key=ch.map(c=>c[0]).join('|'); if(key!==chipKey){chipKey=key;const el=$('chips');el.textContent='';for(const [t,c] of ch){const sp=document.createElement('span');sp.className='chip';sp.textContent=t;sp.style.color=c;el.append(sp)}}
+  const key=ch.map(c=>c[0]).join('|')+'|'+W+'x'+H; if(key!==chipKey){chipKey=key;const el=$('chips');el.textContent='';for(const [t,c] of ch){const sp=document.createElement('span');sp.className='chip';sp.textContent=t;sp.style.color=c;el.append(sp)}
+    if(FINE&&ch.length){let fs=Math.min(64,(H-GY)*.72/UIZ);el.style.fontSize=fs+'px';for(const sp of el.children)sp.style.fontSize='1em';const avail=W-2*(22+76+20)*UIZ;if(el.offsetWidth*UIZ>avail){fs*=avail/(el.offsetWidth*UIZ);el.style.fontSize=fs+'px'}}}
   if(ch.length){const el=$('chips'),hw=el.offsetWidth*UIZ/2+8,bz=$('actBtn').hidden?0:(22+76+14)*UIZ,lo=HANDED==='left'?0:bz,hi=HANDED==='left'?W-bz:W,cx=clamp(bear.x,lo+hw,Math.max(lo+hw,hi-hw)),cy=GY+(H-GY)*.56;const tf='translate('+Math.round(cx/UIZ)+'px,'+Math.round(cy/UIZ)+'px) translate(-50%,-50%)';if(el.style.transform!==tf)el.style.transform=tf}
 }
 
@@ -1664,9 +1666,9 @@ function drawBear(){
   ctx.save();ctx.translate(0,bob);ctx.rotate(lean);
   const sq=b.hitT>0?Math.sin(b.hitT/.55*Math.PI)*.12:0;
   ctx.translate(0,-10);ctx.scale(1+sq,1-sq);ctx.translate(0,10);
+  if(b.weapon&&b.weapon.type==='zooka'&&!b.ko){const a=zAim(),rc=(b.recoil||0)/.18*16;ctx.save();ctx.translate(ZP[0]-Math.cos(a)*rc,ZP[1]-Math.sin(a)*rc);ctx.rotate(a);ctx.scale(1.12,1.12);ctx.translate(-30,0);drawZooka(b.weapon.next);ctx.restore()}
   cel(()=>ctx.ellipse(0,-58,64,47,0,0,TAU),C.fur,C.furSh,-5,2);
   cel(()=>ctx.ellipse(2,-34,34,22,0,0,TAU),C.tan,C.tanSh,4,2);
-  if(b.weapon&&b.weapon.type==='zooka'&&!b.ko&&b.hitT<=0){const a=zAim(),rc=(b.recoil||0)/.18*16;ctx.save();ctx.translate(ZP[0]-Math.cos(a)*rc,ZP[1]-Math.sin(a)*rc);ctx.rotate(a);ctx.scale(1.12,1.12);ctx.translate(-30,0);drawZooka(b.weapon.next);ctx.restore()}
   // head sprite (head + bandana from the original art)
   const hh=124, ww=sp?hh*sp.r:111, sx=-ww*.529, sy=-164;
   const sway=(b.hits?Math.sin(now*5)*.025*Math.min(b.hits,3):0)+(b.hitT>0?Math.sin(now*40)*.08*b.hitT:0);
@@ -1706,10 +1708,10 @@ function drawBear(){
   for(const s of[-1,1]){
     let gx,gy;
     if(b.ko||b.hitT>0){gx=s*(ww*.5+16);gy=-150+Math.sin(now*32+s)*7}
-    else if(zk){const dx=Math.cos(za),dy=Math.sin(za),rc=(b.recoil||0)/.18*16;if(s===1){gx=ZP[0]+dx*(52-rc)-dy*22;gy=ZP[1]+dy*(52-rc)+dx*22}else{gx=ZP[0]-dx*(66+rc)-dy*20;gy=ZP[1]-dy*(66+rc)+dx*20}}
+    else if(zk){const dx=Math.cos(za),dy=Math.sin(za),rc=(b.recoil||0)/.18*16;if(s===1){gx=ZP[0]+dx*(60-rc)-dy*21;gy=ZP[1]+dy*(60-rc)+dx*21}else{gx=ZP[0]+dx*(16-rc)-dy*20;gy=ZP[1]+dy*(16-rc)+dx*20}}
     else if(b.jello){gx=s*44;gy=-176}
     else if(s===1&&b.swing>0){const p=1-b.swing/.28,a=1.2-p*3.1;gx=52+Math.cos(a)*74;gy=-76+Math.sin(a)*74}
-    else if(s===1&&b.weapon){gx=58;gy=-118}
+    else if(s===1&&b.weapon){gx=b.weapon.type==='mitt'?70:62;gy=-118}
     else{const ph=Math.sin(w+(s>0?0:Math.PI))*12*mv;gx=s*(ww*.5+10)+ph*.3;gy=-30+ph*.6}
     hose(s*50,-74,gx,gy,s*14);
     glove(gx,gy);
