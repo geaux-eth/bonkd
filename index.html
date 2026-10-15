@@ -438,7 +438,8 @@ function resize(){
   W=ROT?vh:vw; H=ROT?vw:vh;
   cv.width=Math.round(W*DPR); cv.height=Math.round(H*DPR);
   ctx.setTransform(DPR,0,0,DPR,0,0);
-  S=Math.max(.45,Math.min(2.4,Math.min(H/640,W/1120)));
+  const TOUCHY=matchMedia('(pointer:coarse)').matches;
+  S=Math.max(.32,Math.min(2.4,Math.min(H/(TOUCHY?780:640),W/(TOUCHY?1340:1120))));
   UIZ=ROT?1:clamp(Math.min(H/430,W/900),1,1.75); document.documentElement.style.setProperty('--uiz',UIZ);
   GY=H-Math.max(42,H*.12);
   bgKey='';
@@ -731,7 +732,7 @@ const KEYSPD=720;
 const FINE=matchMedia('(pointer:fine)').matches;
 let INPUT=matchMedia('(hover:hover) and (pointer:fine)').matches?'keys':'touch';
 const actWord=()=>INPUT==='keys'?'PRESS SPACE':'TAP THE BUTTON';
-function applyInput(){const k=INPUT==='keys';document.body.classList.toggle('keys',k);
+function applyInput(){const k=INPUT==='keys';document.body.classList.toggle('keys',k);$('menuHow').hidden=!k;
   $('menuHow').textContent=k?'← → or A / D moves Todd · Space uses weapons · P pauses':'Drag anywhere to move Todd · tap the red button to use weapons';
   $('howMove').textContent=k?'Use the ← → arrow keys (or A and D) to move him left and right':'Drag him left and right';
   $('howAct').textContent=k?'Press Space to use a weapon, or click its button.':'Weapons have different action buttons that appear on the opposite side of the controls.'}
