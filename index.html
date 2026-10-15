@@ -2475,10 +2475,12 @@ function drawWaffle(t,age){
     cel(()=>rr(-24,-15,48,30,3),'#ff8fb1','#e86d92',2,2);
     ctx.save();ctx.beginPath();rr(-24,-15,48,30,3);ctx.clip();ctx.fillStyle='#ffd23f';for(let x=-30;x<30;x+=10){ctx.beginPath();ctx.moveTo(x,-15);ctx.lineTo(x+5,-15);ctx.lineTo(x-5,15);ctx.lineTo(x-10,15);ctx.closePath();ctx.fill()}ctx.restore();
     ctx.beginPath();rr(-24,-15,48,30,3);stroke(2.2);
-    ctx.fillStyle=INK;ctx.font="8px 'Luckiest Guy', Impact, sans-serif";ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText('WAFFLE LOTTO',0,-9);
-    cel(()=>rr(-18,-3,36,14,2),'#d4dae2','#aab2be',1,1,1.6);
-    ctx.save();ctx.beginPath();ctx.moveTo(-18,-3);ctx.lineTo(4,-3);ctx.quadraticCurveTo(-2,4,6,11);ctx.lineTo(-18,11);ctx.closePath();ctx.fillStyle='#ffffff';ctx.fill();ctx.restore();
-    ctx.fillStyle='#e8463f';ctx.font="11px 'Luckiest Guy', Impact, sans-serif";ctx.fillText('2000',-6,5);
+    const fit=(txt,px,maxW,x,y)=>{ctx.font=px+"px 'Luckiest Guy', Impact, sans-serif";const w=ctx.measureText(txt).width;ctx.save();ctx.translate(x,y);if(w>maxW)ctx.scale(maxW/w,1);ctx.fillText(txt,0,0);ctx.restore()};
+    ctx.textAlign='center';ctx.textBaseline='middle';
+    ctx.lineJoin='round';ctx.strokeStyle=INK;ctx.lineWidth=2.4;ctx.font="10px 'Luckiest Guy', Impact, sans-serif";
+    {const w=ctx.measureText('LOTTO').width,k=Math.min(1,34/w);ctx.save();ctx.translate(0,-7.6);ctx.scale(k,1);ctx.strokeText('LOTTO',0,0);ctx.fillStyle='#ffffff';ctx.fillText('LOTTO',0,0);ctx.restore()}
+    cel(()=>rr(-18,-1.5,36,13,2.5),'#ffffff','#e4e8ee',1,1,1.6);
+    ctx.fillStyle='#e8463f';fit('$$$$',10.5,30,0,5.4);
     ctx.restore();
     return;
   }
