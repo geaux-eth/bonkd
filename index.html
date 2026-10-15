@@ -44,7 +44,8 @@ canvas{display:block;width:100%;height:100%;touch-action:none;cursor:grab}
 .lvl{font-size:15px;line-height:1;padding:5px 8px 2px;background:var(--red);border:2px solid var(--ink);border-radius:10px;box-shadow:2px 2px 0 var(--ink);-webkit-text-stroke:1px var(--ink);text-shadow:none}
 .waf{display:flex;align-items:center;gap:4px;font-size:18px;line-height:1;font-variant-numeric:tabular-nums}
 .waf svg{width:22px;height:22px}
-.boss{flex:1;max-width:340px;margin-inline:auto;display:flex;align-items:center;gap:6px}
+#hud.intro .boss{opacity:0}
+.boss{transition:opacity .35s;flex:1;max-width:340px;margin-inline:auto;display:flex;align-items:center;gap:6px}
 .boss span{font-size:12px;line-height:1;-webkit-text-stroke:1px var(--ink);text-shadow:1px 1px 0 var(--ink)}
 .bar{flex:1;height:10px;border:2px solid var(--ink);border-radius:8px;background:var(--paper);overflow:hidden;box-shadow:2px 2px 0 var(--ink)}
 .bar i{display:block;height:100%;width:100%;background:var(--green);border-right:2px solid var(--ink);box-sizing:border-box;transition:width .2s}
@@ -565,7 +566,7 @@ const flies=Array.from({length:16},()=>({x:Math.random(),y:.35+Math.random()*.5,
 const rain=Array.from({length:60},()=>({x:Math.random(),y:Math.random(),v:.9+Math.random()*.6}));
 bear.x=bear.tx=W/2; ghost.x=W/2;
 const HUDTOP=(window.BONKD_TOP||12);document.documentElement.style.setProperty('--top',HUDTOP+'px');
-const ghostBaseY=()=>Math.max((HUDTOP+38)*UIZ+90*S,H*.3);
+const ghostBaseY=()=>H<600?Math.max((HUDTOP+30)*UIZ+64*S,H*.2):Math.max((HUDTOP+38)*UIZ+90*S,H*.3);
 const sceneNo=()=>(level-1)%SCENES.length, lapNo=()=>Math.floor((level-1)/SCENES.length), scene=()=>SCENES[sceneNo()];
 const sceneName=()=>(['','SOGGY ','SPOOKY ','TOASTY '][lapNo()%4])+scene().n;
 
@@ -819,7 +820,7 @@ $('nextBtn').onclick=()=>nextLevel();
 document.addEventListener('visibilitychange',()=>{if(document.hidden)setPause(true)});
 
 function resetBoard(){strike=null;zaps=[];showQ=[];showCur=null;items=[];pops=[];sparks=[];shots=[];gifts=[];buns=[];animals=[];impacts=[];splats=[];wafs=[];angel=null;slowT=0}
-function setGhost(){lvTop=null;ghost.blanket=0;ghost.itch=0;ghost.quills=0;ghost.max=10+(level-1)*4;ghost.hp=ghost.max;ghost.ko=false;ghost.koT=0;ghost.yOff=-280*S;ghost.splat=0;ghost.throwT=1.6;ghost.say=null;ghost.sayT=2.5;ghost.kdT=-1;ghost.kd=0;strike=null;zapT=6;lvStats={hits:0,bonks:0,waffles:0};updateHp()}
+function setGhost(){lvTop=null;ghost.hold=0;$("hud").classList.remove("intro");ghost.blanket=0;ghost.itch=0;ghost.quills=0;ghost.max=10+(level-1)*4;ghost.hp=ghost.max;ghost.ko=false;ghost.koT=0;ghost.yOff=-280*S;ghost.splat=0;ghost.throwT=1.6;ghost.say=null;ghost.sayT=2.5;ghost.kdT=-1;ghost.kd=0;strike=null;zapT=6;lvStats={hits:0,bonks:0,waffles:0};updateHp()}
 function updateHp(){const el=$('hp');el.style.width=Math.max(0,ghost.hp/ghost.max*100)+'%';el.style.background=ghost.hp/ghost.max<.35?'#df3a4e':'#8ee26b';$('lvl').textContent='LV '+level}
 
 function start(m){
@@ -832,6 +833,7 @@ function start(m){
   const big=Math.min(W*.55/3.7,H*.3)/S, run=++runId; store('bonkd-runs',store('bonkd-runs')+1);
   pop("DON'T GET",W/2,H*.47-big*.92*S,C.white,big*.42,1.9); pop('BONKD!',W/2,H*.47,C.gold,big,1.9);
   pops[pops.length-1].rot=-.04; pops[pops.length-2].rot=-.05;
+  ghost.hold=1.9; ghost.throwT+=1.9; $('hud').classList.add('intro');
 }
 
 /* ---------- spawning ---------- */
@@ -1127,7 +1129,8 @@ function update(dt){
 
   // ghost
   ghost.t+=dt; ghost.squash=Math.max(0,ghost.squash-dt); ghost.hitT=Math.max(0,ghost.hitT-dt); ghost.splat=Math.max(0,ghost.splat-dt);
-  ghost.yOff+=(0-ghost.yOff)*Math.min(1,dt*2.5);
+  if(ghost.hold>0){ghost.hold-=dt;ghost.yOff=-280*S;if(ghost.hold<=0)$('hud').classList.remove('intro')}
+  else ghost.yOff+=(0-ghost.yOff)*Math.min(1,dt*2.5);
   const gtx=W/2+Math.sin(ghost.t*(.55+level*.09))*W*.27+Math.sin(ghost.t*1.9+1)*W*.05+(level>=3?(bear.x-W/2)*.15:0);
   if(!ghost.ko)ghost.x+=(gtx-ghost.x)*Math.min(1,dt*3);
   const gvx=(ghost.x-ghost.px)/Math.max(dt,1e-3); ghost.px=ghost.x;
