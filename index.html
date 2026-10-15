@@ -1220,7 +1220,7 @@ function update(dt){
     const near=w.home?Math.hypot(w.x-bear.x,w.y-(GY-96*S))<30*S:w.land?Math.abs(w.x-bear.x)<54*S:Math.hypot(w.x-bear.x,w.y-(GY-96*S))<72*S;
     if((canMove()||w.home)&&!bear.ko&&near){w.gone=true;const T=WTK[w.t]||WT[0];runWaffles+=T.v;runCounts[T.k]=(runCounts[T.k]||0)+1;lvStats.waffles+=T.v;updateWaf();
       if(!runTop||T.v>runTop.v)runTop=T; if(!lvTop||T.v>lvTop.v)lvTop=T;
-      if(T.k==='plain'){pop('+1 WAFFLE',clamp(w.x,140*S,W-140*S),w.y-34*S,'#f2b544',22,.8);sfx.waffle();burst(w.x,w.y,'#f2b544',5)}
+      if(T.k==='plain'){pop('+'+T.v+' WAFFLES',clamp(w.x,140*S,W-140*S),w.y-34*S,'#f2b544',22,.8);sfx.waffle();burst(w.x,w.y,'#f2b544',5)}
       else{showQ.push(T);sfx.waffle();burst(w.x,w.y,'#ffd23f',10)}}
 
   }
