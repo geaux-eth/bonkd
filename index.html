@@ -548,7 +548,7 @@ bear.x=bear.tx=W/2; ghost.x=W/2;
 const HUDTOP=(window.BONKD_TOP||12);document.documentElement.style.setProperty('--top',HUDTOP+'px');
 const ghostBaseY=()=>Math.max((HUDTOP+38)*UIZ+90*S,H*.3);
 const sceneNo=()=>(level-1)%SCENES.length, lapNo=()=>Math.floor((level-1)/SCENES.length), scene=()=>SCENES[sceneNo()];
-const sceneName=()=>(['','SOGGY ','SPOOKY ','SUNNY '][lapNo()%4])+scene().n;
+const sceneName=()=>(['','SOGGY ','SPOOKY ','TOASTY '][lapNo()%4])+scene().n;
 
 /* ---------- audio ---------- */
 let AC=null;
@@ -1860,8 +1860,8 @@ const SCENES=[
   live(){pdog(P(.2),GY-2*S,0,S*.95);pdog(P(.6),GY-2*S,1,S*.95);pdog(P(.84),GY-2*S,2,S*.95)}},
  {n:'COW PIE MEADOW',song:1,tr:-2,cl:'w',bg(){sky('#9fd2ee','#ffe2a6');sunDisk(P(.84),GY-150*S,46*S,'#ffe58a','#ffd04a');hills(GY-110*S,26*S,160*S,'#c8d98a',1);pineLine(GY-92*S,'#8fb46a',26,18);hills(GY-58*S,20*S,120*S,'#b0c96f',4);wireFence(GY-6*S);ground('#a8cf6a','#c48d55',1)},
   live(){cow(P(.14),GY-2*S,S*.95,0,false);cow(P(.47),GY-60*S,S*.45,1,true);cow(P(.82),GY-2*S,S*.9,1,false)}},
- {n:'SUNDOWN FARM',song:1,tr:0,cl:'p',bg(){BG[1]()}},
- {n:'TUMBLEWEED FLATS',song:2,tr:-3,cl:'p',wx:'dust',bg(){sky('#ff9a70','#ffdc96');sunDisk(P(.24),GY-40*S,74*S,'#ffcf5a','#ffb42e');mesa(P(.66),GY-40*S,90*S,70*S,'#c98a5a','#b0744a');mesa(P(.92),GY-40*S,60*S,46*S,'#c98a5a','#b0744a');hills(GY-40*S,10*S,120*S,'#d9a66a',3);ground('#dbb56c','#b98250',0);scrub(P(.1),GY,1.1*S,'#9aa85a');scrub(P(.52),GY-2*S,.8*S,'#a9b06a');cactus(P(.88),GY,.8*S)},
+ {n:'RED BARN RODEO',song:1,tr:0,cl:'p',bg(){BG[1]()}},
+ {n:'TUMBLEWEED TRAIL',song:2,tr:-3,cl:'p',wx:'dust',bg(){sky('#ff9a70','#ffdc96');sunDisk(P(.24),GY-40*S,74*S,'#ffcf5a','#ffb42e');mesa(P(.66),GY-40*S,90*S,70*S,'#c98a5a','#b0744a');mesa(P(.92),GY-40*S,60*S,46*S,'#c98a5a','#b0744a');hills(GY-40*S,10*S,120*S,'#d9a66a',3);ground('#dbb56c','#b98250',0);scrub(P(.1),GY,1.1*S,'#9aa85a');scrub(P(.52),GY-2*S,.8*S,'#a9b06a');cactus(P(.88),GY,.8*S)},
   live(){tumbleweeds()}},
  {n:'RATTLESNAKE RIDGE',song:3,tr:-2,cl:'p',wx:'dust',bg(){sky('#e2876a','#f7c98c');hills(GY-110*S,34*S,190*S,'#b8754e',2);hills(GY-60*S,24*S,140*S,'#c98a5a',6);ground('#d4a065','#a86f45',0);boulder(P(.12),GY,1.1*S,'#a58468','#86664c');boulder(P(.84),GY,1.2*S,'#a58468','#86664c');boulder(P(.92),GY+2*S,.7*S,'#a58468','#86664c');cactus(P(.36),GY,.6*S)},
   live(){rattler(P(.84)+4*S,GY-94*S,1.05*S)}},
@@ -1875,7 +1875,7 @@ const SCENES=[
  {n:'GATOR GULCH',song:3,tr:-5,cl:null,wx:'flies',bg(){sky('#3f5d6e','#d98b63');hills(GY-110*S,20*S,120*S,'#4f6a5e',3);const wy=GY-62*S;water(wy,GY+10*S,'#2f5f5a','#3d6f69');for(const [x,k] of[[.12,.9],[.88,.8],[.5,.5]])cypress(P(x),wy+14*S*k+6*S,k,0);ground('#56703a','#463626',1)},
   live(){gator(.2,GY-40*S,S*.7,1,22);gator(.7,GY-26*S,S*.85,-1,16)}},
  {n:'GRAVEYARD SHIFT',song:3,tr:0,cl:null,bg(){BG[3]()}},
- {n:'HOOT OWL HOLLOW',song:3,tr:2,cl:null,wx:'flies',bg(){sky('#1e2340','#3d4a7a');starField(30,.5);moonDisk(P(.2),GY-230*S,30*S);pineLine(GY-70*S,'#2a3550',34,26);bareTree(P(.84),GY,.8*S,'#3a3346');bareTree(P(.08),GY,.65*S,'#3a3346');ctx.fillStyle='rgba(220,230,255,.18)';ctx.fillRect(0,GY-30*S,W,26*S);ground('#3e5a45','#2e2622',1)},
+ {n:'HOOT OWL HIDEOUT',song:3,tr:2,cl:null,wx:'flies',bg(){sky('#1e2340','#3d4a7a');starField(30,.5);moonDisk(P(.2),GY-230*S,30*S);pineLine(GY-70*S,'#2a3550',34,26);bareTree(P(.84),GY,.8*S,'#3a3346');bareTree(P(.08),GY,.65*S,'#3a3346');ctx.fillStyle='rgba(220,230,255,.18)';ctx.fillRect(0,GY-30*S,W,26*S);ground('#3e5a45','#2e2622',1)},
   live(){owl(P(.84)+30*S*.8*PS,GY-104*S*.8*PS,.6*S)}},
  {n:'PUMPKIN PATCH',song:1,tr:1,cl:'p',wx:'leaves',bg(){sky('#f6b48a','#fde7c0');sunDisk(P(.78),GY-90*S,50*S,'#ffe27a','#ffc845');hills(GY-90*S,24*S,150*S,'#c8b468',2);hills(GY-50*S,18*S,120*S,'#a8b45a',5);scarecrow(P(.16),GY,.85*S);for(const [x,k] of[[.32,.8],[.44,.6],[.62,1],[.74,.7],[.9,.9]])pumpkin(P(x),GY+2*S,k*S);ground('#9ab95a','#8a5a35',1)},
   live(){crow(P(.16)-56*S,GY-156*S*.85,.6*S,0);crow(P(.55),GY-2*S,.6*S,2)}},
@@ -1888,15 +1888,15 @@ const SCENES=[
   live(){goat(P(.86)-2*S,GY-80*S,.75*S)}},
  {n:'THUNDERHEAD PEAK',song:4,tr:0,cl:'s',wx:'rain',bg(){BG[4]()}},
  {n:'AVALANCHE ALLEY',song:4,tr:-2,cl:'w',wx:'snow',bg(){sky('#c4dcef','#f2f8ff');peaks(GY-40*S,[[.15,230,190],[.48,280,220],[.85,240,190]],'#9aa8bf','#ffffff');for(const [x,k] of[[.08,.75],[.22,.55],[.78,.7],[.92,.8]])pine(P(x),GY,k*S,'#4f8a6a','#3f6a5a',true);ground('#f4f8ff','#c9d6e6',0)}},
- {n:'FROSTBITE FLATS',song:0,tr:3,cl:'w',wx:'snow',bg(){sky('#d4e6f5','#f6fbff');hills(GY-80*S,20*S,160*S,'#e6eef8',2);ctx.fillStyle='#bfe2f2';ctx.beginPath();ctx.ellipse(P(.4),GY-6*S,120*S,10*S,0,0,TAU);ctx.fill();stroke(1.6*S);snowman(P(.82),GY,.7*S);pine(P(.1),GY,.65*S,'#4f8a6a','#3f6a5a',true);ground('#f4f8ff','#c9d6e6',0)},
+ {n:'FROSTBITE FIELD',song:0,tr:3,cl:'w',wx:'snow',bg(){sky('#d4e6f5','#f6fbff');hills(GY-80*S,20*S,160*S,'#e6eef8',2);ctx.fillStyle='#bfe2f2';ctx.beginPath();ctx.ellipse(P(.4),GY-6*S,120*S,10*S,0,0,TAU);ctx.fill();stroke(1.6*S);snowman(P(.82),GY,.7*S);pine(P(.1),GY,.65*S,'#4f8a6a','#3f6a5a',true);ground('#f4f8ff','#c9d6e6',0)},
   live(){hare(GY-2*S)}},
  {n:'NORTHERN LIGHTS',song:3,tr:-3,cl:null,wx:'snow',bg(){sky('#0e1838','#24406a');starField(40,.55);hills(GY-70*S,24*S,170*S,'#c9d6ea',3);cabin(P(.82),GY,.8*S);for(const x of[.1,.24])pine(P(x),GY,.7*S,'#2f5a5a','#244a4a',true);ground('#e6eef8','#b8c6da',0)},
   live(){aurora();smoke(P(.82)+32*S,GY-136*S)}},
  {n:'MELTWATER FALLS',song:2,tr:4,cl:'w',bg(){sky('#a8dcf0','#effaf2');peaks(GY-60*S,[[.3,160,150],[.6,190,170]],'#9aa8bf','#ffffff');cliffFall(P(.8),GY-4*S,190*S,120*S);hills(GY-40*S,16*S,130*S,'#9fd07a',4);flowers(GY-6*S,8,['#ffffff','#ffd23f']);ground('#8fd16a','#7a5a3a',1)},
   live(){fallsLive(P(.8),GY-6*S,150)}},
- {n:'WILDFLOWER WALTZ',song:0,tr:1,cl:'w',bg(){sky('#9fe0f7','#f3fbff');hills(GY-100*S,26*S,170*S,'#bfe48f',3);hills(GY-54*S,20*S,130*S,'#a6d97a',6);flowers(GY-60*S,26,['#ff8fb1','#ffd23f','#b48cff','#ffffff','#ff7a45']);flowers(GY-8*S,18,['#ff8fb1','#ffd23f','#b48cff','#8fd3ff']);ground('#9bd36f','#c99a5c',1)},
+ {n:'BUTTERFLY BALLROOM',song:0,tr:1,cl:'w',bg(){sky('#9fe0f7','#f3fbff');hills(GY-100*S,26*S,170*S,'#bfe48f',3);hills(GY-54*S,20*S,130*S,'#a6d97a',6);flowers(GY-60*S,26,['#ff8fb1','#ffd23f','#b48cff','#ffffff','#ff7a45']);flowers(GY-8*S,18,['#ff8fb1','#ffd23f','#b48cff','#8fd3ff']);ground('#9bd36f','#c99a5c',1)},
   live(){butterflies(4)}},
- {n:'BUMBLEBEE BLUFF',song:1,tr:2,cl:'w',bg(){sky('#a4e0f5','#f4fbe8');hills(GY-110*S,30*S,170*S,'#c4e08a',2);unit(P(.8),GY,()=>{cel(()=>rr(-70,-24,140,8,2),'#a8743f','#8a5a2e',0,2,1.8);for(const lx of[-60,56])cel(()=>rr(lx,-18,6,18,1),'#a8743f','#8a5a2e',1,0,1.6)});skep(P(.8)-36*S,GY-24*S,.6*S);skep(P(.8)+30*S,GY-24*S,.55*S);flowers(GY-8*S,16,['#ffffff','#b48cff','#ffd23f']);ground('#9bd36f','#c99a5c',1)},
+ {n:'BUMBLEBEE BUNGALOW',song:1,tr:2,cl:'w',bg(){sky('#a4e0f5','#f4fbe8');hills(GY-110*S,30*S,170*S,'#c4e08a',2);unit(P(.8),GY,()=>{cel(()=>rr(-70,-24,140,8,2),'#a8743f','#8a5a2e',0,2,1.8);for(const lx of[-60,56])cel(()=>rr(lx,-18,6,18,1),'#a8743f','#8a5a2e',1,0,1.6)});skep(P(.8)-36*S,GY-24*S,.6*S);skep(P(.8)+30*S,GY-24*S,.55*S);flowers(GY-8*S,16,['#ffffff','#b48cff','#ffd23f']);ground('#9bd36f','#c99a5c',1)},
   live(){bees(P(.8),GY-70*S,6)}},
  {n:'SUNFLOWER SEA',song:0,tr:-2,cl:'w',bg(){sky('#8fd6f5','#fff2b8');sunDisk(P(.18),GY-230*S,40*S,'#ffe27a','#ffc845');hills(GY-80*S,20*S,160*S,'#a8cf6a',3);ground('#9ac85f','#b98250',1)},
   live(){for(const [x,h,ph] of[[.06,120,0],[.16,100,1],[.27,128,2],[.72,110,3],[.83,130,4],[.94,104,5]])sunflower(P(x),GY,h,ph)}},
@@ -1905,7 +1905,7 @@ const SCENES=[
  {n:'HAYRIDE HILL',song:1,tr:-1,cl:'p',bg(){sky('#ff9f7a','#ffdca0');sunDisk(P(.5),GY-80*S,60*S,'#ffd36a','#ffb83a');hills(GY-80*S,34*S,200*S,'#d4b45a',2);for(const [x,k,r] of[[.1,.7,1],[.22,.55,0],[.36,.5,1]])hayBale(P(x),GY,k*S,r);tractor(P(.78),GY,.65*S);ground('#c9b05a','#a87a45',1)},
   live(){smoke(P(.78)+8*S,GY-76*S)}},
  {n:'HARVEST MOON',song:3,tr:1,cl:null,wx:'flies',bg(){sky('#1d2a52','#4d5a8c');starField(34,.55);moonDisk(P(.62),GY-180*S,70*S);hills(GY-70*S,24*S,180*S,'#2f3d5a',2);for(const [x,k] of[[.12,.8],[.3,.6],[.86,.7]])hayBale(P(x),GY,k*S,true);ground('#3f5a3a','#2e2a26',1)}},
- {n:'HOME SWEET HOLLER',song:0,tr:0,cl:null,bg(){sky('#16224a','#3d4f8c');starField(30,.5);hills(GY-118*S,46*S,150*S,'#3f5a4a',1);hills(GY-58*S,34*S,110*S,'#4a6a50',4);tree(P(.12),GY-46*S,1);tree(P(.88),GY-40*S,.85);ctx.fillStyle='#d8dce8';ctx.fillRect(0,GY-24*S,W,5*S);ctx.fillRect(0,GY-12*S,W,5*S);for(let x=6*S;x<W;x+=24*S)unit(x,GY-2*S,()=>cel(()=>{ctx.moveTo(-5,0);ctx.lineTo(-5,-26);ctx.lineTo(0,-32);ctx.lineTo(5,-26);ctx.lineTo(5,0);ctx.closePath()},'#d8dce8','#b8bfd0',2,0,1.8));ground('#4f7a45','#7a5a3a',1)},
+ {n:'WELCOME HOME',song:0,tr:0,cl:null,bg(){sky('#16224a','#3d4f8c');starField(30,.5);hills(GY-118*S,46*S,150*S,'#3f5a4a',1);hills(GY-58*S,34*S,110*S,'#4a6a50',4);tree(P(.12),GY-46*S,1);tree(P(.88),GY-40*S,.85);ctx.fillStyle='#d8dce8';ctx.fillRect(0,GY-24*S,W,5*S);ctx.fillRect(0,GY-12*S,W,5*S);for(let x=6*S;x<W;x+=24*S)unit(x,GY-2*S,()=>cel(()=>{ctx.moveTo(-5,0);ctx.lineTo(-5,-26);ctx.lineTo(0,-32);ctx.lineTo(5,-26);ctx.lineTo(5,0);ctx.closePath()},'#d8dce8','#b8bfd0',2,0,1.8));ground('#4f7a45','#7a5a3a',1)},
   live(){fireworks()}}
 ];
 function ensureBG(){
