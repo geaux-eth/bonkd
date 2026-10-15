@@ -541,16 +541,16 @@ let wallet={
 };
 const PONG=['PING!','PONG!'];
 const WT=[
-  {k:'plain',name:'WAFFLE',v:1,w:44},
-  {k:'chicken',name:'CHICKEN & WAFFLES',v:5,w:16},
-  {k:'report',name:'STRAIGHT-A WAFFLE',v:7,w:14},
-  {k:'unicorn',name:'BIRTHDAY UNICORN WAFFLE',v:10,w:9},
-  {k:'ring',name:'ENGAGEMENT WAFFLE',v:25,w:6},
-  {k:'refund',name:'TAX REFUND WAFFLE',v:50,w:4.5},
-  {k:'tree',name:'WAFFLE TREE',v:100,w:9},
-  {k:'barrow',name:'WHEELBARROW OF WAFFLES',v:150,w:6},
-  {k:'truck',name:'DUMP TRUCK OF WAFFLES',v:333,w:3.6},
-  {k:'lotto',name:'WAFFLE LOTTO TICKET',v:2000,w:.9}];
+  {k:'plain',name:'WAFFLE',v:5,w:44},
+  {k:'chicken',name:'CHICKEN & WAFFLES',v:25,w:16},
+  {k:'report',name:'STRAIGHT-A WAFFLE',v:100,w:14},
+  {k:'unicorn',name:'BIRTHDAY UNICORN WAFFLE',v:250,w:9},
+  {k:'ring',name:'ENGAGEMENT WAFFLE',v:1000,w:6},
+  {k:'refund',name:'TAX REFUND WAFFLE',v:500,w:9},
+  {k:'tree',name:'WAFFLE TREE',v:5000,w:4.5},
+  {k:'barrow',name:'WHEELBARROW OF WAFFLES',v:2000,w:6},
+  {k:'truck',name:'DUMP TRUCK OF WAFFLES',v:10000,w:1.5},
+  {k:'lotto',name:'WAFFLE LOTTO TICKET',v:25000,w:.3}];
 const QUIP={chicken:'Winner winner, chicken dinner!',report:'Look, Ma! Straight A\'s!',unicorn:'Is it my birthday?!',ring:'I said YES!',refund:'Uncle Sam paid ME back!',tree:'Waffles DO grow on trees!',barrow:'Load \'er up!',truck:'Back it up! Beep beep!',lotto:'I\'m a WAFFLE-AIRE!'};
 let quip=null;
 const WTK={};WT.forEach(t=>WTK[t.k]=t);
@@ -1087,7 +1087,7 @@ function showClear(){
   const dl=$('clrStats'); dl.textContent='';
   for(const [k,v] of rows){const dt=document.createElement('dt'),dd=document.createElement('dd');dt.textContent=k;dd.textContent=v;dl.append(dt,dd)}
   $('clrPre').textContent='Level '+level;
-  if(lvTop&&lvTop.v>=100){$('shareClear').href=xURL('Grumble just poofed into a '+tc(lvTop.name)+' for me in Bonkd! 🧇 Level '+level+' cleared. Don\'t get BONKD!');$('shareClear').hidden=false}else $('shareClear').hidden=true;
+  if(lvTop&&lvTop.v>=500){$('shareClear').href=xURL('Grumble just poofed into a '+tc(lvTop.name)+' for me in Bonkd! 🧇 Level '+level+' cleared. Don\'t get BONKD!');$('shareClear').hidden=false}else $('shareClear').hidden=true;
   $('clear').hidden=false;
   if(typeof window.onLevelClear==='function')window.onLevelClear(level);
 }
@@ -1174,8 +1174,8 @@ function update(dt){
   // special waffles take their bow one at a time: the name, then Todd's line, then the payoff
   if(!showCur&&showQ.length&&state!=='menu')showCur={T:showQ.shift(),t:0,stage:-1};
   if(showCur){const c=showCur,T=c.T,x=clamp(bear.x,230*S,W-230*S),y=GY-(300*bear.gs)*S;c.t+=dt;
-    if(c.stage<0){c.stage=0;pop(T.name+'!',x,y,'#ffd23f',T.v>=333?38:32,2);pop('+'+T.v.toLocaleString()+' WAFFLES',x,y+36*S,'#8ee26b',22,2);pops[pops.length-1].rot=0;sfx.win();burst(x,y,'#ffd23f',T.v>=333?28:16);
-      if(T.v>=333){shake=.5;pop(T.v>=2000?'JACKPOT!':'WHOA!',x,y-46*S,C.red,T.v>=2000?60:46,1.8)}}
+    if(c.stage<0){c.stage=0;pop(T.name+'!',x,y,'#ffd23f',T.v>=2000?38:32,2);pop('+'+T.v.toLocaleString()+' WAFFLES',x,y+36*S,'#8ee26b',22,2);pops[pops.length-1].rot=0;sfx.win();burst(x,y,'#ffd23f',T.v>=2000?28:16);
+      if(T.v>=2000){shake=.5;pop(T.v>=10000?'JACKPOT!':'WHOA!',x,y-46*S,C.red,T.v>=10000?60:46,1.8)}}
     if(c.stage===0&&c.t>1.4){c.stage=1;if(QUIP[T.k])quip={txt:QUIP[T.k],t:2.2}}
     if(c.stage===1&&c.t>3.8)showCur=null}
 
@@ -1376,7 +1376,7 @@ function setMystery(img,col,legend){
   if(legend){x.beginPath();x.moveTo(36,22);x.lineTo(42,4);x.lineTo(52,16);x.lineTo(60,0);x.lineTo(68,16);x.lineTo(78,4);x.lineTo(84,22);x.closePath();x.fillStyle='#ffd23f';x.fill();x.lineWidth=3;x.stroke()}
   img.src=c.toDataURL();
 }
-const BUDDY_PRICE=10000;
+const BUDDY_PRICE=50000;
 let stConfirm=null;
 function renderStore(){
   $('stBal').textContent=wallet.bal().toLocaleString();
@@ -1420,7 +1420,7 @@ const GAME_URL='https://geaux-eth.github.io/bonkd/';
 const xURL=t=>'https://x.com/intent/post?text='+encodeURIComponent(t)+'&url='+encodeURIComponent(GAME_URL);
 const tc=n=>n.toLowerCase().replace(/\b\w/g,c=>c.toUpperCase()).replace(/\b(Of|And)\b/g,w=>w.toLowerCase());
 function runBrag(){
-  if(runTop&&runTop.v>=25)return 'I just grabbed a '+tc(runTop.name)+' in Bonkd! 🧇 Made it to Level '+level+' with '+runWaffles.toLocaleString()+' waffles. Don\'t get BONKD!';
+  if(runTop&&runTop.v>=1000)return 'I just grabbed a '+tc(runTop.name)+' in Bonkd! 🧇 Made it to Level '+level+' with '+runWaffles.toLocaleString()+' waffles. Don\'t get BONKD!';
   return 'I made it to Level '+level+' in Bonkd and grabbed '+runWaffles.toLocaleString()+' waffles! 🧇 Think you can beat me? Don\'t get BONKD!';
 }
 let cardInfo=()=>({name:'',pfp:'todd:gold',waffles:store('bonkd-waffles'),best:Math.max(level,store('bonkd-bestlvl'))});
@@ -2571,7 +2571,7 @@ function render(){
   if(ghostFront&&state!=='menu')drawGhost();
   for(const it of items)drawItem(it);
   for(const g of gifts)drawGift(g);
-  for(const w of wafs){ctx.save();ctx.translate(w.x,w.y);const T=WTK[w.t]||WT[0],k=1.4+Math.min(.6,Math.log10(T.v)*.3);ctx.scale(S*k,S*k);if(w.sq>0){const q=Math.sin(w.sq/.16*Math.PI)*.2;ctx.translate(0,12);ctx.scale(1+q,1-q);ctx.translate(0,-12)}ctx.rotate(w.rot);drawWaffle(w.t,w.age);ctx.restore()}
+  for(const w of wafs){ctx.save();ctx.translate(w.x,w.y);const T=WTK[w.t]||WT[0],k=1.4+Math.min(.6,Math.log10(T.v/5)*.2);ctx.scale(S*k,S*k);if(w.sq>0){const q=Math.sin(w.sq/.16*Math.PI)*.2;ctx.translate(0,12);ctx.scale(1+q,1-q);ctx.translate(0,-12)}ctx.rotate(w.rot);drawWaffle(w.t,w.age);ctx.restore()}
   for(const s of shots)drawShot(s);
   if(strike){const k=strike.t/strike.warn,a=.35+.45*Math.abs(Math.sin(now*16));ctx.save();ctx.globalAlpha=a;ctx.setLineDash([8*S,6*S]);ctx.beginPath();ctx.ellipse(strike.tx,GY+2*S,(54-k*14)*S,10*S,0,0,TAU);ctx.lineWidth=4*S;ctx.strokeStyle='#fff7a8';ctx.stroke();ctx.setLineDash([]);ctx.restore()}
   for(const z of zaps){ctx.save();ctx.globalAlpha=Math.max(0,1-z.age/.35);ctx.lineJoin='round';ctx.lineCap='round';ctx.beginPath();z.pts.forEach((p,i)=>i?ctx.lineTo(p[0],p[1]):ctx.moveTo(p[0],p[1]));ctx.lineWidth=17*S;ctx.strokeStyle=INK;ctx.stroke();ctx.lineWidth=10*S;ctx.strokeStyle='#fff7a8';ctx.stroke();ctx.lineWidth=3.6*S;ctx.strokeStyle='#ffffff';ctx.stroke();ctx.restore()}
