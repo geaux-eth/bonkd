@@ -906,10 +906,10 @@ function storyUpdate(dt){
   s.beam=T>ST.beam&&T<ST.beamOff?Math.min(1,(T-ST.beam)*4,(ST.beamOff-T)*5):0;
   if(T>ST.beam&&!s.hum){s.hum=1;tone('sine',140,560,2.1,.08);tone('triangle',280,1120,2.1,.035)}
   for(let i=0;i<4;i++){if(T>ST.lift+i*ST.liftGap&&picnic.left>3-i){picnic.left=3-i;const top=GY-34*S-(3-i)*11*S;storyWafs.push({x:px,y:top,t:0,rot:0});tone('triangle',520+i*130,900+i*160,.22,.08)}}
-  const gx=ghost.x,gy=ghost.y+ghost.yOff+20*S;
+  const gx=ghost.x,gy=ghost.y+ghost.yOff+(66+GTAIL)*S;
   for(const w of storyWafs){w.t+=dt;w.y+=(gy-w.y)*Math.min(1,dt*1.5);w.x+=(gx-w.x)*Math.min(1,dt*2.4);w.rot+=dt*3.5;w.k=Math.max(0,Math.min(1,(w.y-gy)/(120*S)))}
   storyWafs=storyWafs.filter(w=>w.k>.04);
-  if(T>ST.laugh&&!s.l){s.l=1;pop('HEH HEH HEH!',gx-30*S,gy-96*S,'#b9f27a',42,1.6);sfx.whoosh()}
+  if(T>ST.laugh&&!s.l){s.l=1;pop('HEH HEH HEH!',gx-30*S,gy-(96+66+GTAIL)*S,'#b9f27a',42,1.6);sfx.whoosh()}
   if(T>ST.hey&&!s.hey){s.hey=1;quip={txt:'Hey! Those are my waffles!',t:2.3,d:2.3,k:1.35};bear.hitT=.35}
   if(T>ST.irisAt&&!iris)iris={t:0,mid:false};
 }
@@ -946,7 +946,7 @@ function drawPicnic(){
 function drawStoryFX(){
   if(state!=='story'||!story)return;
   const b=story.beam;
-  if(b>0){const gx=ghost.x,gy=ghost.y+ghost.yOff+46*S,px=picnic.x,py=GY-20*S;
+  if(b>0){const gx=ghost.x,gy=ghost.y+ghost.yOff+(70+GTAIL)*S,px=picnic.x,py=GY-20*S;
     ctx.save();ctx.globalAlpha=b*(.55+.12*Math.sin(now*30));
     const g=ctx.createLinearGradient(0,gy,0,py);g.addColorStop(0,'rgba(190,255,140,.95)');g.addColorStop(1,'rgba(190,255,140,.25)');
     ctx.fillStyle=g;ctx.beginPath();ctx.moveTo(gx-26*S,gy);ctx.lineTo(gx+26*S,gy);ctx.lineTo(px+78*S,py);ctx.lineTo(px-78*S,py);ctx.closePath();ctx.fill();
