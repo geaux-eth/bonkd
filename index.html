@@ -1011,11 +1011,10 @@ function hitBear(it){
 function hitGhost(s){
   ghost.hp-=s.dmg; lvStats.hits++; ghost.hitT=.35; ghost.squash=.3; score+=s.dmg*25;
   const gy=ghost.y+ghost.yOff;
-  impact(s.x,s.y);
   if(s.kind==='quill'){ghost.quills=Math.min(24,(ghost.quills||0)+1);sfx.ping()}
   else if(s.kind==='ivy'){ghost.blanket=1.3;ghost.itch=8;ghost.itchRate=superDmg('effective')*.35/8;pop('BLANKETED!',ghost.x,gy-74*S,'#4fbf5a',40);setFx('ivy',2.4);sfx.splat()}
   else if(s.kind==='zap'){pop('ZAP BACK!',ghost.x,gy-84*S,'#fff7a8',50,1.1);sfx.ghostHit()}
-  else if(s.kind==='smash'){pop('SMASH!',ghost.x,gy-74*S,C.red,56);sfx.clang();impact(ghost.x,gy)}
+  else if(s.kind==='smash'){pop('SMASH!',ghost.x,gy-74*S,C.red,56);sfx.clang()}
   else if(s.kind==='pie'){ghost.splat=3.5;pop('SPLAT!',ghost.x,gy-74*S,'#ff8fb1',46);sfx.splat()}
   else if(s.kind==='banana'){pop('THWACK!',ghost.x,gy-74*S,C.gold,40);sfx.ghostHit()}
   else if(s.kind==='animal'){const q=HITQ[s.animal]||['POW!'];pop(q[Math.floor(Math.random()*q.length)],ghost.x,gy-84*S,C.gold,38,1.2);sfx.ghostHit()}
