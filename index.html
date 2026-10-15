@@ -812,7 +812,7 @@ $('menuBtn').onclick=goMenu;
 function setPause(v){if(v&&!(state==='play'||state==='levelup'))return;paused=v;$('pause').hidden=!v;try{if(AC)v?AC.suspend():AC.resume()}catch(e){}}
 $('pauseBtn').onclick=()=>setPause(true);
 function syncGear(){$('gearBtn').hidden=state!=='menu'}
-$('gearBtn').onclick=()=>{audio();$('settings').hidden=false};
+$('gearBtn').onclick=()=>{track('settings_open',{lv:null});audio();$('settings').hidden=false};
 $('pauseSettings').onclick=()=>{$('settings').hidden=false};
 $('settingsClose').onclick=()=>{$('settings').hidden=true};
 $('muteBtn').addEventListener('click',e=>{e.stopPropagation();MUTED=!MUTED;try{localStorage.setItem('bonkd-muted',MUTED?'1':'0')}catch(_){};audio();applyAudioPrefs()});
@@ -847,6 +847,7 @@ function start(m){
   setGhost(); ghost.x=W/2;
   ['menu','over','pause','clear','boardPanel','settings'].forEach(k=>$(k).hidden=true); renderMeter();
   const run=++runId; store('bonkd-runs',store('bonkd-runs')+1);
+  track('run_start',{lv:1,n:store('bonkd-runs')});
   beginStory();
 }
 /* ---------- the picnic: Grumble beams up Todd's waffles, Todd gives chase (tap or any key skips) ---------- */
@@ -878,6 +879,7 @@ function beginStory(){
   $('hud').hidden=true; bgKey='';
 }
 function beginPlay(chase){
+  if(chase)track('story_done',{lv:null});
   picnic=null; storyWafs=[]; story=null; quip=null; bgKey='';
   state='play'; playLevel(); $('hud').hidden=false; renderMeter();
   if(chase){bear.x=-70*S;bear.tx=W*.5;bear.face=bear.faceS=1}
@@ -887,7 +889,7 @@ function beginPlay(chase){
   pops[pops.length-1].rot=-.04; pops[pops.length-2].rot=-.05;
   ghost.hold=1.9; ghost.throwT=1.6+1.9; $('hud').classList.add('intro');
 }
-function skipStory(){if(state==='story'){iris=null;beginPlay()}}
+function skipStory(){if(state==='story'){track('story_skip',{lv:null,n:story?story.t*10:0});iris=null;beginPlay()}}
 /* the story beats, in seconds */
 const ST={line:.3,drop:1.7,huh:3.0,beam:3.6,lift:3.85,liftGap:.45,beamOff:5.75,laugh:5.85,flee:6.5,hey:6.9,run:9.0,irisAt:9.55};
 function storyUpdate(dt){
@@ -986,6 +988,13 @@ function ghostThrow(){
   ghost.throwT=fast*(.75+rng()*.5);
 }
 let TEST=false;try{TEST=/[?&]test\b/.test(location.search)}catch(e){}
+/* ---------- anonymous play stats: queued here, sent in batches by the web build (no names, no personal info) ---------- */
+const EVQ=[],SESS=(window.crypto&&crypto.randomUUID)?crypto.randomUUID():'00000000-0000-4000-8000-'+String(Date.now()).padStart(12,'0').slice(-12);
+const DEV=matchMedia('(pointer:coarse)').matches?'phone':'computer';
+let lastJunk=null;
+function track(ev,o){if(TEST)return;o=o||{};EVQ.push({ev,lv:o.lv!==undefined?o.lv:(state==='menu'?null:level),k:o.k==null?null:String(o.k),n:o.n==null?null:Math.round(o.n),m:o.m==null?null:Math.round(o.m),t:Math.round(performance.now()/1000)});if(EVQ.length>300)EVQ.splice(0,EVQ.length-300)}
+setTimeout(()=>{let r=0;try{r=+localStorage.getItem('bonkd-runs')||0}catch(e){}track('session',{lv:null,k:(matchMedia('(display-mode: fullscreen)').matches||navigator.standalone)?'app':'web',n:r>0?1:0})},0);
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden'&&(state==='play'||state==='ko'||state==='story'||state==='levelup'))track('left',{k:state,n:lvlTime})});
 let testI=0;
 const HELP={pie:1,banana:1,jello:1,bun:1,zooka:1,mitt:1,magnet:1,paddle:1,ivy:1,porcu:1,beans:1};
 function pickPower(){if(TEST)return ['ivy','porcu','beans'][testI++%3];const cur=bear.jello?'jello':bear.weapon&&bear.weapon.type, armed=!!cur;if(bear.hits>=2&&rng()<.45)return 'kit';const own=wallet.owned();const pool=Object.keys(PW).filter(k=>k!==cur&&(!SUPER[k]||own.has(k))&&(armed||HELP[k]||(k==='bucket'&&level>=3))&&(k!=='kit'||bear.hits>0)&&(k!=='bucket'||!bear.helmet)&&(k!=='snail'||slowT<=0));const wt=k=>PW[k].w*(k==='bucket'&&level>=3?1.8:1);const tot=pool.reduce((a,k)=>a+wt(k),0);let r=rng()*tot;for(const k of pool){r-=wt(k);if(r<=0)return k}return pool[0]}
@@ -1030,6 +1039,7 @@ function act(){
   const b=$('actBtn');b.classList.add('hit');setTimeout(()=>b.classList.remove('hit'),110);
 }
 $('actBtn').addEventListener('pointerdown',e=>{e.preventDefault();e.stopPropagation();audio();if(state==='play'&&!paused)act()});
+['shareClear','shareRun','cardX'].forEach(id=>{const e=$(id);if(e)e.addEventListener('click',()=>track('share',{k:id}))});
 $('actBtn').addEventListener('click',e=>{if(e.detail===0&&state==='play'&&!paused)act()});
 let actKey='';
 function updateAct(){
@@ -1146,19 +1156,22 @@ function zapBack(){
 function bonk(x,label,col,heavy){
   const hp=headPos();
   if(bear.weapon&&bear.weapon.type==='beans'){pop(Math.random()<.5?'BOING!':'PFF!',x,hp.y-30*S,'#ffd23f',30,.7);burst(x,hp.y,'#ffd23f',6);return}
+  track('bonk',{k:lastJunk||label,n:lvlTime});
   bear.hits++; lvStats.bonks++; bear.hitT=.55; bear.inv=1; bear.lumpPop=.35; shake=Math.max(shake,.4);
   pop(label,x,hp.y-60*S,col,46); impact(x,hp.y-40*S);
   heavy?sfx.clang():sfx.bonk(); renderMeter();
   if(navigator.vibrate)try{navigator.vibrate(40)}catch(e){}
-  if(bear.hits>=MAXH){bear.ko=true;bear.koT=0;state='ko';shake=.7;bear.jello=null;bear.weapon=null;strike=null;setTimeout(()=>pop('BONKD!',W/2,H*.4,C.red,80,1.4),180);sfx.ko()}
+  if(bear.hits>=MAXH){track('ko',{k:lastJunk||label,n:lvlTime});lastJunk=null;bear.ko=true;bear.koT=0;state='ko';shake=.7;bear.jello=null;bear.weapon=null;strike=null;setTimeout(()=>pop('BONKD!',W/2,H*.4,C.red,80,1.4),180);sfx.ko()}
 }
 function hitBear(it){
   const hp=headPos();
   it.loose=true; it.vy=-380*S; it.vx=(it.x<bear.x?-1:1)*(180+Math.random()*120)*S; it.vr*=2.5; it.g=1500*S;
-  if(bear.helmet>0){bear.helmet--;bear.inv=.4;pop('CLONK!',it.x,hp.y-60*S,'#d4dae2',38);sfx.clonk();burst(it.x,hp.y-40*S,'#ffffff');return}
+  lastJunk=it.type;
+  if(bear.helmet>0){track('blocked',{k:it.type});bear.helmet--;bear.inv=.4;pop('CLONK!',it.x,hp.y-60*S,'#d4dae2',38);sfx.clonk();burst(it.x,hp.y-40*S,'#ffffff');return}
   bonk(it.x,'BONK!',C.gold,HZ[it.type].heavy);
 }
 function hitGhost(s){
+  track('ghost_hit',{k:s.kind==='animal'?'zooka':s.kind,n:s.dmg});
   ghost.hp-=s.dmg; lvStats.hits++; ghost.hitT=.35; ghost.squash=.3; score+=s.dmg*25;
   const gy=ghost.y+ghost.yOff;
   if(s.kind==='quill'){ghost.quills=Math.min(24,(ghost.quills||0)+1);sfx.ping()}
@@ -1174,6 +1187,7 @@ function hitGhost(s){
 }
 function grawlix(){const g='#@%&$!*?';let s='';for(let i=0;i<4;i++)s+=g[Math.floor(Math.random()*g.length)];return s+'!'}
 function ghostDown(){
+  track('level_clear',{n:lvlTime,m:lvStats.bonks});
   bear.weapon=null; bear.jello=null; bear.helmet=0; bear.zap=0; slowT=0; paddleT=0;
   state='levelup'; levelT=0; clrT=0; ghost.ko=true; ghost.koT=0; shake=.6; ghost.say=null;
   for(const it of items){it.loose=true;it.g=1500*S}
@@ -1314,8 +1328,8 @@ function update(dt){
       g.x+=g.vx*dt; g.y+=g.vy*dt; g.x=clamp(g.x,34*S,W-34*S);
       if(g.y>=GY-34*S){g.y=GY-34*S;g.land=true;g.lt=0;g.rot=0;burst(g.x,GY-6*S,'#ffffff',5)}
     }
-    if(state==='play'&&(Math.hypot(g.x-hp.x,g.y-hp.y)<62*S||Math.hypot(g.x-bear.x,g.y-by)<58*S)){g.gone=true;activate(g.type,g.x,g.y)}
-    else if(g.land&&g.lt>1.5){g.gone=true;pop('MISSED!',g.x,GY-50*S,C.white,22,.7);burst(g.x,GY-20*S,'#ffffff',8)}
+    if(state==='play'&&(Math.hypot(g.x-hp.x,g.y-hp.y)<62*S||Math.hypot(g.x-bear.x,g.y-by)<58*S)){g.gone=true;track('gift',{k:g.type});activate(g.type,g.x,g.y)}
+    else if(g.land&&g.lt>1.5){g.gone=true;track('gift_miss',{k:g.type});pop('MISSED!',g.x,GY-50*S,C.white,22,.7);burst(g.x,GY-20*S,'#ffffff',8)}
   }
   gifts=gifts.filter(g=>!g.gone);
   for(const w of wafs){
@@ -1331,7 +1345,7 @@ function update(dt){
     else w.landT+=dt;
     if(w.sq>0)w.sq=Math.max(0,w.sq-dt);
     const near=w.home?Math.hypot(w.x-bear.x,w.y-(GY-96*S))<30*S:w.land?Math.abs(w.x-bear.x)<54*S:Math.hypot(w.x-bear.x,w.y-(GY-96*S))<72*S;
-    if((canMove()||w.home)&&!bear.ko&&near){w.gone=true;const T=WTK[w.t]||WT[0];runWaffles+=T.v;runCounts[T.k]=(runCounts[T.k]||0)+1;lvStats.waffles+=T.v;updateWaf();
+    if((canMove()||w.home)&&!bear.ko&&near){w.gone=true;const T=WTK[w.t]||WT[0];runWaffles+=T.v;runCounts[T.k]=(runCounts[T.k]||0)+1;track('waffle',{k:T.k,n:T.v});lvStats.waffles+=T.v;updateWaf();
       if(!runTop||T.v>runTop.v)runTop=T; if(!lvTop||T.v>lvTop.v)lvTop=T;
       if(T.k==='plain'){pop('+'+T.v+' WAFFLES',clamp(w.x,140*S,W-140*S),w.y-34*S,'#f2b544',22,.8);sfx.waffle();burst(w.x,w.y,'#f2b544',5)}
       else{showQ.push(T);sfx.waffle();burst(w.x,w.y,'#ffd23f',10)}}
@@ -1436,6 +1450,7 @@ function update(dt){
 function showOver(){
   $('lvlCard').hidden=true;
   state='over'; curSong=null;
+  track('run_end',{n:score,m:runWaffles,k:Math.round(t)});
   const s=Math.floor(score), k=bestKey(mode), best=store(k), nb=s>best;
   if(nb)store(k,s);
   $('overMode').textContent='Made it to Level '+level;
@@ -1513,19 +1528,19 @@ function renderStore(){
     if(L.owned.has(g.key)){o.className='own';o.textContent='Yours! ✓'}else o.textContent='From '+g.title;d.append(i,t,o);lb.append(d)});
   for(let n=L.list.length;n<3;n++){const d=document.createElement('div');d.className='st-card';const i=document.createElement('img');i.alt='Mystery Legend';setMystery(i,cols[n%3],true);const t=document.createElement('span');t.textContent='Tournament prize';d.append(i,t);lb.append(d)}
 }
-function showNoWaffles(k){const need=k&&SUPER[k]?Math.max(1,SUPER[k].price-wallet.bal()):0;
+function showNoWaffles(k){track('no_waffles',{k});const need=k&&SUPER[k]?Math.max(1,SUPER[k].price-wallet.bal()):0;
   $('noTxt').textContent=need?"You don't have enough waffles for the "+PW[k].name+". You need "+need.toLocaleString()+" more. Wanna buy some?":"You don't have enough waffles. Wanna buy some?";$('stNo').hidden=false}
-function buyWaffles(){$('stNo').hidden=true;const m=$('stMsg');m.textContent='Waffle packs are coming soon! Until then, bonk Grumble to earn more.';m.hidden=false}
+function buyWaffles(){track('buy_waffles_tap');$('stNo').hidden=true;const m=$('stMsg');m.textContent='Waffle packs are coming soon! Until then, bonk Grumble to earn more.';m.hidden=false}
 async function buyItem(k){
   if(wallet.bal()<SUPER[k].price){stConfirm=null;renderStore();showNoWaffles(k);return}
   if(stConfirm!==k){stConfirm=k;renderStore();return}
   stConfirm=null; const r=await wallet.buy(k); const m=$('stMsg');
-  if(r&&r.ok){m.textContent='Got it! Booster can now toss you the '+PW[k].name+'.';m.hidden=false;sfx.power()}
+  if(r&&r.ok){track('buy',{k,n:SUPER[k].price});m.textContent='Got it! Booster can now toss you the '+PW[k].name+'.';m.hidden=false;sfx.power()}
   else if(r&&r.reason==='not_enough')showNoWaffles(k);
   else{m.textContent="Couldn't reach the store. Try again.";m.hidden=false}
   renderStore();
 }
-function openStore(){audio();stConfirm=null;$('stMsg').hidden=true;$('storePage').hidden=false;renderStore();if(typeof window.onStoreOpen==='function')window.onStoreOpen()}
+function openStore(){track('store_open');audio();stConfirm=null;$('stMsg').hidden=true;$('storePage').hidden=false;renderStore();if(typeof window.onStoreOpen==='function')window.onStoreOpen()}
 $('storeBtn').onclick=openStore; $('storeBtn2').onclick=openStore;
 $('stClose').onclick=$('stX').onclick=()=>{$('storePage').hidden=true};
 $('stBuyW').onclick=buyWaffles; $('noBuy').onclick=buyWaffles; $('noClose').onclick=()=>{$('stNo').hidden=true};
@@ -1598,7 +1613,11 @@ async function loadTop(){
   }catch(e){SB=null;console.warn('Leaderboard offline:',e)}
   dbTried=true; renderBoard(); renderProfile();
 })();
+async function flushEv(){if(!SB||!myId||!EVQ.length||flushEv.busy)return;flushEv.busy=1;const b=EVQ.splice(0,60);
+  try{const {error}=await SB.rpc('log_events',{p_sess:SESS,p_dev:DEV,p_ev:b});if(error)throw error}catch(e){if(EVQ.length<240)EVQ.unshift(...b)}flushEv.busy=0}
+setInterval(flushEv,15000);document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden')flushEv()});
 async function saveRun(){
+  setTimeout(flushEv,1500);
   if(TEST){$('saveNote').textContent='Test mode: this run is not saved.';$('saveNote').hidden=false;return}
   store('bonkd-waffles',localWaf()+runWaffles);
   if(!SB||!myId)return;
@@ -1661,7 +1680,7 @@ function renderBoard(){
     li.append(rk,av,nm,wf); list.append(li);
   });
 }
-function openBoard(){$('boardPanel').hidden=false;renderProfile();renderBoard();Promise.all([loadTop(),loadTour()]).then(()=>{if(tour&&tour.live&&boardMode==='all'&&!openBoard.seen){boardMode='tour';openBoard.seen=1}renderBoard()})}
+function openBoard(){track('board_open',{lv:null});$('boardPanel').hidden=false;renderProfile();renderBoard();Promise.all([loadTop(),loadTour()]).then(()=>{if(tour&&tour.live&&boardMode==='all'&&!openBoard.seen){boardMode='tour';openBoard.seen=1}renderBoard()})}
 $('tAll').onclick=()=>{boardMode='all';renderBoard()};$('tLive').onclick=()=>{boardMode='tour';renderBoard()};
 $('ppShare').onclick=()=>shareCard();
 $('boardBtn').onclick=openBoard; $('boardBtn2').onclick=openBoard;
@@ -1703,7 +1722,7 @@ $('pfForm').addEventListener('submit',async e=>{
       if(!data.ok)return pfFail(data.reason);
       $('profile').hidden=true; pop('LINKED! HI, '+data.nick.toUpperCase()+'!',W/2,H*.3,C.gold,30,1.8);
     }else{
-      const {data,error}=await SB.rpc('save_profile',{p_nick:nick}); if(error)throw error;
+      const {data,error}=await SB.rpc('save_profile',{p_nick:nick}); if(error)throw error; track('profile_saved',{lv:null});
       if(!data.ok)return pfFail(data.reason);
       $('profile').hidden=true; pop(pfMode==='create'?'PROFILE SAVED!':'NAME CHANGED!',W/2,H*.3,C.gold,30,1.6);
     }
