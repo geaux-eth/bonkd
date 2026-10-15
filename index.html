@@ -1233,6 +1233,7 @@ function update(dt){
     bear.vx=(nx-bear.x)/Math.max(dt,1e-3); bear.x=nx;
   } else bear.vx*=.9;
   if(!bear.ko&&Math.abs(bear.vx)>40)bear.face=Math.sign(bear.vx);
+  else if(!bear.ko&&bear.weapon&&bear.weapon.type==='mitt'&&bear.weapon.catches>0){let best=null,bd=1e9;for(const it of items){if(it.loose||it.dead||it.vy<0)continue;const d=Math.abs(it.x-bear.x);if(d<260*S&&d>12*S&&it.y<GY-60*S&&d<bd){bd=d;best=it}}if(best)bear.face=Math.sign(best.x-bear.x)}
   bear.faceS=bear.face;
   bear.recoil=Math.max(0,(bear.recoil||0)-dt);
   if(bear.weapon&&bear.weapon.type==='zooka'&&!bear.ko){const ta=Math.atan2(ghost.y+ghost.yOff-(GY+(4+ZP[1])*S),ghost.x-(bear.x+bear.face*ZP[0]*S));bear.aim+=Math.atan2(Math.sin(ta-bear.aim),Math.cos(ta-bear.aim))*Math.min(1,dt*8)}
@@ -1401,7 +1402,8 @@ function update(dt){
     }
     if(bear.gs>1.6&&Math.abs(it.x-bear.x)<70*S*bear.gs&&it.y>GY-190*S*bear.gs){it.loose=true;it.vy=-650*S;it.vx=(it.x<bear.x?-1:1)*420*S;it.g=1500*S;pop('BOINK!',it.x,it.y-20*S,C.gold,30,.6);sfx.clonk();continue}
     const touching=Math.hypot(it.x-hp.x,it.y-hp.y)<r+36*S||Math.hypot(it.x-bear.x,it.y-by)<r+40*S;
-    if(touching&&W8&&W8.type==='mitt'&&W8.catches>0){it.dead=true;W8.catches--;W8.held.push(it.type);pop('YOINK!',it.x,it.y-30*S,C.gold,36,.7);sfx.clonk();continue}
+    const mittNear=W8&&W8.type==='mitt'&&W8.catches>0&&Math.hypot(it.x-(bear.x+bear.face*110*S),it.y-(GY-128*S))<r+64*S;
+    if((touching||mittNear)&&W8&&W8.type==='mitt'&&W8.catches>0){it.dead=true;W8.catches--;W8.held.push(it.type);pop('YOINK!',it.x,it.y-30*S,C.gold,36,.7);sfx.clonk();continue}
     if((Math.hypot(it.x-hp.x,it.y-hp.y)<r+36*S||Math.hypot(it.x-bear.x,it.y-by)<r+40*S)&&bear.inv<=0)hitBear(it);
     else if(it.y>GY-r*.4){it.loose=true;it.vy=-Math.abs(it.vy)*.3;it.vx*=.5;it.g=1500*S}
   }
