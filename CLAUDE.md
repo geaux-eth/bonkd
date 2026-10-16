@@ -50,10 +50,11 @@
 - Grumble always floats: the tail lifts and curls up behind him. Never a long tail lying flat or low (reads as a slug).
 - Grumble's cloak always drapes softly over his shoulders and hangs in loose folds, as in the float pose. Never stiff or short.
 - His arms are short and stubby and come from his sides under the cloak, never from the hood or above it.
-- Expressions read as a grumpy grown-up villain, never childish: no wailing or crying faces. When bonked he gets dazed (stars circling, small pupils pointing different ways, gritted-teeth grimace). No lump on his head.
+- Expressions read as a grumpy grown-up villain, never childish: no wailing or crying faces. When bonked he gets dazed (stars circling, gritted-teeth grimace). No lump on his head.
+- Canva credits cost money: every generation is built from the specs on Franky's sprite sheets so it comes out right the first time. For Grumble, paste the locked spec block (scratchpad audit/grum_spec.txt, mirrored here) verbatim and change only the pose line. Check the prompt against the sheet before generating, one generation per pose, no speculative extras.
 - Grumble's face is identical in every pose:
   - Expressions come from the Nibbles ghost expression sheet (audit/ghost_expr.png; Canva media MAHYMfbn4KE). Pass it as a reference for any new expression.
-  - Eyes are always two open round orange-amber rings with black pupils and a small white glint. Never closed, crescent, winking or glowing eyes. Emotion comes from brows, lids and pupils.
+  - Eyes are Grumble's own, copied from the float and head refs: two orange-amber eyes pressed together with no gap, each with a heavy flat upper lid across the top, a big black pupil and a small white glint. Never round rings without lids, never small pupils, never closed, crescent, winking or glowing eyes. Emotion comes from lid angle, brows and pupil direction.
   - Small round nose and a thin mouth line.
   - An open mouth has a black inside and a pink-red tongue, shaped like the sheet's mouths. No fangs, nothing yellow or orange in the mouth. Teeth only as the sheet's gritted zigzag line.
   - Body green is the Nibbles Grumble green (206,248,162). After cutting, run art/grumgreen.py on every Grumble sprite so the green matches exactly.
