@@ -50,11 +50,12 @@
 - Grumble always floats: the tail lifts and curls up behind him. Never a long tail lying flat or low (reads as a slug).
 - Grumble's cloak always drapes softly over his shoulders and hangs in loose folds, as in the float pose. Never stiff or short.
 - His arms are short and stubby and come from his sides under the cloak, never from the hood or above it.
-- Expressions read as a grumpy grown-up villain, never childish: no wailing or crying faces. When bonked he gets dazed (stars, one eye shut). No lump on his head.
+- Expressions read as a grumpy grown-up villain, never childish: no wailing or crying faces. When bonked he gets dazed (stars circling, small pupils pointing different ways, gritted-teeth grimace). No lump on his head.
 - Grumble's face is identical in every pose:
-  - Orange-amber eyes, black pupils, small white glint, heavy angry brows. Never yellow or glowing eyes, even in the beam pose.
+  - Expressions come from the Nibbles ghost expression sheet (audit/ghost_expr.png; Canva media MAHYMfbn4KE). Pass it as a reference for any new expression.
+  - Eyes are always two open round orange-amber rings with black pupils and a small white glint. Never closed, crescent, winking or glowing eyes. Emotion comes from brows, lids and pupils.
   - Small round nose and a thin mouth line.
-  - An open mouth has a black inside and a pink-red tongue. No teeth, no fangs, nothing yellow or orange in the mouth.
+  - An open mouth has a black inside and a pink-red tongue, shaped like the sheet's mouths. No fangs, nothing yellow or orange in the mouth. Teeth only as the sheet's gritted zigzag line.
   - Body green is the Nibbles Grumble green (206,248,162). After cutting, run art/grumgreen.py on every Grumble sprite so the green matches exactly.
 - Outline treatment must match Todd on every sprite: thick black outline on the character, then ONE plain white sticker border, with no black or gray line outside the white. Cut Canva art with STRIP=1 (art/cut.py drops Canva's own border), then cut.py adds the clean white border.
 - Trinket style: thick even black outline, flat colors with one darker shade, small white glint, white sticker border.
