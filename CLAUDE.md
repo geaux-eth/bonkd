@@ -25,6 +25,14 @@
 9. **Sounds**: its own fire sound and its own hit sound, recognizable and funny. Barn-zooka animals are the bar.
 10. **Store icon** and **gift-drop art** checked at real size, in the game, on both phone and computer.
 
+## Character anatomy rules
+- Keep each character proportionate. Arms have fixed lengths (upper arm and forearm), and they bend only at the elbow. Never stretch an arm to reach a handle.
+- If a weapon's handles are out of reach, change the weapon (its size, its handle spots, where it rests) to fit the character. Do not change the character to fit the weapon.
+- Know which way the character faces before placing arms.
+  - Facing right (3/4 view): his right arm is the near arm, on the viewer's left, drawn in front of the body. His left arm is the far arm, on the viewer's right, drawn behind the body.
+  - Facing left: the drawing is mirrored.
+  - A shoulder weapon rests on the near shoulder. The near hand takes the trigger and the far hand takes the front grip.
+
 ## Art rules
 - Trinket style: thick even black outline, flat colors with one darker shade, small white glint, white sticker border.
 - Big sprites need a thin border. Check the border at real in-game size.
