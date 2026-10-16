@@ -26,6 +26,7 @@
 10. **Store icon** and **gift-drop art** checked at real size, in the game, on both phone and computer.
 
 ## Character anatomy rules
+- Todd is a grown-up bear. Never make his head bigger or his arms and legs shorter than the approved art; that makes him look like a cub. Check every new pose against the approved body.
 - Keep each character proportionate. Arms have fixed lengths (upper arm and forearm), and they bend only at the elbow. Never stretch an arm to reach a handle.
 - If a weapon's handles are out of reach, change the weapon (its size, its handle spots, where it rests) to fit the character. Do not change the character to fit the weapon.
 - Know which way the character faces before placing arms.
@@ -33,7 +34,16 @@
   - Facing left: the drawing is mirrored.
   - A shoulder weapon rests on the near shoulder. The near hand takes the trigger and the far hand takes the front grip.
 
+## Pose coverage
+- Every character needs every pose the game AND the opening story use, not just gameplay. Check the story beats (storyUpdate in the source) before calling a character done.
+- Todd: stand, walk, bonked, knocked out, bucket on, holding each weapon, throwing; story: sitting and eating, startled, angry, running.
+- Grumble: float, throw, hit, poof, each weapon's effect on him; story: drifting down, beaming the waffles up, evil laugh, flying off.
+- Booster: fly, toss.
+- The picnic setting (Settings round): hilltop, shade tree, gingham blanket, plate and waffle stack, syrup bottle, beam, butterflies.
+
 ## Art rules
+- References: Franky's trinkets (object style), the Nibbles scene Todd (todd-body-ref.png: Todd's look), and Franky's bear branding sheet (Benny: turnaround, expressions, hanging arms, claws). The bear sheet guides poses and details only. Keep Todd's approved proportions; do not make him fatter like Benny.
+- Todd's approved art is the Canva full-body set (plain, armless game body, bucket version). Don't redraw it; new poses must match it.
 - Trinket style: thick even black outline, flat colors with one darker shade, small white glint, white sticker border.
 - Big sprites need a thin border. Check the border at real in-game size.
 - Anything worn must match the wearer's facing and head angle. Near ear in front, far ear hidden. Handles go somewhere sensible.
