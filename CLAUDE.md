@@ -48,6 +48,9 @@
 - Todd's approved art is the Canva full-body set (plain, armless game body, bucket version). Don't redraw it; new poses must match it.
 - Grumble is built on the Nibbles ghost turnaround (2 1/4 heads tall, bottom-heavy blob body, small mitten hands low at the sides). Front view: no tail, round bottom. 3/4 and side views: the body sweeps back into a long thin tail trailing low BEHIND him, away from where he faces. Never a curly tail hanging straight down. Hood, cloak and blue gem on top.
 - Grumble always floats: the tail lifts and curls up behind him. Never a long tail lying flat or low (reads as a slug).
+- Grumble's cloak always drapes softly over his shoulders and hangs in loose folds, as in the float pose. Never stiff or short.
+- His arms are short and stubby and come from his sides under the cloak, never from the hood or above it.
+- Expressions read as a grumpy grown-up villain, never childish: no wailing or crying faces. When bonked he gets dazed (stars, one eye shut). No lump on his head.
 - Grumble's face is identical in every pose:
   - Orange-amber eyes, black pupils, small white glint, heavy angry brows. Never yellow or glowing eyes, even in the beam pose.
   - Small round nose and a thin mouth line.
