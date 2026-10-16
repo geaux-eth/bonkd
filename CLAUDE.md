@@ -38,6 +38,8 @@
 - Every character needs every pose the game AND the opening story use, not just gameplay. Check the story beats (storyUpdate in the source) before calling a character done.
 - Todd: stand, walk, bonked, knocked out, bucket on, holding each weapon, throwing; story: sitting and eating, startled, angry, running.
 - Grumble: float, throw, hit, poof, each weapon's effect on him; story: drifting down, beaming the waffles up, evil laugh, flying off.
+- Every held item or weapon needs a standing hold AND a walking-while-holding pose, with arms and paws drawn in the Canva art (never game-drawn arms on Canva bodies).
+- Anything Todd eats (Mega Beans and any future food item) gets an eating pose: Popeye-style, he squeezes the can and the food shoots into his mouth.
 - Booster: fly, toss.
 - The picnic setting (Settings round): hilltop, shade tree, gingham blanket, plate and waffle stack, syrup bottle, beam, butterflies.
 
