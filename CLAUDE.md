@@ -49,4 +49,5 @@
 - Trinket style: thick even black outline, flat colors with one darker shade, small white glint, white sticker border.
 - Big sprites need a thin border. Check the border at real in-game size.
 - Anything worn must match the wearer's facing and head angle. Near ear in front, far ear hidden. Handles go somewhere sensible.
+- Sticker look across the scene: characters and weapons have the white sticker edge. Don't leave them as the only stickered things, or they read as die-cut stickers on a storyboard. In the Settings round, give foreground props the same treatment: thick outline plus the white edge on things in the play layer (picnic tree, blanket, fences, crates, critters). Mid layers get the outline only. Far layers get no outline, paler and bluer. Then the stickers read as depth, not as pasted-on.
 - Review every group in the art review page before anything ships. Never deploy unapproved art.
