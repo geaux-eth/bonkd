@@ -46,6 +46,8 @@
 ## Art rules
 - References: Franky's trinkets (object style), the Nibbles scene Todd (todd-body-ref.png: Todd's look), and Franky's bear branding sheet (Benny: turnaround, expressions, hanging arms, claws). The bear sheet guides poses and details only. Keep Todd's approved proportions; do not make him fatter like Benny.
 - Todd's approved art is the Canva full-body set (plain, armless game body, bucket version). Don't redraw it; new poses must match it.
+- Grumble is built on the Nibbles ghost turnaround (2 1/4 heads tall, bottom-heavy blob body, small mitten hands low at the sides). Front view: no tail, round bottom. 3/4 and side views: the body sweeps back into a long thin tail trailing low BEHIND him, away from where he faces. Never a curly tail hanging straight down. Hood, cloak and blue gem on top.
+- Outline treatment must match Todd on every sprite: thick black outline on the character, then ONE plain white sticker border, with no black or gray line outside the white. Cut Canva art with STRIP=1 (art/cut.py drops Canva's own border), then cut.py adds the clean white border.
 - Trinket style: thick even black outline, flat colors with one darker shade, small white glint, white sticker border.
 - Big sprites need a thin border. Check the border at real in-game size.
 - Anything worn must match the wearer's facing and head angle. Near ear in front, far ear hidden. Handles go somewhere sensible.
