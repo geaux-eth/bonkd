@@ -2185,13 +2185,13 @@ function dragonfly(){const x=W*(.3+.25*Math.sin(now*.45)),y=GY-(60+Math.sin(now*
 const SCENES=[
  {n:'MAPLE MEADOW',song:0,tr:0,cl:'w',bg(){BG[0]()},
    live(){let fl=3;if(bgArt())fl=drawSetting('meadow1',[]);butterflies(fl)}},
- {n:'PRAIRIE DOG PASTURE',song:0,tr:2,cl:'w',bg(){sky('#93d8f5','#e2f7ff');hills(GY-120*S,30*S,170*S,'#c9e7a0',2);hills(GY-66*S,22*S,130*S,'#aedb84',5);railFence(GY-6*S,'#a8743f','#8a5a2e');ground('#9bd36f','#c99a5c',1)},
-  live(){pdog(P(.2),GY-2*S,0,S*.95);pdog(P(.6),GY-2*S,1,S*.95);pdog(P(.84),GY-2*S,2,S*.95)}},
- {n:'COW PIE MEADOW',song:1,tr:-2,cl:'w',bg(){sky('#9fd2ee','#ffe2a6');sunDisk(P(.84),GY-150*S,46*S,'#ffe58a','#ffd04a');hills(GY-110*S,26*S,160*S,'#c8d98a',1);pineLine(GY-92*S,'#8fb46a',26,18);hills(GY-58*S,20*S,120*S,'#b0c96f',4);wireFence(GY-6*S);ground('#a8cf6a','#c48d55',1)},
-  live(){cow(P(.14),GY-2*S,S*.95,0,false);cow(P(.47),GY-60*S,S*.45,1,true);cow(P(.82),GY-2*S,S*.9,1,false)}},
- {n:'RED BARN RODEO',song:1,tr:0,cl:'p',bg(){BG[1]()}},
- {n:'TUMBLEWEED TRAIL',song:2,tr:-3,cl:'p',wx:'dust',bg(){sky('#ff9a70','#ffdc96');sunDisk(P(.24),GY-40*S,74*S,'#ffcf5a','#ffb42e');mesa(P(.66),GY-40*S,90*S,70*S,'#c98a5a','#b0744a');mesa(P(.92),GY-40*S,60*S,46*S,'#c98a5a','#b0744a');hills(GY-40*S,10*S,120*S,'#d9a66a',3);ground('#dbb56c','#b98250',0);scrub(P(.1),GY,1.1*S,'#9aa85a');scrub(P(.52),GY-2*S,.8*S,'#a9b06a');cactus(P(.88),GY,.8*S)},
-  live(){tumbleweeds()}},
+ {n:'CLOVER HILL',song:0,tr:2,cl:'w',bg(){sky('#93d8f5','#e2f7ff');hills(GY-120*S,30*S,170*S,'#c9e7a0',2);hills(GY-66*S,22*S,130*S,'#aedb84',5);railFence(GY-6*S,'#a8743f','#8a5a2e');ground('#9bd36f','#c99a5c',1)},
+  live(){if(bgArt()){butterflies(drawSetting('meadow1',[]));return}pdog(P(.2),GY-2*S,0,S*.95);pdog(P(.6),GY-2*S,1,S*.95);pdog(P(.84),GY-2*S,2,S*.95)}},
+ {n:'LADYBUG LANE',song:1,tr:-2,cl:'w',bg(){sky('#9fd2ee','#ffe2a6');sunDisk(P(.84),GY-150*S,46*S,'#ffe58a','#ffd04a');hills(GY-110*S,26*S,160*S,'#c8d98a',1);pineLine(GY-92*S,'#8fb46a',26,18);hills(GY-58*S,20*S,120*S,'#b0c96f',4);wireFence(GY-6*S);ground('#a8cf6a','#c48d55',1)},
+  live(){if(bgArt()){butterflies(drawSetting('meadow1',[]));return}cow(P(.14),GY-2*S,S*.95,0,false);cow(P(.47),GY-60*S,S*.45,1,true);cow(P(.82),GY-2*S,S*.9,1,false)}},
+ {n:'DAISY DELL',song:1,tr:0,cl:'p',bg(){BG[1]()},live(){if(bgArt())butterflies(drawSetting('meadow1',[]))}},
+ {n:'SHADY GROVE',song:2,tr:-3,cl:'p',bg(){sky('#ff9a70','#ffdc96');sunDisk(P(.24),GY-40*S,74*S,'#ffcf5a','#ffb42e');mesa(P(.66),GY-40*S,90*S,70*S,'#c98a5a','#b0744a');mesa(P(.92),GY-40*S,60*S,46*S,'#c98a5a','#b0744a');hills(GY-40*S,10*S,120*S,'#d9a66a',3);ground('#dbb56c','#b98250',0);scrub(P(.1),GY,1.1*S,'#9aa85a');scrub(P(.52),GY-2*S,.8*S,'#a9b06a');cactus(P(.88),GY,.8*S)},
+  live(){if(bgArt()){butterflies(drawSetting('meadow1',[]));return}tumbleweeds()}},
  {n:'RATTLESNAKE RIDGE',song:3,tr:-2,cl:'p',wx:'dust',bg(){sky('#e2876a','#f7c98c');hills(GY-110*S,34*S,190*S,'#b8754e',2);hills(GY-60*S,24*S,140*S,'#c98a5a',6);ground('#d4a065','#a86f45',0);boulder(P(.12),GY,1.1*S,'#a58468','#86664c');boulder(P(.84),GY,1.2*S,'#a58468','#86664c');boulder(P(.92),GY+2*S,.7*S,'#a58468','#86664c');cactus(P(.36),GY,.6*S)},
   live(){rattler(P(.84)+4*S,GY-94*S,1.05*S)}},
  {n:'COYOTE CANYON',song:3,tr:0,cl:null,bg(){sky('#6a58a8','#f3a46c');starField(14,.25);moonDisk(P(.5),GY-250*S,26*S);hills(GY-70*S,22*S,170*S,'#d9a07c',2);hills(GY-46*S,14*S,120*S,'#cf8d68',5);canyonWalls(GY,'#c4623e','#a64f30');ground('#c97b4b','#9a5634',0)},
@@ -2238,7 +2238,7 @@ const SCENES=[
   live(){fireworks()}}
 ];
 /* painted backgrounds: one wide image per setting; its dirt line (fraction of image height) lands just under the ground line */
-const BGART={'PICNIC':['bd_picnic',.876],'MAPLE MEADOW':['bd_picnic',.876,1]};
+const BGART={'PICNIC':['bd_picnic',.876],'MAPLE MEADOW':['bd_picnic',.876,1],'CLOVER HILL':['bd_picnic',.876],'LADYBUG LANE':['bd_picnic',.876,1],'DAISY DELL':['bd_picnic',.876],'SHADY GROVE':['bd_picnic',.876,1]};
 /* front-layer prop sprites, bottom-centred on the ground line: [sprite, x as fraction of width, width in S units] */
 function prop(k,fx,w,sway){const A=SPR[k];if(!A)return;const h=w/A.r,x=W*fx,y=GY+7*S;ctx.save();ctx.translate(x,y);ctx.scale(S,S);if(sway)ctx.rotate(Math.sin(now*1.3+fx*9)*.012);ctx.drawImage(A.img,-w/2,-h,w,h);ctx.restore()}
 /* ---------- setting planner: scenery and wildlife share one ground line ----------
@@ -2260,6 +2260,12 @@ SETTING.meadow1={busy:10,
   short:{n:[1,2],items:[['pl_bush',84,2],['pl_rock',62,1]]},
   ground:{n:[3,5],items:SETTING.meadow.ground.items},
   flutter:{n:[2,3],items:[['butterfly',0,1]]},small:{n:[0,1],items:[['cr_ladybug',30,1,'crawl']]},medium:{n:[0,0],items:[]},large:{n:[0,0],items:[]}};
+/* setting 1 placeholders until its own scenery sheet: green prairie, then dry range */
+SETTING.prairie={busy:8,tall:{n:[0,1],items:[['pr_tree',400,1]]},short:{n:[0,2],items:[['pl_bush',84,2],['pl_rock',62,1]]},
+  ground:{n:[3,5],items:[['pl_grass',66,4],['pl_clover',46,2],['pl_daisy',70,2],['pl_buttercup',66,2]]},
+  flutter:{n:[1,3],items:[['butterfly',0,1]]},small:{n:[0,1],items:[['cr_ladybug',30,1,'crawl']]},medium:{n:[0,0],items:[]},large:{n:[0,0],items:[]}};
+SETTING.dry={busy:6,tall:{n:[0,0],items:[]},short:{n:[1,2],items:[['pl_rock',62,1]]},
+  ground:{n:[2,4],items:[['pl_grass',66,1]]},flutter:{n:[0,0]},small:{n:[0,0],items:[]},medium:{n:[0,0],items:[]},large:{n:[0,0],items:[]}};
 const TCOST={large:4,tall:3,medium:2.5,short:1.5,small:1,flutter:.5};
 const TPRI=['large','tall','medium','short','small'];
 let PLAN={k:'',a:[],flutter:0};
