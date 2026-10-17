@@ -61,11 +61,48 @@
 - Outline treatment must match Todd on every sprite: thick black outline on the character, then ONE plain white sticker border, with no black or gray line outside the white. Cut Canva art with STRIP=1 (art/cut.py drops Canva's own border), then cut.py adds the clean white border.
 - Trinket style: thick even black outline, flat colors with one darker shade, small white glint, white sticker border.
 - Big sprites need a thin border. Check the border at real in-game size.
+- Edge standard, for everything we make from now on (characters, weapons, props, plants, critters, code-drawn things):
+  - In game, every sprite's white edge and black outline match Todd's, the tree's and the berry bush's. On the 1440x860 computer view that is about 2 to 3 px of white and 4 to 5 px of black.
+  - A sprite's edge depends on how big it's drawn, not its file size, so cut with DRAWN=<largest side in game units> (art/cut.py) and let EDGE (default 1.6 game units) set the white. Thin a too-heavy black outline in the source before cutting.
+  - Before showing anything new, screenshot it in the game and put it beside Todd and the berry bush at the same zoom. If its edges look thicker or thinner, fix it first.
+  - art/cut.py with DRAWN set also measures the outer black outline and tops it up to INK (default 2.6 game units). For frame pairs, thicken the sources the same way before art/cut_pair.py (BORDER env sets its white).
+- Design for the outline: the thick outline is part of the style, so things must be simple enough to carry it at their in-game size. Use a few big, bold shapes and a chunky silhouette, with no thin spindly parts, tiny details or busy interior lines. Plan this in the prompt (the SIMPLICITY line in audit/obj_spec.txt, with the in-game size filled in), not after. The cricket was dropped because its thin antennae and legs turned into black blobs.
 - Anything worn must match the wearer's facing and head angle. Near ear in front, far ear hidden. Handles go somewhere sensible.
 - Sticker look across the scene: characters and weapons have the white sticker edge. Don't leave them as the only stickered things, or they read as die-cut stickers on a storyboard. In the Settings round, give foreground props the same treatment: thick outline plus the white edge on things in the play layer (picnic tree, blanket, fences, crates, critters). Mid layers get the outline only. Far layers get no outline, paler and bluer. Then the stickers read as depth, not as pasted-on.
 - Review every group in the art review page before anything ships. Never deploy unapproved art.
 
+## Screen scale
+- One scale for every screen, touch or not: S = min(H/640, W/1384). Wide computer windows show the same amount of scene around the characters as a phone held sideways. Grumble's size is GK (0.82 of the original); everything placed around him scales with it.
+- Check "phone" views with real touch emulation (audit/bg_shots_t.py with TOUCH=1), not just a phone-sized window.
+
+## Waffles
+- Every waffle is the original square waffle (w_plain: golden, square, 3 by 3 grid of square pockets, thick side edge, butter pat). Never round or oval, anywhere: stacks, held waffles, thrown waffles, icons, story art. Pass w_plain (Canva media MAHYTKCJelU) as a reference for any art that shows a waffle.
+- The picnic spread is Canva art in the same style: pr_blanket (gingham blanket with the empty plate and syrup bottle) plus one stack sprite per count (pr_stack1 to pr_stack4, one outline around the whole stack). Never stack separate outlined waffle sprites; four outlines read badly. Todd's eating and startled poses hold a square waffle.
+
 ## World building
-- Todd's home is Maple Meadow, named for his love of waffles and maple syrup, not for maple trees. No maple trees or maple leaves in the scenery; trees are the round, lobed, Nibbles-green kind. The opening picnic takes place there.
+- Todd's home is Maple Meadow, named for his love of waffles and maple syrup, not for maple trees. No maple trees or maple leaves in the scenery; trees are the round, lobed, Nibbles-green kind. The approved tree style is the user's ChatGPT tree (pr_tree): one solid canopy with soft shading, a plain smooth trunk. No circle dots in the canopy, no sparkle-star glints, no knot holes. The opening picnic takes place there.
 - The world blends Nibbles critter country (lived-in homes built into nature: hollow logs, stump mailboxes, mushroom porches, clotheslines, beehives) with breakfast country (syrup, waffle and pancake shapes in plants, berry bushes, butter-pat mushrooms).
 - Settings are built in two parts: a painted backdrop with only the sky, far layer, mid layer and flat ground line (no front-layer props), plus front-layer props as separate trinket-style sprites (thick outline, flat color with one shade, glint, white sticker edge) placed by the game.
+- Every front-layer thing gets the same edge as the sprites (thick black, then white), including code-drawn ones: butterflies, the picnic spread, flying waffles. Use sticker() for anything drawn in code.
+- Every setting's front-layer scenery comes in three tiers (SCENERY in the source):
+  - Tall: trees, saguaros, rock formations. Few and far apart.
+  - Short: bushes, boulders, stumps. A handful.
+  - Ground: weeds, flowers, small rocks. Many, unevenly spaced.
+  Each is a single item from that setting's set, picked and placed at random on every visit, drawn tall, then short, then ground. Never a fixed strip or a repeating combo. Plan each new setting's Canva sheet(s) to cover all three tiers.
+- Settings can also have wildlife, in four tiers, picked at random per visit like the scenery:
+  - Fluttering: butterflies, falling leaves, lightning bugs.
+  - Small ground animals and insects.
+  - Medium animals. Never ones from the Nibbles collection.
+  - Large animals, real and imaginary.
+  Wildlife fits the setting, gets the same trinket style and sticker edge, moves on its own (flutter, hop, wander), and never blocks play or covers Todd, Grumble or the HUD.
+- Every scenery or wildlife generation uses the locked object spec (scratchpad audit/obj_spec.txt), with Franky's Trinkets sheet (MAHYSqJ9iO4) and the approved tree (MAHYS40tVFE) as references. Fill in only the bracketed slots: shape and proportions, per-surface colors with one shadow and one upper-left highlight, layout. Keep the strict exclusions: no spots on foliage, no holes or knots, no sparkle stars, no maple leaves, no gradients, plain cream background, no sticker edge (cut.py adds it). Several objects for one setting go on one sheet, widely spaced, to save credits.
+- Setting animals and objects must never repeat something that already exists as a power-up, item or weapon (no snails because of the SLOWMO Snail). Check the item list in the source first. Current clashes to avoid: snail, porcupine, cow, pig, sheep, rooster or chicken, poison ivy, waffle tree, banana, coconut, peach, pie, skillet, bucket, magnet, brick, bowling ball, ping pong paddle, beans. Whenever the user brainstorms a new item, remind them to check it against the settings' animals and objects, and the reverse.
+- Not every setting uses every tier. One planner (planSetting in the source, profile per setting in SETTING) decides what goes where so scenery and wildlife never compete:
+  - Fixed props are reserved first.
+  - Each visit rolls a count per tier, then spends a busy budget, big things first: large animal, tall, medium animal, short, small animal, then fluttering. A setting that gets a deer gets fewer bushes.
+  - Everything claims its real footprint on the ground. Animals claim the whole lane they move in.
+  - Ground cover is a small count (2 to 4), placed last. Each plant takes its own spot: it never overlaps another plant, a prop, a character's spot (Todd included) or an animal's lane. Less is better; the approved look is one or two plants on each side.
+  - Size decides layering everywhere. Draw order, back to front: large animals, tall, short, ground cover, medium animals, small animals. Shorter things always sit in front of taller ones. A setting's fixed props are drawn in their own tier's slot (the picnic tree in tall, the berry bush in short), never on top of the order.
+  - Maple Meadow has butterflies only for fluttering things (dandelion seeds were rejected).
+  - Fluttering things are the frontmost scenery. Butterflies are Canva art (bf_pink/yellow/blue, open and closed frames, flapping). Each gets its own patch of air, spread apart, and steers away from Todd, Grumble and the speech line instead of crossing them. They also keep apart from each other.
+- Props must make sense where they stand: no mailbox without a house.
