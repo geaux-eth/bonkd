@@ -64,3 +64,8 @@
 - Anything worn must match the wearer's facing and head angle. Near ear in front, far ear hidden. Handles go somewhere sensible.
 - Sticker look across the scene: characters and weapons have the white sticker edge. Don't leave them as the only stickered things, or they read as die-cut stickers on a storyboard. In the Settings round, give foreground props the same treatment: thick outline plus the white edge on things in the play layer (picnic tree, blanket, fences, crates, critters). Mid layers get the outline only. Far layers get no outline, paler and bluer. Then the stickers read as depth, not as pasted-on.
 - Review every group in the art review page before anything ships. Never deploy unapproved art.
+
+## World building
+- Todd's home is Maple Meadow. The opening picnic takes place there.
+- The world blends Nibbles critter country (lived-in homes built into nature: hollow logs, stump mailboxes, mushroom porches, clotheslines, beehives) with breakfast country (maple trees tapped for syrup, waffle and pancake shapes in plants, berry bushes, butter-pat mushrooms).
+- Settings are built in two parts: a painted backdrop with only the sky, far layer, mid layer and flat ground line (no front-layer props), plus front-layer props as separate trinket-style sprites (thick outline, flat color with one shade, glint, white sticker edge) placed by the game.
