@@ -471,7 +471,7 @@ function resize(){
   const TOUCHY=matchMedia('(pointer:coarse)').matches;
   /* one scale for every screen, touch or not: wide screens show the same amount of scene around the characters as a phone held sideways (about 2.2:1) */
   S=Math.max(.28,Math.min(2.4,Math.min(H/640,W/1384)));
-  BSC=Math.max(.45,Math.min(2.4,Math.min(H/640,W/1120)));
+  BSC=Math.max(.45,Math.min(2.4,Math.min(H/640,W/1384)));
   document.body.classList.toggle('short',H<460);
   UIZ=ROT?1:clamp(Math.min(H/430,W/900),1,1.75); document.documentElement.style.setProperty('--uiz',UIZ);
   GY=H-Math.max(42,H*.12);
@@ -2183,7 +2183,8 @@ function dragonfly(){const x=W*(.3+.25*Math.sin(now*.45)),y=GY-(60+Math.sin(now*
 
 /* the settings, in travel order */
 const SCENES=[
- {n:'HONEY HOLLER',song:0,tr:0,cl:'w',bg(){BG[0]()}},
+ {n:'MAPLE MEADOW',song:0,tr:0,cl:'w',bg(){BG[0]()},
+   live(){let fl=3;if(bgArt())fl=drawSetting('meadow1',[]);butterflies(fl)}},
  {n:'PRAIRIE DOG PASTURE',song:0,tr:2,cl:'w',bg(){sky('#93d8f5','#e2f7ff');hills(GY-120*S,30*S,170*S,'#c9e7a0',2);hills(GY-66*S,22*S,130*S,'#aedb84',5);railFence(GY-6*S,'#a8743f','#8a5a2e');ground('#9bd36f','#c99a5c',1)},
   live(){pdog(P(.2),GY-2*S,0,S*.95);pdog(P(.6),GY-2*S,1,S*.95);pdog(P(.84),GY-2*S,2,S*.95)}},
  {n:'COW PIE MEADOW',song:1,tr:-2,cl:'w',bg(){sky('#9fd2ee','#ffe2a6');sunDisk(P(.84),GY-150*S,46*S,'#ffe58a','#ffd04a');hills(GY-110*S,26*S,160*S,'#c8d98a',1);pineLine(GY-92*S,'#8fb46a',26,18);hills(GY-58*S,20*S,120*S,'#b0c96f',4);wireFence(GY-6*S);ground('#a8cf6a','#c48d55',1)},
@@ -2224,7 +2225,7 @@ const SCENES=[
   live(){fallsLive(P(.8),GY-6*S,150)}},
  {n:'BUTTERFLY BALLROOM',song:0,tr:1,cl:'w',bg(){sky('#9fe0f7','#f3fbff');hills(GY-100*S,26*S,170*S,'#bfe48f',3);hills(GY-54*S,20*S,130*S,'#a6d97a',6);flowers(GY-60*S,26,['#ff8fb1','#ffd23f','#b48cff','#ffffff','#ff7a45']);flowers(GY-8*S,18,['#ff8fb1','#ffd23f','#b48cff','#8fd3ff']);ground('#9bd36f','#c99a5c',1)},
   live(){butterflies(4)}},
- {n:'BUMBLEBEE BUNGALOW',song:1,tr:2,cl:'w',bg(){sky('#a4e0f5','#f4fbe8');hills(GY-110*S,30*S,170*S,'#c4e08a',2);unit(P(.8),GY,()=>{cel(()=>rr(-70,-24,140,8,2),'#a8743f','#8a5a2e',0,2,1.8);for(const lx of[-60,56])cel(()=>rr(lx,-18,6,18,1),'#a8743f','#8a5a2e',1,0,1.6)});skep(P(.8)-36*S,GY-24*S,.6*S);skep(P(.8)+30*S,GY-24*S,.55*S);flowers(GY-8*S,16,['#ffffff','#b48cff','#ffd23f']);ground('#9bd36f','#c99a5c',1)},
+ {n:'FIREFLY FIELDS',song:1,tr:2,cl:'w',bg(){sky('#a4e0f5','#f4fbe8');hills(GY-110*S,30*S,170*S,'#c4e08a',2);unit(P(.8),GY,()=>{cel(()=>rr(-70,-24,140,8,2),'#a8743f','#8a5a2e',0,2,1.8);for(const lx of[-60,56])cel(()=>rr(lx,-18,6,18,1),'#a8743f','#8a5a2e',1,0,1.6)});skep(P(.8)-36*S,GY-24*S,.6*S);skep(P(.8)+30*S,GY-24*S,.55*S);flowers(GY-8*S,16,['#ffffff','#b48cff','#ffd23f']);ground('#9bd36f','#c99a5c',1)},
   live(){bees(P(.8),GY-70*S,6)}},
  {n:'SUNFLOWER SEA',song:0,tr:-2,cl:'w',bg(){sky('#8fd6f5','#fff2b8');sunDisk(P(.18),GY-230*S,40*S,'#ffe27a','#ffc845');hills(GY-80*S,20*S,160*S,'#a8cf6a',3);ground('#9ac85f','#b98250',1)},
   live(){for(const [x,h,ph] of[[.06,120,0],[.16,100,1],[.27,128,2],[.72,110,3],[.83,130,4],[.94,104,5]])sunflower(P(x),GY,h,ph)}},
@@ -2233,11 +2234,11 @@ const SCENES=[
  {n:'HAYRIDE HILL',song:1,tr:-1,cl:'p',bg(){sky('#ff9f7a','#ffdca0');sunDisk(P(.5),GY-80*S,60*S,'#ffd36a','#ffb83a');hills(GY-80*S,34*S,200*S,'#d4b45a',2);for(const [x,k,r] of[[.1,.7,1],[.22,.55,0],[.36,.5,1]])hayBale(P(x),GY,k*S,r);tractor(P(.78),GY,.65*S);ground('#c9b05a','#a87a45',1)},
   live(){smoke(P(.78)+8*S,GY-76*S)}},
  {n:'HARVEST MOON',song:3,tr:1,cl:null,wx:'flies',bg(){sky('#1d2a52','#4d5a8c');starField(34,.55);moonDisk(P(.62),GY-180*S,70*S);hills(GY-70*S,24*S,180*S,'#2f3d5a',2);for(const [x,k] of[[.12,.8],[.3,.6],[.86,.7]])hayBale(P(x),GY,k*S,true);ground('#3f5a3a','#2e2a26',1)}},
- {n:'WELCOME HOME',song:0,tr:0,cl:null,bg(){sky('#16224a','#3d4f8c');starField(30,.5);hills(GY-118*S,46*S,150*S,'#3f5a4a',1);hills(GY-58*S,34*S,110*S,'#4a6a50',4);tree(P(.12),GY-46*S,1);tree(P(.88),GY-40*S,.85);ctx.fillStyle='#d8dce8';ctx.fillRect(0,GY-24*S,W,5*S);ctx.fillRect(0,GY-12*S,W,5*S);for(let x=6*S;x<W;x+=24*S)unit(x,GY-2*S,()=>cel(()=>{ctx.moveTo(-5,0);ctx.lineTo(-5,-26);ctx.lineTo(0,-32);ctx.lineTo(5,-26);ctx.lineTo(5,0);ctx.closePath()},'#d8dce8','#b8bfd0',2,0,1.8));ground('#4f7a45','#7a5a3a',1)},
+ {n:'HOME SWEET HOME',song:0,tr:0,cl:null,bg(){sky('#16224a','#3d4f8c');starField(30,.5);hills(GY-118*S,46*S,150*S,'#3f5a4a',1);hills(GY-58*S,34*S,110*S,'#4a6a50',4);tree(P(.12),GY-46*S,1);tree(P(.88),GY-40*S,.85);ctx.fillStyle='#d8dce8';ctx.fillRect(0,GY-24*S,W,5*S);ctx.fillRect(0,GY-12*S,W,5*S);for(let x=6*S;x<W;x+=24*S)unit(x,GY-2*S,()=>cel(()=>{ctx.moveTo(-5,0);ctx.lineTo(-5,-26);ctx.lineTo(0,-32);ctx.lineTo(5,-26);ctx.lineTo(5,0);ctx.closePath()},'#d8dce8','#b8bfd0',2,0,1.8));ground('#4f7a45','#7a5a3a',1)},
   live(){fireworks()}}
 ];
 /* painted backgrounds: one wide image per setting; its dirt line (fraction of image height) lands just under the ground line */
-const BGART={'PICNIC':['bd_picnic',.876],'HONEY HOLLER':['bg_honey',.873]};
+const BGART={'PICNIC':['bd_picnic',.876],'MAPLE MEADOW':['bd_picnic',.876,1]};
 /* front-layer prop sprites, bottom-centred on the ground line: [sprite, x as fraction of width, width in S units] */
 function prop(k,fx,w,sway){const A=SPR[k];if(!A)return;const h=w/A.r,x=W*fx,y=GY+7*S;ctx.save();ctx.translate(x,y);ctx.scale(S,S);if(sway)ctx.rotate(Math.sin(now*1.3+fx*9)*.012);ctx.drawImage(A.img,-w/2,-h,w,h);ctx.restore()}
 /* ---------- setting planner: scenery and wildlife share one ground line ----------
@@ -2253,6 +2254,12 @@ const SETTING={meadow:{busy:8,
   short:{n:[0,2],items:[['pl_bush',84,2],['pl_rock',62,1]]},
   ground:{n:[2,4],items:[['pl_grass',66,3],['pl_clover',46,3],['pl_daisy',70,2],['pl_pinkflower',88,1],['pl_buttercup',66,2],['pl_fern',74,2]]},
   flutter:{n:[2,3],items:[['butterfly',0,1]]},small:{n:[0,1],items:[['cr_ladybug',30,2,'crawl']]},medium:{n:[0,0],items:[]},large:{n:[0,0],items:[]}}};
+/* level 1: the same meadow as the picnic, now open ground for the chase */
+SETTING.meadow1={busy:10,
+  tall:{n:[1,2],items:[['pr_tree',400,1]]},
+  short:{n:[1,2],items:[['pl_bush',84,2],['pl_rock',62,1]]},
+  ground:{n:[3,5],items:SETTING.meadow.ground.items},
+  flutter:{n:[2,3],items:[['butterfly',0,1]]},small:{n:[0,1],items:[['cr_ladybug',30,1,'crawl']]},medium:{n:[0,0],items:[]},large:{n:[0,0],items:[]}};
 const TCOST={large:4,tall:3,medium:2.5,short:1.5,small:1,flutter:.5};
 const TPRI=['large','tall','medium','short','small'];
 let PLAN={k:'',a:[],flutter:0};
@@ -2306,6 +2313,8 @@ function drawBflies(P){const av=flyAvoid(),dt=1/60;
 function drawDrift(p){const A=SPR[p.k];if(!A)return;const GW=W/S,u=(p.x0+now*p.v)%1.1-.05,x=u*GW,y=p.y0+Math.sin(now*.9+p.ph)*18,w=p.h*A.r;
   ctx.save();ctx.translate(x*S,GY-y*S);ctx.scale(S,S);ctx.rotate(.35+Math.sin(now*1.4+p.ph)*.25);ctx.drawImage(A.img,-w/2,-p.h/2,w,p.h);ctx.restore()}
 function drawPlanned(p){const A=SPR[p.k];if(!A)return;let x=p.x,y=0,f=p.f,rot=Math.sin(now*1.3+p.x*.2)*.02*f;
+  /* tall things never reach up into the HUD */
+  if(p.t==='tall'){const room=(GY-Math.max(hudBottom(),H*.1)-14)/S;if(p.h>room){p.w*=room/p.h;p.h=room}}
   if(p.mv){const sp={crawl:.05,hop:.16,walk:.12,graze:.03}[p.mv],u=now*sp+p.ph,tri=Math.abs((u%2)-1)*2-1,
       dir=((u%2)<1)?1:-1,rest=(Math.sin(now*.7+p.ph)>.35);
     x=p.x+tri*(p.lane-p.w)/2*(rest?.98:1);f=dir;rot=0;
@@ -2319,8 +2328,8 @@ function drawSetting(name,fixed,props){const P=planSetting(name,fixed);if(!P)ret
   /* a setting's fixed props are drawn in their own tier's slot, so size decides layering everywhere */
   for(const t of TORDER){for(const p of P.a)if(p.t===t)drawPlanned(p);if(props&&props[t])props[t]()}for(const p of P.drift||[])drawDrift(p);if(SPR.bf_pink_o){drawBflies(P);return 0}return P.flutter}
 function bgArt(){const a=BGART[scene().n];return a&&SPR[a[0]]?a:null}
-function paintBGArt(a){const I=SPR[a[0]].img,iw=I.naturalWidth,ih=I.naturalHeight,dy=a[1]*ih,gy=GY+8*BSC;
-  const k=Math.max(W/iw,gy/dy,(H-gy)/(ih-dy)),w=iw*k,h=ih*k;ctx.drawImage(I,(W-w)/2,gy-dy*k,w,h)}
+function paintBGArt(a){const I=SPR[a[0]].img,iw=I.naturalWidth,ih=I.naturalHeight,dy=a[1]*ih,gy=GY+8*BSC;if(a[2]){ctx.save();ctx.translate(W,0);ctx.scale(-1,1)}
+  const k=Math.max(W/iw,gy/dy,(H-gy)/(ih-dy)),w=iw*k,h=ih*k;ctx.drawImage(I,(W-w)/2,gy-dy*k,w,h);if(a[2])ctx.restore()}
 function ensureBG(){
   const k=W+'x'+H+':'+(state==='story'?'picnic':level)+':'+BSC+':'+!!bgArt(); if(k===bgKey)return;
   bgCan.width=Math.round(W*DPR);bgCan.height=Math.round(H*DPR);

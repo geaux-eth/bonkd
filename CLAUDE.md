@@ -106,3 +106,5 @@
   - Maple Meadow has butterflies only for fluttering things (dandelion seeds were rejected).
   - Fluttering things are the frontmost scenery. Butterflies are Canva art (bf_pink/yellow/blue, open and closed frames, flapping). Each gets its own patch of air, spread apart, and steers away from Todd, Grumble and the speech line instead of crossing them. They also keep apart from each other.
 - Props must make sense where they stand: no mailbox without a house.
+- Levels: the opening picnic is the story; level 1 is Maple Meadow, a straight continuation of the picnic (the picnic backdrop mirrored, the same scenery set with trees, bushes, plants, ladybug and butterflies; replaced Honey Holler). The U-Pick berry bush belongs to the picnic only: it's a story prop, too busy for gameplay; level 25 is Firefly Fields (summer dusk, lightning bugs; replaced Bumblebee Bungalow); level 30, the last, is Home Sweet Home.
+- Scenery is drawn at the same scale as the characters (BSC uses the same W/1384 as S). Tall scenery is capped so it never reaches into the HUD.
