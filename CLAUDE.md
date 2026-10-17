@@ -96,7 +96,7 @@
   The Nibbles cast (never used as setting wildlife or scenery characters): bear, cock (chicken), raccoon, beaver, gnome, ghost, wolf, gecko. The Barn-zooka keeps its chicken.
   - Large animals, real and imaginary.
   Wildlife fits the setting, gets the same trinket style and sticker edge, moves on its own (flutter, hop, wander), and never blocks play or covers Todd, Grumble or the HUD.
-- Every scenery or wildlife generation uses the locked object spec (scratchpad audit/obj_spec.txt), with Franky's Trinkets sheet (MAHYSqJ9iO4) and the approved tree (MAHYS40tVFE) as references. Fill in only the bracketed slots: shape and proportions, per-surface colors with one shadow and one upper-left highlight, layout. Keep the strict exclusions: no spots on foliage, no holes or knots, no sparkle stars, no maple leaves, no gradients, plain cream background, no sticker edge (cut.py adds it). Several objects for one setting go on one sheet, widely spaced, to save credits.
+- Every scenery or wildlife generation uses the locked object spec (scratchpad audit/obj_spec.txt), with Franky's Trinkets sheet (MAHYSqJ9iO4) and the approved tree (MAHYS40tVFE) as references. Fill in only the bracketed slots: shape and proportions, per-surface colors with one shadow and one upper-left highlight, layout. Keep the strict exclusions: no spots on foliage, no holes or knots, no sparkle stars, no maple leaves, no gradients, plain cream background, no sticker edge (cut.py adds it). Several objects for one setting go on one sheet, widely spaced, to save credits. Never put tall items (trees, saguaros, rock formations) on a sheet: they come out squat and don't scale. A tall item gets its own image, styled after the approved shade tree, or the setting skips the tall tier when its backdrop already provides the height (the forest).
 - Setting animals and objects must never repeat something that already exists as a power-up, item or weapon (no snails because of the SLOWMO Snail). Check the item list in the source first. Current clashes to avoid: snail, porcupine, cow, pig, sheep, rooster or chicken, poison ivy, waffle tree, banana, coconut, peach, pie, skillet, bucket, magnet, brick, bowling ball, ping pong paddle, beans. Whenever the user brainstorms a new item, remind them to check it against the settings' animals and objects, and the reverse.
 - Not every setting uses every tier. One planner (planSetting in the source, profile per setting in SETTING) decides what goes where so scenery and wildlife never compete:
   - Fixed props are reserved first.
@@ -109,7 +109,7 @@
 - Props must make sense where they stand: no mailbox without a house.
 - Levels: the opening picnic is the story, then six settings of five levels:
   1. Meadow: Maple Meadow, Clover Hill, Ladybug Lane, Daisy Dell, Shady Grove.
-  2. Forest: Piney Woods, Hoot Owl Hideout, Beaver Bend, Mossy Hollow, Conifer Corner.
+  2. Forest: Piney Woods, Hoot Owl Hideout, Foxglove Bend, Mossy Hollow, Conifer Corner.
   3. Mountain: Biscuit Bluff, Switchback Summit, Eagle's Perch, Thunderhead Peak, Avalanche Alley.
   4. River canyon: Muddy River Crossing, Echo Canyon, Coyote Crag, Red Rock Rapids, Cattail Creek.
   5. Desert: Tumbleweed Trail, Rattlesnake Ridge, Cactus Flats, Dusty Dunes, Sidewinder Sands.
