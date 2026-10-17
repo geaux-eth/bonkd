@@ -93,6 +93,7 @@
   - Fluttering: butterflies, falling leaves, lightning bugs.
   - Small ground animals and insects.
   - Medium animals. Never ones from the Nibbles collection.
+  The Nibbles cast (never used as setting wildlife or scenery characters): bear, cock (chicken), raccoon, beaver, gnome, ghost, wolf, gecko. The Barn-zooka keeps its chicken.
   - Large animals, real and imaginary.
   Wildlife fits the setting, gets the same trinket style and sticker edge, moves on its own (flutter, hop, wander), and never blocks play or covers Todd, Grumble or the HUD.
 - Every scenery or wildlife generation uses the locked object spec (scratchpad audit/obj_spec.txt), with Franky's Trinkets sheet (MAHYSqJ9iO4) and the approved tree (MAHYS40tVFE) as references. Fill in only the bracketed slots: shape and proportions, per-surface colors with one shadow and one upper-left highlight, layout. Keep the strict exclusions: no spots on foliage, no holes or knots, no sparkle stars, no maple leaves, no gradients, plain cream background, no sticker edge (cut.py adds it). Several objects for one setting go on one sheet, widely spaced, to save credits.
