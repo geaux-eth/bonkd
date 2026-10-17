@@ -66,6 +66,6 @@
 - Review every group in the art review page before anything ships. Never deploy unapproved art.
 
 ## World building
-- Todd's home is Maple Meadow. The opening picnic takes place there.
-- The world blends Nibbles critter country (lived-in homes built into nature: hollow logs, stump mailboxes, mushroom porches, clotheslines, beehives) with breakfast country (maple trees tapped for syrup, waffle and pancake shapes in plants, berry bushes, butter-pat mushrooms).
+- Todd's home is Maple Meadow, named for his love of waffles and maple syrup, not for maple trees. No maple trees or maple leaves in the scenery; trees are the round, lobed, Nibbles-green kind. The opening picnic takes place there.
+- The world blends Nibbles critter country (lived-in homes built into nature: hollow logs, stump mailboxes, mushroom porches, clotheslines, beehives) with breakfast country (syrup, waffle and pancake shapes in plants, berry bushes, butter-pat mushrooms).
 - Settings are built in two parts: a painted backdrop with only the sky, far layer, mid layer and flat ground line (no front-layer props), plus front-layer props as separate trinket-style sprites (thick outline, flat color with one shade, glint, white sticker edge) placed by the game.
