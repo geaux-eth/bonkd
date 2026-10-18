@@ -79,6 +79,19 @@
 - Every waffle is the original square waffle (w_plain: golden, square, 3 by 3 grid of square pockets, thick side edge, butter pat). Never round or oval, anywhere: stacks, held waffles, thrown waffles, icons, story art. Pass w_plain (Canva media MAHYTKCJelU) as a reference for any art that shows a waffle.
 - The picnic spread is Canva art in the same style: pr_blanket (gingham blanket with the empty plate and syrup bottle) plus one stack sprite per count (pr_stack1 to pr_stack4, one outline around the whole stack). Never stack separate outlined waffle sprites; four outlines read badly. Todd's eating and startled poses hold a square waffle.
 
+## Setting checklist: every new setting, before showing it
+
+1. **Its own world.** The backdrop is filled by that world (deep woods, not a meadow with a tree line) and has its own ground strip. Never reuse the meadow's dirt path. One backdrop shared by all five levels.
+2. **Names match.** Every level name matches what the setting shows. Nothing from the Nibbles cast, the Barn-zooka animals or the item list appears as scenery or wildlife.
+3. **Real height, not just stickers.** Small pieces along the bottom alone read as stickers. Every setting needs:
+   - Tall items, 3 to 4 per level when the world is dense: each its own Canva image (never on a sheet), in the approved tree style, never a stacked Christmas-tree shape. Very tall ones (like the redwood trunk) run off the top of the screen.
+   - Medium items around Todd's chest height or taller (big bushes, boulders, snags, fern clumps).
+   - Then small ground pieces and wildlife to fill in.
+4. **Outlines.** Thin any Canva outline that comes out heavier than the standard before cutting; check edges against Todd at game size.
+5. **Ground line.** Todd's feet and every piece's base sit on the same line. Trim empty space under each cut sprite. Give uneven bases (spreading roots) a small sink. If the setting's grass strip is thick, shift the backdrop (its ground fraction in BGART) so Todd's feet land where the grass meets the dirt, rather than moving Todd. Check zoomed in on computer and phone.
+6. **Wildlife moves sensibly.** Ground animals walk or hop in their own lanes; fliers glide across high, facing their way, and only now and then.
+7. **Check before showing.** Several random visits plus a real touch phone, zoomed on the ground line, before calling it done.
+
 ## World building
 - Todd's home is Maple Meadow, named for his love of waffles and maple syrup, not for maple trees. No maple trees or maple leaves in the scenery; trees are the round, lobed, Nibbles-green kind. The approved tree style is the user's ChatGPT tree (pr_tree): one solid canopy with soft shading, a plain smooth trunk. No circle dots in the canopy, no sparkle-star glints, no knot holes. The opening picnic takes place there.
 - The world blends Nibbles critter country (lived-in homes built into nature: hollow logs, stump mailboxes, mushroom porches, clotheslines, beehives) with breakfast country (syrup, waffle and pancake shapes in plants, berry bushes, butter-pat mushrooms).
