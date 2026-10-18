@@ -68,7 +68,8 @@
   - art/cut.py with DRAWN set also measures the outer black outline and tops it up to INK (default 2.6 game units). For frame pairs, thicken the sources the same way before art/cut_pair.py (BORDER env sets its white).
 - Design for the outline: the thick outline is part of the style, so things must be simple enough to carry it at their in-game size. Use a few big, bold shapes and a chunky silhouette, with no thin spindly parts, tiny details or busy interior lines. Plan this in the prompt (the SIMPLICITY line in audit/obj_spec.txt, with the in-game size filled in), not after. The cricket was dropped because its thin antennae and legs turned into black blobs.
 - Anything worn must match the wearer's facing and head angle. Near ear in front, far ear hidden. Handles go somewhere sensible.
-- Sticker look across the scene: characters and weapons have the white sticker edge. Don't leave them as the only stickered things, or they read as die-cut stickers on a storyboard. In the Settings round, give foreground props the same treatment: thick outline plus the white edge on things in the play layer (picnic tree, blanket, fences, crates, critters). Mid layers get the outline only. Far layers get no outline, paler and bluer. Then the stickers read as depth, not as pasted-on.
+- Sticker look: the white sticker edge marks game pieces: characters, weapons, items, drops, and the opening picnic's props (shade tree, blanket, waffle stacks, berry bush). Backdrops have black outlines only, and gameplay levels have no extra scenery, so nothing else carries a white edge.
+- Greens on any sprite placed over a backdrop match the backdrop's fresh, muted greens (about hue 0.26, saturation 0.46, value 0.68), never neon. art/orig_green holds the pre-match originals.
 - Review every group in the art review page before anything ships. Never deploy unapproved art.
 
 ## Screen scale
@@ -81,54 +82,31 @@
 
 ## Setting checklist: every new setting, before showing it
 
-1. **Its own world.** The backdrop is filled by that world (deep woods, not a meadow with a tree line) and has its own ground strip. Never reuse the meadow's dirt path. One backdrop shared by all five levels.
-2. **Names match.** Every level name matches what the setting shows. Nothing from the Nibbles cast, the Barn-zooka animals or the item list appears as scenery or wildlife.
-3. **Real height, not just stickers.** Small pieces along the bottom alone read as stickers. Every setting needs:
-   - Tall items, 3 to 4 per level when the world is dense: each its own Canva image (never on a sheet), in the approved tree style, never a stacked Christmas-tree shape. Very tall ones (like the redwood trunk) run off the top of the screen.
-   - Medium items around Todd's chest height or taller (big bushes, boulders, snags, fern clumps).
-   - Then small ground pieces and wildlife to fill in.
-4. **Outlines.** Thin any Canva outline that comes out heavier than the standard before cutting; check edges against Todd at game size.
-5. **Ground line.** Todd's feet and every piece's base sit on the same line. Trim empty space under each cut sprite. Give uneven bases (spreading roots) a small sink. If the setting's grass strip is thick, shift the backdrop (its ground fraction in BGART) so Todd's feet land where the grass meets the dirt, rather than moving Todd. Check zoomed in on computer and phone.
-6. **Wildlife moves sensibly.** Ground animals walk or hop in their own lanes; fliers glide across high, facing their way, and only now and then.
-7. **Check before showing.** Several random visits plus a real touch phone, zoomed on the ground line, before calling it done.
+1. **One painted backdrop per setting, made in Gemini.** The user runs the prompt in Gemini (no Canva credits). The style matches the approved mountain backdrop (art/src_bd_mountain.png, attach it to every prompt):
+   - bold, even black outlines on every shape in every layer; flat colors with one darker shade; no texture or gradients;
+   - bright cyan sky with puffy cartoon clouds and soft light rays;
+   - far layers paler and slightly blue; fresh, muted greens;
+   - big shapes may frame the left and right edges, but the center stays open for play;
+   - a flat, level ground strip across the full width with a solid black top line at 85% of the height, in that setting's own color;
+   - no characters, animals, text, white sticker edge or objects standing on the ground strip.
+   2400x1200 (2:1). Save the source as art/src_bd_<name>, write art/review/r_bd_<name>.webp at 2048 wide.
+2. **Its own world.** The backdrop is filled by that world and its own ground strip (meadow: orange dirt; forest: dark brown earth under moss; mountain: orange dirt). Never reuse another setting's look.
+3. **Names match.** Every level name matches what the backdrop shows. Nothing from the Nibbles cast, the Barn-zooka animals or the item list appears in it.
+4. **Backdrop only in play.** Gameplay levels show the backdrop with no extra scenery or wildlife: added props read as items because of their white edge. Only the opening picnic keeps props.
+5. **Ground line.** In BGART, set the ground fraction so Todd's feet sit just under the black top line, on the strip (about the line's fraction plus 0.02; for a thick grass or moss band, where it meets the dirt). Approved: meadow .875, forest .895, mountain .872. Alternate levels mirror the backdrop.
+6. **Check before showing.** Computer and real touch phone, zoomed on the ground line, mirrored and unmirrored.
 
 ## World building
-- Todd's home is Maple Meadow, named for his love of waffles and maple syrup, not for maple trees. No maple trees or maple leaves in the scenery; trees are the round, lobed, Nibbles-green kind. The approved tree style is the user's ChatGPT tree (pr_tree): one solid canopy with soft shading, a plain smooth trunk. No circle dots in the canopy, no sparkle-star glints, no knot holes. The opening picnic takes place there.
-- The world blends Nibbles critter country (lived-in homes built into nature: hollow logs, stump mailboxes, mushroom porches, clotheslines, beehives) with breakfast country (syrup, waffle and pancake shapes in plants, berry bushes, butter-pat mushrooms).
-- Settings are built in two parts: a painted backdrop with only the sky, far layer, mid layer and flat ground line (no front-layer props), plus front-layer props as separate trinket-style sprites (thick outline, flat color with one shade, glint, white sticker edge) placed by the game.
-- Every front-layer thing gets the same edge as the sprites (thick black, then white), including code-drawn ones: butterflies, the picnic spread, flying waffles. Use sticker() for anything drawn in code.
-- Every setting's front-layer scenery comes in three tiers (SCENERY in the source):
-  - Tall: trees, saguaros, rock formations. Few and far apart.
-  - Short: bushes, boulders, stumps. A handful.
-  - Ground: weeds, flowers, small rocks. Many, unevenly spaced.
-  Each is a single item from that setting's set, picked and placed at random on every visit, drawn tall, then short, then ground. Never a fixed strip or a repeating combo. Plan each new setting's Canva sheet(s) to cover all three tiers.
-- Settings can also have wildlife, in four tiers, picked at random per visit like the scenery:
-  - Fluttering: butterflies, falling leaves, lightning bugs.
-  - Small ground animals and insects.
-  - Medium animals. Never ones from the Nibbles collection.
-  The Nibbles cast (never used as setting wildlife or scenery characters): bear, cock (chicken), raccoon, beaver, gnome, ghost, wolf, gecko. The Barn-zooka keeps its chicken.
-  - Large animals, real and imaginary.
-  Wildlife fits the setting, gets the same trinket style and sticker edge, moves on its own (flutter, hop, wander), and never blocks play or covers Todd, Grumble or the HUD.
-- Every scenery or wildlife generation uses the locked object spec (scratchpad audit/obj_spec.txt), with Franky's Trinkets sheet (MAHYSqJ9iO4) and the approved tree (MAHYS40tVFE) as references. Fill in only the bracketed slots: shape and proportions, per-surface colors with one shadow and one upper-left highlight, layout. Keep the strict exclusions: no spots on foliage, no holes or knots, no sparkle stars, no maple leaves, no gradients, plain cream background, no sticker edge (cut.py adds it). Several objects for one setting go on one sheet, widely spaced, to save credits. Never put tall items (trees, saguaros, rock formations) on a sheet: they come out squat and don't scale. A tall item gets its own image, styled after the approved shade tree, for example the forest's big shaggy evergreen (fo_fir, never a stacked Christmas-tree shape) and its giant redwood trunk (fo_redwood), which rises out of the top of the screen. Tall items that run off the top skip the HUD height cap. The forest uses 3 to 4 tall trees per level; the earlier lollipop forest tree was dropped.
-- Setting animals and objects must never repeat something that already exists as a power-up, item or weapon (no snails because of the SLOWMO Snail). Check the item list in the source first. Current clashes to avoid: snail, porcupine, cow, pig, sheep, rooster or chicken, poison ivy, waffle tree, banana, coconut, peach, pie, skillet, bucket, magnet, brick, bowling ball, ping pong paddle, beans. Whenever the user brainstorms a new item, remind them to check it against the settings' animals and objects, and the reverse.
-- Not every setting uses every tier. One planner (planSetting in the source, profile per setting in SETTING) decides what goes where so scenery and wildlife never compete:
-  - Fixed props are reserved first.
-  - Each visit rolls a count per tier, then spends a busy budget, big things first: large animal, tall, medium animal, short, small animal, then fluttering. A setting that gets a deer gets fewer bushes.
-  - Everything claims its real footprint on the ground. Animals claim the whole lane they move in.
-  - Ground cover is a small count (2 to 4), placed last. Each plant takes its own spot: it never overlaps another plant, a prop, a character's spot (Todd included) or an animal's lane. Less is better; the approved look is one or two plants on each side.
-  - Size decides layering everywhere. Draw order, back to front: large animals, tall, short, ground cover, medium animals, small animals. Shorter things always sit in front of taller ones. A setting's fixed props are drawn in their own tier's slot (the picnic tree in tall, the berry bush in short), never on top of the order.
-  - Maple Meadow has butterflies only for fluttering things (dandelion seeds were rejected).
-  - Fluttering things are the frontmost scenery. Butterflies are Canva art (bf_pink/yellow/blue, open and closed frames, flapping). Each gets its own patch of air, spread apart, and steers away from Todd, Grumble and the speech line instead of crossing them. They also keep apart from each other.
-- Props must make sense where they stand: no mailbox without a house.
-- Levels: the opening picnic is the story, then six settings of five levels:
-  1. Meadow: Maple Meadow, Clover Hill, Ladybug Lane, Daisy Dell, Shady Grove.
-  2. Forest: Piney Woods, Hoot Owl Hideout, Foxglove Bend, Mossy Hollow, Conifer Corner.
-  3. Mountain: Biscuit Bluff, Switchback Summit, Eagle's Perch, Thunderhead Peak, Avalanche Alley.
+- Todd's home is Maple Meadow, named for his love of waffles and maple syrup, not for maple trees. No maple trees or maple leaves anywhere; trees are the round, lobed kind. The opening picnic takes place there.
+- The world blends Nibbles critter country (homes built into nature: hollow logs, stump mailboxes, mushroom porches, clotheslines, beehives) with breakfast country (syrup, waffle and pancake shapes in plants, berry bushes, butter-pat mushrooms). This flavors backdrop prompts and story scenes.
+- The Nibbles cast never appears as scenery or wildlife: bear, cock (chicken), raccoon, beaver, gnome, ghost, wolf, gecko. The Barn-zooka keeps its chicken.
+- Setting animals and objects must never repeat something that already exists as a power-up, item or weapon (no snails because of the SLOWMO Snail). Check the item list in the source first. Current clashes to avoid: snail, porcupine, cow, pig, sheep, rooster or chicken, poison ivy, waffle tree, banana, coconut, peach, pie, skillet, bucket, magnet, brick, bowling ball, ping pong paddle, beans, oatmeal. Whenever the user brainstorms a new item, remind them to check it against the settings' backdrops, and the reverse.
+- Levels: the opening picnic is the story, then six settings of five levels, all five sharing one backdrop:
+  1. Meadow (bd_meadow): Maple Meadow, Clover Hill, Ladybug Lane, Daisy Dell, Shady Grove.
+  2. Forest (bd_woods): Piney Woods, Hoot Owl Hideout, Foxglove Bend, Mossy Hollow, Conifer Corner.
+  3. Mountain (bd_mountain): Biscuit Bluff, Switchback Summit, Eagle's Perch, Thunderhead Peak, Avalanche Alley.
   4. River canyon: Muddy River Crossing, Echo Canyon, Coyote Crag, Red Rock Rapids, Cattail Creek.
   5. Desert: Tumbleweed Trail, Rattlesnake Ridge, Cactus Flats, Dusty Dunes, Sidewinder Sands.
   6. Harvest, heading home: Pickleberry Pasture, Corny Maze, Hayride Hill, Harvest Moon, Home Sweet Home.
-  The U-Pick berry bush belongs to the picnic only (a story prop, too busy for gameplay).
-- Each setting must feel clearly different from the others, not a variation of the meadow: its own world filling the backdrop (the forest is deep woods with trunks and canopy, not a meadow with a tree line) and its own ground strip (meadow: orange-brown dirt; forest: dark brown earth with pine needles under moss). Never carry the meadow's dirt path into another setting.
-- The 30 levels are six settings of five levels. Every level in a setting shares ONE backdrop, so the game stays cohesive; the levels differ through the planner's random scenery and animals (plus each setting's landmark and scenery sheets). Per setting that's about 2 to 3 Canva generations: one sky-and-horizon backdrop, one landmark sheet if needed, one scenery/wildlife sheet. Setting 1 (Maple Meadow, Clover Hill, Ladybug Lane, Daisy Dell, Shady Grove) uses the Maple Meadow backdrop and scenery for all five, and its level names match that scenery. Level names in every setting must match what the setting actually shows. Nothing in the scenery may show cows, barns or other Barn-zooka things. The painted per-level panels bd_l2 to bd_l5 were dropped.
-- Every scenery sprite stands on the same line as Todd's feet: trim any empty space under the art after cutting, and give art whose roots or base spread unevenly a small sink value so it settles into the grass instead of floating on top of it. Check the ground line zoomed in before showing.
-- Scenery is drawn at the same scale as the characters (BSC uses the same W/1384 as S). Tall scenery is capped so it never reaches into the HUD.
+- The opening picnic uses bd_meadow plus its props through the scenery planner (planSetting, SETTING.meadow): the shade tree (pr_tree), pr_blanket with pr_stack1 to 4, the U-Pick berry bush (picnic only), a few plants, butterflies (Canva bf_* frames that steer clear of Todd, Grumble and the speech line) and the ladybug. Layering is by size: taller things behind shorter ones. Plants never overlap each other, props or Todd.
+- The gameplay profiles (SETTING.meadow1, forest, mountain) are zeroed in the source, so the planner places nothing there. The forest and meadow scenery sprites stay in art/review in case a piece is ever wanted back.
