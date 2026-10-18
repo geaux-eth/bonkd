@@ -100,7 +100,7 @@
 - Todd's home is Maple Meadow, named for his love of waffles and maple syrup, not for maple trees. No maple trees or maple leaves anywhere; trees are the round, lobed kind. The opening picnic takes place there.
 - The world blends Nibbles critter country (homes built into nature: hollow logs, stump mailboxes, mushroom porches, clotheslines, beehives) with breakfast country (syrup, waffle and pancake shapes in plants, berry bushes, butter-pat mushrooms). This flavors backdrop prompts and story scenes.
 - The Nibbles cast never appears as scenery or wildlife: bear, cock (chicken), raccoon, beaver, gnome, ghost, wolf, gecko. The Barn-zooka keeps its chicken.
-- Setting animals and objects must never repeat something that already exists as a power-up, item or weapon (no snails because of the SLOWMO Snail). Check the item list in the source first. Current clashes to avoid: snail, porcupine, cow, pig, sheep, rooster or chicken, poison ivy, waffle tree, banana, coconut, peach, pie, skillet, bucket, magnet, brick, bowling ball, ping pong paddle, beans, oatmeal. Whenever the user brainstorms a new item, remind them to check it against the settings' backdrops, and the reverse.
+- Setting animals and objects must never repeat something that already exists as a power-up, item or weapon (no snails because of the SLOWMO Snail). Check the item list in the source first. Current clashes to avoid: snail, porcupine, cow, pig, sheep, rooster or chicken, poison ivy, waffle tree, banana, coconut, peach, pie, skillet, bucket, magnet, brick, bowling ball, ping pong paddle, beans, oatmeal, shoe or boot, tuba, bubblegum or gumball, waffles as loose objects, laser or halo. Whenever the user brainstorms a new item, remind them to check it against the settings' backdrops, and the reverse.
 - Levels: the opening picnic is the story, then six settings of five levels, all five sharing one backdrop:
   1. Meadow (bd_meadow): Maple Meadow, Clover Hill, Ladybug Lane, Daisy Dell, Shady Grove.
   2. Forest (bd_woods): Piney Woods, Hoot Owl Hideout, Foxglove Bend, Mossy Hollow, Conifer Corner.
@@ -110,3 +110,20 @@
   6. Harvest, heading home: Pickleberry Pasture, Corny Maze, Hayride Hill, Harvest Moon, Home Sweet Home.
 - The opening picnic uses bd_meadow plus its props through the scenery planner (planSetting, SETTING.meadow): the shade tree (pr_tree), pr_blanket with pr_stack1 to 4, the U-Pick berry bush (picnic only), a few plants, butterflies (Canva bf_* frames that steer clear of Todd, Grumble and the speech line) and the ladybug. Layering is by size: taller things behind shorter ones. Plants never overlap each other, props or Todd.
 - The gameplay profiles (SETTING.meadow1, forest, mountain) are zeroed in the source, so the planner places nothing there. The forest and meadow scenery sprites stay in art/review in case a piece is ever wanted back.
+
+## Lives and continues
+- Everyone starts a run with 3 lives. A wallet connected on nibblethis.wtf adds 1 life per Nibble held, up to 25 more. The host page sends the count with postMessage({type:'bonkd:wallet',nibbles:N}) (only nibblethis.wtf origins are accepted) or window.bonkdSetNibbles(N).
+- The HUD shows Todd's head × lives where the score used to be. The score is still kept for the leaderboard but not shown during play.
+- After getting BONKD, a life continues the run from that point (bonks reset, junk cleared). Free lives are used before bought ones.
+- Extra lives cost 1,000 waffles, at most 10 per rolling 24 hours, and are banked on the profile (Supabase buy_life / use_life; waffle_board.lives, life_buys).
+
+## Chapter scenes and unlocks
+- After levels 5, 10, 15, 20 and 25 a skippable scene plays (CHAPTERS in the source): Grumble flies over and drops the new thing on the bandana parachute, Todd grabs it and uses it, an info card explains it, Todd celebrates (c_todd_cheer), then runs off after Grumble.
+  - 5: LUMPY OATMEAL: plain, gloppy, grayish oatmeal, no spoon, no toppings. Doubles how many bonks Todd can take; each meter icon gets a rainbow outline that the first bonk removes, then the icon fills.
+  - 10: SHOE HORN (weapon): an old boot that's also a tuba, 2 hands, 5 honks of gold music notes; Grumble gets a headache (c_grum_headache, notes circling).
+  - 15: BEAR HANDED (power-up): double damage for 20 s, red glow on Todd and a countdown chip.
+  - 20: GARGANTU-GUM (weapon): Todd eats it (c_todd_eat_gum), blows bubbles (c_todd_blow, 3 per gumball) that float up and pop on Grumble (c_grum_gum), who peels it off.
+  - 25: WAFFLICIOUS (power-up): for 10 s Grumble throws waffles (mostly plain) instead of junk.
+- Each unlock joins Booster's random pool only after its chapter level (PW[k].unlock).
+- BOOSTER BEAM is a store power-up (1,500 waffles): Booster flies in and blasts Grumble with a golden beam (c_boost_beam). Its drop look is Booster's halo, drawn in code.
+- Todd pose prompts use the locked block in scratchpad audit/todd_spec.txt (references: h_zooka/w_zooka for 2-hand holds, beans_eat for eating, todd_full for others).
