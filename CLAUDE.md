@@ -137,4 +137,4 @@
 - Ending (tap to skip): back at the Maple Meadow picnic, waffles back on the plate, Todd eating (sit_eat) with lots of butterflies (SETTING.ending), two quips, THE END, then the win card "GRUMBLEMAX is DEFEATED!" over the picnic.
 - Harvest level 29 is Pumpkin Patch (the user swapped the moon for a sun).
 - After beating GRUMBLEMAX once (localStorage bonkd-cleared on that device), every new run keeps the unlocks: Lumpy Oatmeal from the start, all chapter items in Booster's pool from level 1, and the chapter scenes are skipped. The win card's button reads "Play again".
-- Store: a "Quests: Coming soon!" section (three Mystery Quest cards over dimmed backdrops). Quests will be new places to fight Grumble in new ways.
+- Store: a "Quests: Coming soon!" section with blurred teaser cards: Space Quest (bd_space, moon surface) and Underwater Quest (bd_sea, sandy sea floor), both Gemini backdrops made to gameplay spec (ground line at 85%) so they can become real levels, plus a "More Quests" card. Quests will be new places to fight Grumble in new ways.
