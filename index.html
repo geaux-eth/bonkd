@@ -1491,7 +1491,7 @@ function endingUpdate(dt){const e=ending;e.t+=dt;bear.pose='sit_eat';bear.x=bear
   if(e.t>7.2&&!e.end){e.end=1;pop('THE END',W/2,H*.3,C.gold,90,3);sfx.waffle()}
   if(e.t>10)finishEnding()}
 function finishEnding(){if(state!=='ending')return;ending=null;quip=null;bear.pose='sit_eat';showWin()}
-function showWin(){showOver();setOverLogo('GRUMBLEMAX is','DEFEATED!');$('overMode').textContent='Waffles saved!';track('boss_win',{n:score})}
+function showWin(){showOver();$('againBtn').textContent='Play again';setOverLogo('GRUMBLEMAX is','DEFEATED!');$('overMode').textContent='Waffles saved!';track('boss_win',{n:score})}
 function drawBossFX(){const b=bossI;
   if(b){const cm=bgPt(.75,.642);if(b.glow>0){const r=(90+b.glow*60)*S,g=ctx.createRadialGradient(cm.x,cm.y,r*.1,cm.x,cm.y,r);g.addColorStop(0,`rgba(140,255,150,${.7*b.glow})`);g.addColorStop(1,'rgba(140,255,150,0)');ctx.save();ctx.fillStyle=g;ctx.beginPath();ctx.arc(cm.x,cm.y,r,0,TAU);ctx.fill();ctx.restore()}
     for(const f of b.fl){ctx.save();ctx.translate(f.x,f.y);ctx.scale(S*1.1,S*1.1);ctx.rotate(f.rot);drawWaffle('plain',0);ctx.restore()}
@@ -1754,7 +1754,7 @@ function update(dt){
 
 function setOverLogo(pre,word){$('overPre').textContent=pre;const l=$('overLogo');l.textContent='';l.setAttribute('aria-label',word);for(const ch of word){const sp=document.createElement('span');sp.textContent=ch===' '?'\u00a0':ch;l.append(sp)}l.style.fontSize='';l.style.whiteSpace='nowrap';requestAnimationFrame(()=>{const cw=l.parentElement.clientWidth-28;if(l.scrollWidth>cw)l.style.fontSize=(parseFloat(getComputedStyle(l).fontSize)*cw/l.scrollWidth)+'px'})}
 function showOver(){
-  $('lvlCard').hidden=true; $('cont').hidden=true; setOverLogo('You got','BONKD!');
+  $('lvlCard').hidden=true; $('cont').hidden=true; setOverLogo('You got','BONKD!'); $('againBtn').textContent='Replay';
   state='over'; curSong=null;
   track('run_end',{n:score,m:runWaffles,k:Math.round(t)});
   const s=Math.floor(score), k=bestKey(mode), best=store(k), nb=s>best;
