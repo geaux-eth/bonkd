@@ -133,5 +133,6 @@
 - Backdrop bd_hideout (Gemini): cave lair, far golden waffle heap, syrup cauldron over green ghost fire, no furniture (ghosts don't sit).
 - Intro (skippable): Grumble floats to the cauldron, tosses in 3 normal waffles, the cauldron spits out the magic waffle (w_magic: glowing mint-green waffle with goopy glowing green butter), he eats it (c_grum_eatmagic), swells into GRUMBLEMAX and roars.
 - GRUMBLEMAX art is built on the user's Oswald mega-ghost sheet with Grumble's face: huge saggy body, meaty sagging underside, NO tail. Poses: c_mega_float, throw, hit (dazed and angry, never worried), roar, deflate (waffles bursting out). Hitboxes x2.1.
-- Fight: 220 HP. Phase 1 fast junk; under 2/3 he roars, "SYRUP STORM": syrup drips fall with ground warning shadows; under 1/3 "GRUMBLE RAGE": more junk plus lightning. Hits sometimes burp out waffles; Booster comes more often. Defeat: KA-POP, waffles rain, then the win card ("You popped GRUMBLE!").
+- Fight: 220 HP. Phase 1 fast junk; under 2/3 he roars, "SYRUP STORM": syrup drips fall with ground warning shadows; under 1/3 "GRUMBLE RAGE": more junk plus lightning. Hits sometimes burp out waffles; Booster comes more often. Defeat: KA-POP, waffles rain, then the ending.
+- Ending (tap to skip): back at the Maple Meadow picnic, waffles back on the plate, Todd eating (sit_eat) with lots of butterflies (SETTING.ending), two quips, THE END, then the win card "GRUMBLEMAX is DEFEATED!" over the picnic.
 - Harvest level 29 is Pumpkin Patch (the user swapped the moon for a sun).
