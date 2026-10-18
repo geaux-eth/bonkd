@@ -1462,7 +1462,7 @@ function finishChapter(){const h=chap;if(!h)return;if(h.c.k==='oat'&&!bear.oat){
 function skipChapter(){if(!chap)return;track('chapter_skip',{k:chap.c.k,n:chap.t*10});finishChapter()}
 /* ---------- the boss: Grumble's Hideout. Grumble tosses waffles into his cauldron, gobbles the magic waffle it spits out, and swells into GRUMBLEMAX ---------- */
 function bgPt(u,v){const a=bgArt();if(!a)return{x:u*W,y:v*H};const I=SPR[a[0]].img,iw=I.naturalWidth,ih=I.naturalHeight,dy=a[1]*ih,gy=GY+8*BSC,k=Math.max(W/iw,gy/dy,(H-gy)/(ih-dy)),w=iw*k,h=ih*k;let x=(W-w)/2+u*w;if(a[2])x=W-x;return{x,y:gy-dy*k+v*h}}
-function startBoss(){$('clear').hidden=true;bossMode=true;bossPhase=1;drips=[];bgKey='';setGhost();ghost.max=ghost.hp=220;updateHp();$('lvl').textContent='BOSS';
+function startBoss(){$('clear').hidden=true;bossMode=true;bossPhase=1;drips=[];bgKey='';setGhost();ghost.max=ghost.hp=180;updateHp();$('lvl').textContent='BOSS';
   state='bossintro';bossI={t:0,tossed:0,fl:[],magic:null,glow:0};ghost.hold=0;ghost.yOff=0;ghost.pose=null;ghost.x=W+120*S;ghost.y=H*.3;
   bear.weapon=null;bear.jello=null;items=[];gifts=[];shots=[];playLevel();$('chSkip').hidden=false;
   const n=$('lvNum');n.textContent='';for(const ch of 'BOSS'){const sp=document.createElement('span');sp.textContent=ch;n.append(sp)}$('lvName').textContent=BOSS_SCENE.n;
