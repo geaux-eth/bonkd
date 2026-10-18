@@ -136,3 +136,5 @@
 - Fight: 220 HP. Phase 1 fast junk; under 2/3 he roars, "SYRUP STORM": syrup drips fall with ground warning shadows; under 1/3 "GRUMBLE RAGE": more junk plus lightning. Hits sometimes burp out waffles; Booster comes more often. Defeat: KA-POP, waffles rain, then the ending.
 - Ending (tap to skip): back at the Maple Meadow picnic, waffles back on the plate, Todd eating (sit_eat) with lots of butterflies (SETTING.ending), two quips, THE END, then the win card "GRUMBLEMAX is DEFEATED!" over the picnic.
 - Harvest level 29 is Pumpkin Patch (the user swapped the moon for a sun).
+- After beating GRUMBLEMAX once (localStorage bonkd-cleared on that device), every new run keeps the unlocks: Lumpy Oatmeal from the start, all chapter items in Booster's pool from level 1, and the chapter scenes are skipped. The win card's button reads "Play again".
+- Store: a "Quests: Coming soon!" section (three Mystery Quest cards over dimmed backdrops). Quests will be new places to fight Grumble in new ways.
