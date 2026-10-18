@@ -125,5 +125,6 @@
   - 20: GARGANTU-GUM (weapon): Todd eats it (c_todd_eat_gum), blows bubbles (c_todd_blow, 3 per gumball) that float up and pop on Grumble (c_grum_gum), who peels it off.
   - 25: WAFFLICIOUS (power-up): for 10 s Grumble throws waffles (mostly plain) instead of junk.
 - Each unlock joins Booster's random pool only after its chapter level (PW[k].unlock).
-- BOOSTER BEAM is a store power-up (1,500 waffles): Booster flies in and blasts Grumble with a golden beam (c_boost_beam). Its drop look is Booster's halo, drawn in code.
+- BOOSTER BEAM is a store power-up (5,000 waffles): Booster flies in and blasts Grumble with the Canva gold laser (fx_beam, tiled and scrolling, with glow and sparkles) and a spinning starburst blast (fx_burst) on the side of Grumble facing Booster, so his face stays visible. Booster pose: c_boost_beam. Drop look: Booster's halo, drawn in code.
+- Booster always has a soft golden glow behind him and a trail of twinkles (boosterGlow) so he stands out on every backdrop.
 - Todd pose prompts use the locked block in scratchpad audit/todd_spec.txt (references: h_zooka/w_zooka for 2-hand holds, beans_eat for eating, todd_full for others).
