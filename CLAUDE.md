@@ -107,7 +107,7 @@
   3. Mountain (bd_mountain): Biscuit Bluff, Switchback Summit, Eagle's Perch, Thunderhead Peak, Avalanche Alley.
   4. River canyon: Muddy River Crossing, Echo Canyon, Coyote Crag, Red Rock Rapids, Cattail Creek.
   5. Desert: Tumbleweed Trail, Rattlesnake Ridge, Cactus Flats, Dusty Dunes, Sidewinder Sands.
-  6. Harvest, heading home: Pickleberry Pasture, Corny Maze, Hayride Hill, Harvest Moon, Home Sweet Home.
+  6. Harvest, heading home: Pickleberry Pasture, Corny Maze, Hayride Hill, Pumpkin Patch, Home Sweet Home.
 - The opening picnic uses bd_meadow plus its props through the scenery planner (planSetting, SETTING.meadow): the shade tree (pr_tree), pr_blanket with pr_stack1 to 4, the U-Pick berry bush (picnic only), a few plants, butterflies (Canva bf_* frames that steer clear of Todd, Grumble and the speech line) and the ladybug. Layering is by size: taller things behind shorter ones. Plants never overlap each other, props or Todd.
 - The gameplay profiles (SETTING.meadow1, forest, mountain) are zeroed in the source, so the planner places nothing there. The forest and meadow scenery sprites stay in art/review in case a piece is ever wanted back.
 
@@ -128,3 +128,10 @@
 - BOOSTER BEAM is a store power-up (5,000 waffles): Booster flies in and blasts Grumble with the Canva gold laser (fx_beam, tiled and scrolling, with glow and sparkles) and a spinning starburst blast (fx_burst) on the side of Grumble facing Booster, so his face stays visible. Booster pose: c_boost_beam. Drop look: Booster's halo, drawn in code.
 - Booster always has a soft golden glow behind him and a trail of twinkles (boosterGlow) so he stands out on every backdrop.
 - Todd pose prompts use the locked block in scratchpad audit/todd_spec.txt (references: h_zooka/w_zooka for 2-hand holds, beans_eat for eating, todd_full for others).
+
+## The boss: Grumble's Hideout (after level 30)
+- Backdrop bd_hideout (Gemini): cave lair, far golden waffle heap, syrup cauldron over green ghost fire, no furniture (ghosts don't sit).
+- Intro (skippable): Grumble floats to the cauldron, tosses in 3 normal waffles, the cauldron spits out the magic waffle (w_magic: glowing mint-green waffle with goopy glowing green butter), he eats it (c_grum_eatmagic), swells into Mega Grumble and roars.
+- Mega Grumble art is built on the user's Oswald mega-ghost sheet with Grumble's face: huge saggy body, meaty sagging underside, NO tail. Poses: c_mega_float, throw, hit (dazed and angry, never worried), roar, deflate (waffles bursting out). Hitboxes x2.1.
+- Fight: 220 HP. Phase 1 fast junk; under 2/3 he roars, "SYRUP STORM": syrup drips fall with ground warning shadows; under 1/3 "GRUMBLE RAGE": more junk plus lightning. Hits sometimes burp out waffles; Booster comes more often. Defeat: KA-POP, waffles rain, then the win card ("You popped GRUMBLE!").
+- Harvest level 29 is Pumpkin Patch (the user swapped the moon for a sun).
