@@ -73,7 +73,8 @@
 - Review every group in the art review page before anything ships. Never deploy unapproved art.
 
 ## Screen scale
-- One scale for every screen, touch or not: S = min(H/640, W/1384). Wide computer windows show the same amount of scene around the characters as a phone held sideways. Grumble's size is GK (0.82 of the original); everything placed around him scales with it.
+- Base scale S = min(H/640, W/1384). Wide computer windows show the same amount of scene around the characters as a phone held sideways. Grumble's size is GK (0.82 of the original); everything placed around him scales with it.
+- Phones (touch, short side under 520 px) draw the world at PHONE_Z (0.58) of that so Todd and Grumble have room between them; words use TS (0.85 of the base) so they stay readable. The phone dirt strip is 8.5% of the height (computer 12%).
 - Check "phone" views with real touch emulation (audit/bg_shots_t.py with TOUCH=1), not just a phone-sized window.
 
 ## Waffles
@@ -138,6 +139,11 @@
 - Harvest level 29 is Pumpkin Patch (the user swapped the moon for a sun).
 - After beating GRUMBLEMAX once (saved on the device as localStorage bonkd-cleared AND on the profile as waffle_board.cleared_at via mark_cleared; isCleared() checks both, and a device flag syncs up to the profile), every new run keeps the unlocks: Lumpy Oatmeal from the start, all chapter items in Booster's pool from level 1, and the chapter scenes are skipped. The win card's button reads "Play again".
 - Store: a "Quests: Coming soon!" section with blurred teaser cards: Space Quest (bd_space, moon surface) and Underwater Quest (bd_sea, sandy sea floor), both Gemini backdrops made to gameplay spec (ground line at 85%) so they can become real levels, plus a "More Quests" card. Quests will be new places to fight Grumble in new ways.
+
+## Controls
+- Touch: drag anywhere to move Todd, tap anywhere to use the weapon (a quick touch under 350 ms that doesn't move). The red badge only shows the weapon and ammo; it isn't a button. Two thumbs work: the newest finger steers, and the one still down takes over when it lifts.
+- Keys: arrows or A/D move, Space uses weapons, P pauses.
+- Pie (2) and Boomer-nana (1) are held and thrown with the weapon control. The Junk Magnet (12 s) only grabs metal junk that comes near Todd, holds up to 3, and fires them back with the weapon control.
 
 ## Title, lettering and music
 - The title is the real logo lettering (logo_text_only: "Don't get BONKD!" cut from the approved sticker logo, finished in ChatGPT; scratchpad sprites/logo.webp, embedded as __LOGO__). The menu shows it pinned near the top; the run start pops the same image sized to stay between the HUD and Todd's head. Never retype the title in a font.
