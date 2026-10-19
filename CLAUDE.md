@@ -114,7 +114,7 @@
 
 ## Lives and continues
 - Everyone starts a run with 3 lives. A wallet connected on nibblethis.wtf adds 1 life per Nibble held, up to 25 more. The host page sends the count with postMessage({type:'bonkd:wallet',nibbles:N}) (only nibblethis.wtf origins are accepted) or window.bonkdSetNibbles(N).
-- The HUD shows Todd's head × lives where the score used to be. The score is still kept for the leaderboard but not shown during play.
+- The HUD shows Todd's head × lives where the score used to be. The head is a sticker cut from the approved logo head (no lump or stars, white sticker edge, no circle behind it): art/todd_head.webp, made by scratchpad logo/head_icon.py. The score is still kept for the leaderboard but not shown during play.
 - After getting BONKD, a life continues the run from that point (bonks reset, junk cleared). Free lives are used before bought ones.
 - Extra lives cost 1,000 waffles, at most 10 per rolling 24 hours, and are banked on the profile (Supabase buy_life / use_life; waffle_board.lives, life_buys).
 
