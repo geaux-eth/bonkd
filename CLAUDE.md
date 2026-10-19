@@ -161,7 +161,10 @@
 - Lettering: headings (.logo, .pre) and in-game pop words are built from the user's letter sheet in the title style (scratchpad font/sheet.jpg, sliced by font/build.py into art/font_atlas.webp + FONTM metrics; '-' '.' ':' are made from the sheet's own plus sign and dots). Other colours (red, green, white) recolour the gold fill and keep the outline, shadow and shine. Lilita One remains the fallback for anything not on the sheet. Headings written as one span per letter are merged into words first. Button words are plain text: white on red buttons, red on the other pills.
 - Loading screen (#boot): the approved logo with Todd's head (sprites/logo_full.webp) held still in the middle on the label blue, with 16 real w_plain waffles tumbling down behind it, until the menu art, font and letter atlas are in. Never code-drawn art on anything players look at; code only places and animates real art.
 - The how-to line after the story is outlined text that pops in (no pill).
-- The leaderboard handle box never invites autofill of a real name: autocomplete off, placeholder "Pick a handle", and the card says not to use your real name.
+- The leaderboard handle box is a contenteditable field (#pfName, not an <input>), so iPhone Safari never shows AutoFill Contact; it caps at 14 characters, Enter saves, and game keys ignore it while typing.
+- Bounced and swatted junk (Peach Wobbler, paddle) hits anywhere on Grumble's body: ghostBodyHit, an ellipse from the hood to the bottom of his body (not the tail).
+- Booster's flight and beam frames carry the approved head pasted from c_boost_fly / c_boost_beam (anim/boost_head.py, lined up on the halo), because the Canva frames' faces came out muddy.
+- No falling waffles on the menu; they're on the loading screen.
 - The picnic spot is a fraction of the screen width (picnic.x getter), so resizes and restarts can't move it.
 - Level names stay plain dark text (bigger), the number a little smaller.
 - Music: one recorded track ("The Fun Starts Here", Pixabay/mmaudio) makes the set: menu = the song from the top at .82; gameplay = its main section looping (24.87 s to 98.41 s); boss = that loop at 1.12x; win = the song's ending sting. Mega Beans keeps its synth tune.
@@ -169,4 +172,4 @@
 ## Future heroes (planned, not built)
 - kit/WORLD_KIT.md is the formula: every slot a hero's world must fill, what's shared (engine, Grumble and GRUMBLEMAX, waffle values, wallet, lives, leaderboard) and the engine work needed (a WORLD config object, per-world asset bundles, hero select and unlock). kit/todd_world.json is the generated inventory of Todd's world.
 - Nothing from one hero's world is reused in another's. There is ONE leaderboard for every hero: waffles are waffles on the backend; each world only draws and names them its own way, and each world's store is branded for its hero.
-- Next hero: Carlito (Nibble #8102, raccoon). Night-time, grungy world: diner dumpster, alleyway, underground sewer, drainage pond, then inside the drainage facility for GRUMBLEMAX. Trashy waffles and trash or used-food items. Unlocked for a large waffle price or a small payment. Build only when the user says Todd is done.
+- Next hero: Carlito (Nibble #8102, raccoon). Night-time, grungy world: diner dumpster, alleyway, underground sewer, drainage pond, the junkyard outside the drainage facility, then inside it for GRUMBLEMAX (5 settings, 25 levels plus the boss). Trashy waffles and trash or used-food items. Unlocked for a large waffle price or a small payment. Build only when the user says Todd is done.
