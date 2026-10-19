@@ -114,7 +114,7 @@
 
 ## Lives and continues
 - Everyone starts a run with 3 lives. A wallet connected on nibblethis.wtf adds 1 life per Nibble held, up to 25 more. The host page sends the count with postMessage({type:'bonkd:wallet',nibbles:N}) (only nibblethis.wtf origins are accepted) or window.bonkdSetNibbles(N).
-- The HUD shows Todd's head × lives where the score used to be. The head is a sticker cut from the approved logo head (no lump or stars, white sticker edge, no circle behind it): art/todd_head.webp, made by scratchpad logo/head_icon.py. The score is still kept for the leaderboard but not shown during play.
+- The HUD shows Todd's head × lives where the score used to be. The head is a sticker cut from the approved logo head WITH its lump and dizzy stars (white sticker edge, no circle behind it): art/todd_head.webp, made by scratchpad logo/head_icon3.py. The score is still kept for the leaderboard but not shown during play.
 - After getting BONKD, a life continues the run from that point (bonks reset, junk cleared). Free lives are used before bought ones.
 - Extra lives cost 1,000 waffles, at most 10 per rolling 24 hours, and are banked on the profile (Supabase buy_life / use_life; waffle_board.lives, life_buys).
 
@@ -151,6 +151,7 @@
 - Menu order: title, Play, then Leaderboard and Waffle Store spaced evenly between the bottom of Play and the backdrop's grass strip (layoutMenuLinks, GRASS_FRAC .833). No controls text on the menu.
 - After the story, a one-line how-to shows for about 4 s (keys or touch wording), centred on the dirt strip under Todd so it never covers him or Grumble.
 - Todd's lump and dizzy stars sit on CROWN[key] (the top of his head between the ears, measured per pose), so they stay on his head in every pose. Steps follow distance: one foot swap per TODD_STEP (46) game units; the run hop follows the same phase.
+- Story animation (Canva sheets, 6 frames each, 2 rows of 3, design DAHYMS6kGn0 pages 84-88): Grumble descend, beam, laugh and flee play c_grum_<pose>_a0..5, face-anchored by GPF in the source; Todd's run is the long-legged sprint sheet (c_todd_rn0..5, k .45, matching the walk art). Sheet prompts: the locked spec block plus an ANIMATION SHEET line and the pose line; the single pose art is passed as the 4th reference.
 - No sprint pose in play: Todd only walks, faster the harder he's dragged. The run art is for the story and chapter scenes only (b.pose==='run').
 - Plain Todd walks with a 6-frame Canva walk cycle (c_todd_wk0 to wk5, one Canva generation from todd_full + h_walk refs, split and cut STRIP=1 SIZE=640 DRAWN=200), one frame per WK_D/6 (118/6) game units walked (bear.wd). Held items, weapons and the bucket still use their two-drawing stand/step pairs; a cycle for each would cost one Canva credit apiece.
 - Lettering: Lilita One for the display font. Headings, labels and buttons are built per letter by glossify(): gold or red two-tone fill, a white streak-and-dot shine, a thin round black outline and a hard shadow. Words on red buttons are white. Level names stay plain dark text (bigger), the number a little smaller.
