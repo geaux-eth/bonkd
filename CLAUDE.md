@@ -127,7 +127,7 @@
   - 25: WAFFLICIOUS (power-up): for 10 s Grumble throws waffles (mostly plain) instead of junk.
 - Each unlock joins Booster's random pool only after its chapter level (PW[k].unlock).
 - BOOSTER BEAM is a store power-up (5,000 waffles): Booster flies in and blasts Grumble with the Canva gold laser (fx_beam, tiled and scrolling, with glow and sparkles) and a spinning starburst blast (fx_burst) on the side of Grumble facing Booster, so his face stays visible. Booster pose: c_boost_beam. Drop look: Booster's halo, drawn in code.
-- Booster always has a soft golden glow behind him and a trail of twinkles (boosterGlow) so he stands out on every backdrop.
+- Booster always has a soft golden glow behind him (boosterGlow), no trail of puffs. He flies with a 6-frame full-body flap cycle (c_boost_fa0..5, design page 91, lined up on his halo by BOOST_FA), swoops in on an arc over 1.3 s, hovers, tosses at 1.9 s and flies off climbing.
 - Todd pose prompts use the locked block in scratchpad audit/todd_spec.txt (references: h_zooka/w_zooka for 2-hand holds, beans_eat for eating, todd_full for others).
 
 ## The boss: Grumble's Hideout (after level 30)
@@ -157,5 +157,6 @@
 - Pop words are rendered at screen resolution (glossWord at DPR*1.3) so they stay crisp.
 - No sprint pose in play: Todd only walks, faster the harder he's dragged. The run art is for the story and chapter scenes only (b.pose==='run').
 - Plain Todd walks with a 6-frame Canva walk cycle (c_todd_wk0 to wk5, one Canva generation from todd_full + h_walk refs, split and cut STRIP=1 SIZE=640 DRAWN=200), one frame per WK_D/6 (118/6) game units walked (bear.wd). Held items, weapons and the bucket still use their two-drawing stand/step pairs; a cycle for each would cost one Canva credit apiece.
-- Lettering: Lilita One for the display font. Headings, labels and buttons are built per letter by glossify(): gold or red two-tone fill, a white streak-and-dot shine, a thin round black outline and a hard shadow. Words on red buttons are white. Level names stay plain dark text (bigger), the number a little smaller.
+- Lettering: Lilita One for the display font. Headings (.logo, .pre) are drawn as images, word by word, by the same canvas renderer as the in-game pop words (glossWord via glossify): gold or red two-tone fill, a white streak-and-dot shine, a round black outline and a hard shadow, identical on iPhone Safari. Button words are plain text: white on red buttons, red on the other pills.
+- Loading screen (#boot): the logo on blue with a spinning waffle covers the page until the menu art and font are in, so nobody sees a half-built menu. Level names stay plain dark text (bigger), the number a little smaller.
 - Music: one recorded track ("The Fun Starts Here", Pixabay/mmaudio) makes the set: menu = the song from the top at .82; gameplay = its main section looping (24.87 s to 98.41 s); boss = that loop at 1.12x; win = the song's ending sting. Mega Beans keeps its synth tune.
