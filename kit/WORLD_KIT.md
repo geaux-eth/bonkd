@@ -26,6 +26,7 @@ A new world fills every slot with its own assets, and uses nothing from another 
 | Grumble's junk | j_* (anvil, bowling, brick, coconut, pan, safe) | 6 | 6 junk pieces in the theme (same hit sizes and metal flags) |
 | Grumble's reactions to weapons | c_grum_<effect> | per weapon | one reaction pose per new weapon effect |
 | Waffles | w_* (plain, chicken, report, unicorn, ring, refund, tree, barrow, truck, lotto) + w_magic | 11 | 10 tier skins + the boss's magic version, with themed names and quips |
+| Supers | 7 (beam, beans, porcu, ivy, zooka, shoe, bearhand) | 7 | one super per store item and signature move: painted animated super backdrop (plate + pieces sheet), cut-in art, sound set, lettering word, lore or joke lines |
 | Effects | fx_* | 29 | themed hit and fire effect sheets per weapon (Marvel vs. Capcom style) |
 | Sounds | 56 synth + 19 clips | 75 | fire and hit sound per weapon, hero voice beats, waffle pickup, helper in/out |
 | Music | "The Fun Starts Here" set | 5 cuts | a track that fits the world's mood, cut into menu, loop, boss and sting |

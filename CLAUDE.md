@@ -156,6 +156,13 @@
 - Store sections: Super Duper Weapons, Quests (coming soon), New Heroes (coming soon: only the next hero's silhouette coin, art/st_carlito.webp, nothing that gives him away) and Tournaments (coming soon, waffle prizes only). Buddies and Legends are gone for good.
 - Store: a "Quests: Coming soon!" section with blurred teaser cards: Space Quest (bd_space, moon surface) and Underwater Quest (bd_sea, sandy sea floor), both Gemini backdrops made to gameplay spec (ground line at 85%) so they can become real levels, plus a "More Quests" card. Quests will be new places to fight Grumble in new ways.
 
+## Supers (Marvel vs. Capcom hyper-combo moments)
+- Rule: everything bought in the Waffle Store gets a super moment, plus the Barn-zooka, the Shoe Horn's last honk and Bear Handed. Today: Booster Beam, Mega Beans, Porcu-Popper, Ivy Launcher, Barn-zooka, Shoe Horn, Bear Handed.
+- A super: everything freezes for a beat, the hero cut-in slides across, the level backdrop fades out and that super's own painted, animated super backdrop fades in behind the characters and effects (which stay fully lit), with its own sound set, a big lettering word from the letter sheet and a lore or joke line. When the move ends the level backdrop fades back.
+- Super backdrops are Gemini paintings (the user runs the prompts, no Canva credits), two per super: the plate (2400x1200) and a pieces sheet (6 loose pieces on white, cut and flown around by code). Code only places, spins, pulses, scrolls and flies the real art; nothing is code-drawn. They're meant to be wild.
+- Haptics: buzz on bonks, KO, supers and big hits, with a settings toggle. Android browsers support it; iPhone Safari doesn't allow web vibration. Inside nibblethis.wtf (a cross-origin frame) Chrome blocks it, so the game also posts {type:'bonkd:haptic',pattern} for the host page to vibrate (needs CD).
+- Every hero world gets its own version of all of this (Carlito's supers, backdrops, sounds, lettering words and jokes); nothing is shared between heroes.
+
 ## Controls
 - Touch: drag anywhere to move Todd, tap anywhere to use the weapon (a quick touch under 350 ms that doesn't move). The red badge only shows the weapon and ammo; it isn't a button. Two thumbs work: the newest finger steers, and the one still down takes over when it lifts.
 - Keys: arrows or A/D move, Space uses weapons, P pauses.
