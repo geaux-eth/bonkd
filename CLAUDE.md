@@ -27,12 +27,13 @@
 
 ## Animation rule: no still image performs an action
 - A single still drawing may only be shown while the character is holding still (standing, a held reaction). Anything that moves, throws, flies, walks, eats or recovers needs a sprite sheet (6 frames, 2 rows of 3, the pose art as a reference).
-- Until a reaction has its sheet, Grumble is STUNNED while a reaction pose shows (ghostStunned: pie, soot, quills, zap, flat, headache, gum, blanket): no throwing, almost no drifting, just a wobble. It never throws or roams in a still reaction pose.
-- Use this rule to find the next sheets to make. Still poses that still do something today:
-  - Grumble: throw, hit, pie, soot, quills, zap, flat, headache, gum, blanket, blanket_off, itch, slow, poof, eatmagic.
-  - GRUMBLEMAX: throw, hit, roar, deflate.
-  - Todd: bonked, KO, throw, sit_eat, sit_huh, angry, cheer, eat_beans, eat_gum, eat_oat, blow; every held item walks on a 2-drawing step pair (banana, beans, bucket, bun, ivy, jello, magnet, mitt, paddle, pie, porcu, shoe, zooka).
-  - Booster: toss.
+- Grumble is STUNNED during a reaction (ghostStunned: pie, soot, quills, zap, flat, headache, gum, blanket): no throwing and almost no drifting while its sheet plays. The code wobble only runs for a reaction that has no sheet.
+- Sheets made (design DAHYMS6kGn0 pages 94-100 are reused as export slots; media ids in scratchpad sheets/media.txt, prompts in sheets/*.json and audit/*_spec.txt):
+  - Grumble c_grum_<k>_a0..5 for throw, hit, pie, soot, quills, zap, flat, headache, gum, blanket (frames 0-2 trapped, 3-5 flinging it off), itch, slow, poof, eatmagic. grumFrame() picks the frame: one-shot reactions follow their own timer (fxT/fxD, splat, offT, koT), loops follow the clock, and the throw's wind-up plays as throwT runs out, the release while throwA runs. Face anchors in GPF (all lined up on the float pose's eyes).
+  - GRUMBLEMAX c_mega_<k>_a0..5 for throw, hit, roar, deflate (deflate shrinks back to regular size in the art), anchors MEGA_F.
+  - Todd c_todd_<k>_0..5: bonked, ko, th (throw), sit_eat, sit_huh, angry, cheer, eat_beans, eat_gum, eat_oat, blow, and walk cycles w_<item>_0..5. T2A/CROWN entries per frame (ears matched to todd_full). Walking with banana, beans, bucket, bun, jello, magnet, mitt, paddle, pie, shoe uses the cycle (WALKSHEET); ivy, porcu and zooka keep their 2-drawing pairs until each walk frame gets its barrel mask (ammo must sit inside the barrel).
+  - Booster: new fly (c_boost_fa), beam (c_boost_bf, 6 frames, mirrored to face Grumble) and toss (c_boost_ts) sheets drawn from the user's Booster portrait (Canva MAHYe0MMVis), all lined up on the halo of c_boost_fly. Booster has white eyes with big pupils and droopy lids, never sunglasses or an eye patch (spec: audit/boost_spec.txt).
+- Frames are cut with art/cut.py (STRIP=1, DRAWN per character), saved at 512 px max.
 
 ## Character anatomy rules
 - Todd is a grown-up bear. Never make his head bigger or his arms and legs shorter than the approved art; that makes him look like a cub. Check every new pose against the approved body.
