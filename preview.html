@@ -518,7 +518,7 @@ const TAU=Math.PI*2, INK='#161616', LW=2.4;
 const C={fur:'#1d1d20',furSh:'#3a3a41',tan:'#eec594',tanSh:'#d9aa74',pink:'#f48aa8',pinkSh:'#ffc3d3',white:'#ffffff',red:'#df3a4e',gold:'#ffd23f',goldSh:'#f0b400'};
 const $=id=>document.getElementById(id);
 const cv=$('c'); let ctx=cv.getContext('2d');
-let W=0,H=0,S=1,GY=0,DPR=1,UIZ=1,BSC=1;
+let W=0,H=0,S=1,GY=0,DPR=1,UIZ=1,BSC=1,WZ=1,TS=1,PHONE=false;
 const bgCan=document.createElement('canvas'); let bgKey='';
 const stage=$('stage'); let ROT=false;
 function resize(){
@@ -533,12 +533,15 @@ function resize(){
   const TOUCHY=matchMedia('(pointer:coarse)').matches;
   /* one scale for every screen, touch or not: wide screens show the same amount of scene around the characters as a phone held sideways (about 2.2:1) */
   S=Math.max(.28,Math.min(2.4,Math.min(H/640,W/1384)));
+  /* phones: the characters draw smaller (WZ) so there's more room between Todd and Grumble; words keep a readable size (TS) */
+  PHONE=TOUCHY&&Math.min(W,H)<520; WZ=PHONE?PHONE_Z:1; TS=S*(PHONE?.85:1); S=Math.max(.2,S*WZ);
   BSC=Math.max(.45,Math.min(2.4,Math.min(H/640,W/1384)));
   document.body.classList.toggle('short',H<460);
   UIZ=ROT?1:clamp(Math.min(H/430,W/900),1,1.75); document.documentElement.style.setProperty('--uiz',UIZ);
-  GY=H-Math.max(42,H*.12);
+  GY=H-(PHONE?Math.max(30,H*.085):Math.max(42,H*.12));
   bgKey='';
 }
+const PHONE_Z=.58;
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 function toStage(e){return ROT?{x:e.clientY,y:innerWidth-e.clientX}:{x:e.clientX,y:e.clientY}}
 addEventListener('resize',resize); resize();
@@ -594,9 +597,9 @@ const PW={
 };
 const METAL={pan:1,anvil:1,safe:1};
 let SEEN={};try{SEEN=JSON.parse(localStorage.getItem('bonkd-seen')||'{}')||{}}catch(e){}
-const FIRST={beam:'BOOSTER BLASTS GRUMBLE FOR YOU',shoe:'# TO HONK · 5 BLASTS',bearhand:'DOUBLE DAMAGE FOR 20 SECONDS',gum:'# TO BLOW A BUBBLE · 3 BUBBLES',waffli:'GRUMBLE THROWS WAFFLES FOR 10 SECONDS',pie:'IT FINDS GRUMBLE ALL BY ITSELF',banana:'HITS GRUMBLE TWICE',jello:'JUNK BOUNCES OFF IT',bun:'# TO LOB · 3 PER SOCK',zooka:'# TO FIRE · 6 BARNYARD BLASTS',
-  bucket:'BLOCKS 2 BONKS · CATCHES LIGHTNING',mitt:'CATCHES UP TO 3 PIECES OF JUNK · # TO THROW',magnet:'ONLY PULLS IN METAL JUNK',paddle:'12 SECONDS · # TO SWOT',snail:'EVERYTHING SLOWS DOWN',kit:'HEALS ALL YOUR BONKS',ivy:'# TO LAUNCH · GRUMBLE GETS ITCHY',porcu:'# TO POP · QUILL STORM!',beans:'TODD GOES GIANT · # TO SMASH'};
-const HAND={shoe:1,gum:1,jello:1,bun:1,zooka:1,mitt:1,magnet:1,paddle:1,ivy:1,porcu:1,beans:1};
+const FIRST={beam:'BOOSTER BLASTS GRUMBLE FOR YOU',shoe:'# TO HONK · 5 BLASTS',bearhand:'DOUBLE DAMAGE FOR 20 SECONDS',gum:'# TO BLOW A BUBBLE · 3 BUBBLES',waffli:'GRUMBLE THROWS WAFFLES FOR 10 SECONDS',pie:'2 PIES · # TO THROW · THEY FIND GRUMBLE',banana:'# TO THROW · HITS GRUMBLE TWICE',jello:'JUNK BOUNCES OFF IT',bun:'# TO LOB · 3 PER SOCK',zooka:'# TO FIRE · 6 BARNYARD BLASTS',
+  bucket:'BLOCKS 2 BONKS · CATCHES LIGHTNING',mitt:'CATCHES UP TO 3 PIECES OF JUNK · # TO THROW',magnet:'CATCHES METAL JUNK NEAR YOU · # TO FIRE IT BACK',paddle:'12 SECONDS · # TO SWOT',snail:'EVERYTHING SLOWS DOWN',kit:'HEALS ALL YOUR BONKS',ivy:'# TO LAUNCH · GRUMBLE GETS ITCHY',porcu:'# TO POP · QUILL STORM!',beans:'TODD GOES GIANT · # TO SMASH'};
+const HAND={pie:1,banana:1,shoe:1,gum:1,jello:1,bun:1,zooka:1,mitt:1,magnet:1,paddle:1,ivy:1,porcu:1,beans:1};
 const SUPER={beam:{price:5000,tier:'beam',label:'Heavenly',desc:'Booster swoops in and blasts Grumble with a holy laser!'},ivy:{price:250,tier:'effective',label:'Effective',desc:'The itchiest threads in town!'},
   porcu:{price:750,tier:'omghost',label:'Really Effective',desc:'Ouch is right!'},
   beans:{price:2000,tier:'unbearable',label:'Really Really Effective',desc:"They're good for your heart!"}};
@@ -970,21 +973,26 @@ applyInput();
 document.addEventListener('pointerdown',e=>{if(e.pointerType==='touch')setInput('touch')},true);
 const canMove=()=>!paused&&(state==='play'||state==='levelup'||state==='clear');
 /* right-handed (the default): drag on the left, the weapon button on the right under the right thumb */
-function inActZone(p){return p.y>H*.4&&(HANDED==='right'?p.x>W*.72:p.x<W*.28)}
+/* only a touch right around the button fires it, so a thumb landing elsewhere on that side still drags Todd */
+function inActZone(p){const b=$('actBtn');if(!b||b.hidden)return false;const r=b.getBoundingClientRect();if(!r.width)return false;
+  const c=toStage({clientX:r.left+r.width/2,clientY:r.top+r.height/2}),rad=Math.max(r.width,r.height)/2+26;return Math.hypot(p.x-c.x,p.y-c.y)<rad}
 cv.addEventListener('pointerdown',e=>{e.preventDefault();audio();const p=toStage(e);
   if(state==='story'){skipStory();return}
   if(state==='ending'){if(ending&&ending.t>1)finishEnding();return}
   if(state==='play'&&!paused&&inActZone(p)&&!$('actBtn').hidden){act();return}
-  if(ptr&&ptr.id!==e.pointerId&&performance.now()-ptr.last<400)return;
-  ptr={id:e.pointerId,x:p.x,y:p.y,lx:p.x,t:performance.now(),last:performance.now(),drag:false};try{cv.setPointerCapture(e.pointerId)}catch(_){}});
+  /* two thumbs: every finger on the screen is tracked; the newest one steers Todd, and when it lifts the one still down takes over */
+  ptr={id:e.pointerId,x:p.x,y:p.y,lx:p.x,t:performance.now(),last:performance.now(),drag:false};touchPts.set(e.pointerId,ptr);try{cv.setPointerCapture(e.pointerId)}catch(_){}});
+const touchPts=new Map();
 cv.addEventListener('pointermove',e=>{
-  if(!ptr||e.pointerId!==ptr.id)return;
-  const p=toStage(e), dx=p.x-ptr.lx; ptr.lx=p.x; ptr.last=performance.now();
-  if(Math.abs(p.x-ptr.x)+Math.abs(p.y-ptr.y)>12)ptr.drag=true;
-  if(canMove())bear.tx=clamp(bear.tx+dx*1.3,44*S,W-44*S);
+  const q=touchPts.get(e.pointerId);if(!q)return;
+  const p=toStage(e), dx=p.x-q.lx; q.lx=p.x; q.last=performance.now();
+  if(q!==ptr)return;
+  if(Math.abs(p.x-q.x)+Math.abs(p.y-q.y)>12)q.drag=true;
+  if(canMove())bear.tx=clamp(bear.tx+dx*(PHONE?1.15:1.3),44*S,W-44*S);
 });
-cv.addEventListener('pointerup',e=>{if(!ptr||e.pointerId!==ptr.id)return;ptr=null});
-cv.addEventListener('pointercancel',e=>{if(ptr&&e.pointerId===ptr.id)ptr=null});
+function dropPtr(e){if(!touchPts.delete(e.pointerId))return;if(ptr&&ptr.id===e.pointerId){let nx=null;for(const q of touchPts.values())if(!nx||q.t>nx.t)nx=q;ptr=nx}}
+cv.addEventListener('pointerup',dropPtr);
+cv.addEventListener('pointercancel',dropPtr);cv.addEventListener('lostpointercapture',dropPtr);
 document.addEventListener('gesturestart',e=>e.preventDefault());
 document.addEventListener('dblclick',e=>e.preventDefault());
 const keys={};
@@ -1170,7 +1178,7 @@ function drawStoryFX(){
     for(let i=0;i<5;i++){const k=((now*1.6+i/5)%1),y=py+(gy-py)*k,w=(78-52*k)*S;ctx.beginPath();ctx.ellipse(gx+(px-gx)*(1-k),y,w,w*.18,0,0,TAU);ctx.stroke()}
     ctx.restore()}
   for(const w of storyWafs){const f=()=>{ctx.save();ctx.translate(w.x,w.y);const k=.35+.65*w.k;ctx.scale(S*1.5*k,S*1.5*k*Math.min(1,.25+w.t*3));ctx.rotate(w.rot);drawWaffle('plain',w.t);ctx.restore()};SPR.w_plain?f():sticker(w.x-60*S,w.y-60*S,120*S,120*S,f)}
-  if(!story.noHint){ctx.save();ctx.font=Math.round(15*S)+"px 'Lilita One', 'Arial Black', Impact, sans-serif";ctx.textAlign='right';ctx.textBaseline='bottom';ctx.globalAlpha=.75;ctx.lineJoin='round';
+  if(!story.noHint){ctx.save();ctx.font=Math.round(15*TS)+"px 'Lilita One', 'Arial Black', Impact, sans-serif";ctx.textAlign='right';ctx.textBaseline='bottom';ctx.globalAlpha=.75;ctx.lineJoin='round';
     const tx=INPUT==='keys'?'PRESS ANY KEY TO SKIP':'TAP TO SKIP';ctx.lineWidth=4*S;ctx.strokeStyle=INK;ctx.strokeText(tx,W-18*S,H-14*S);ctx.fillStyle='#ffffff';ctx.fillText(tx,W-18*S,H-14*S);ctx.restore()}
 }
 
@@ -1233,15 +1241,16 @@ function activate(type,x,y){
   const hp=headPos(), P=PW[type];
   if(type==='pie'||type==='banana'||type==='kit'||type==='bearhand'||type==='waffli')pop(P.name.toUpperCase()+'!',clamp(bear.x,170*S,W-170*S),GY-(206*bear.gs+30)*S,P.color,34,1.6);
   if(!SEEN[type]){SEEN[type]=1;try{localStorage.setItem('bonkd-seen',JSON.stringify(SEEN))}catch(e){}
-    pop(FIRST[type].replace('#',actWord()),W/2,H*.6+32*S,C.white,18,2.4)}
+    pop(FIRST[type].replace('#',actWord()),W/2,H*.6+32*S,C.white,PHONE?27:18,2.6)}
   sfx.power(); burst(x,y,P.color);
   if(HAND[type]){bear.jello=null;bear.weapon=null}
   /* pie and banana: Todd holds it up for a moment (he got the gift), then throws */
-  if(type==='pie')bear.hold={k:'pie',t:.75,shot:{kind:'pie',vx:0,vy:-600*S,dmg:4,speed:560,rot:0,left:1,cool:0}};
-  if(type==='banana')bear.hold={k:'banana',t:.75,shot:{kind:'banana',vx:0,vy:-600*S,dmg:2,speed:520,rot:0,left:2,cool:0}};
+  /* pie and banana: Todd holds it; the action button throws it (2 pies, 1 boomerang banana) */
+  if(type==='pie')bear.weapon={type:'pie',ammo:2};
+  if(type==='banana')bear.weapon={type:'banana',ammo:1};
   if(type==='jello')bear.jello={t:12,b:6,q:0};
   if(type==='mitt')bear.weapon={type:'mitt',catches:3,held:[]};
-  if(type==='magnet'){sfx.magnetOn();bear.weapon={type:'magnet',t:8};ghost.throwT=Math.min(ghost.throwT,.5)}
+  if(type==='magnet'){sfx.magnetOn();bear.weapon={type:'magnet',t:12,held:[]};ghost.throwT=Math.min(ghost.throwT,.5)}
   if(type==='paddle'){bear.weapon={type:'paddle',t:12};pongI=0}
   if(type==='bun')bear.weapon={type:'bun',ammo:3};
   if(type==='shoe'){bear.weapon={type:'shoe',ammo:5};snd('shoeGet')}
@@ -1274,7 +1283,7 @@ $('actBtn').addEventListener('pointerdown',e=>{e.preventDefault();e.stopPropagat
 $('actBtn').addEventListener('click',e=>{if(e.detail===0&&state==='play'&&!paused)act()});
 let actKey='';
 function updateAct(){
-  const w=bear.weapon, usable=!!w&&(w.type==='shoe'||(w.type==='gum'&&!(w.eatT>0))||w.type==='bun'||w.type==='zooka'||w.type==='paddle'||w.type==='ivy'||w.type==='porcu'||w.type==='beans'||(w.type==='mitt'&&w.held.length>0));
+  const w=bear.weapon, usable=!!w&&(w.type==='pie'||w.type==='banana'||(w.type==='magnet'&&w.held&&w.held.length>0)||w.type==='shoe'||(w.type==='gum'&&!(w.eatT>0))||w.type==='bun'||w.type==='zooka'||w.type==='paddle'||w.type==='ivy'||w.type==='porcu'||w.type==='beans'||(w.type==='mitt'&&w.held.length>0));
   const zp=bear.zap>0, show=(usable||zp)&&(state==='play'||state==='levelup'||state==='clear');
   let lbl='SWOT',n='',col='#df3a4e';
   if(zp){lbl='ZAP';n='×'+bear.zap}
@@ -1284,6 +1293,8 @@ function updateAct(){
     else if(w.type==='gum'){lbl='BLOW';n='×'+w.ammo}
     else if(w.type==='paddle'){lbl='SWOT';n=Math.ceil(w.t)+'s';col='#ff7a45'}
     else if(w.type==='mitt'&&w.held.length){lbl='THROW';n='×'+w.held.length;col=PW.mitt.color}
+    else if(w.type==='pie'||w.type==='banana'){lbl='THROW';n='×'+w.ammo}
+    else if(w.type==='magnet'&&w.held&&w.held.length){lbl='FIRE';n='×'+w.held.length}
     else if(w.type==='ivy'){lbl='LAUNCH';n='×'+w.ammo;col=PW.ivy.color}
     else if(w.type==='porcu'){lbl='POP';n='×'+w.ammo;col=PW.porcu.color}
     else if(w.type==='beans'){lbl='SMASH';n=Math.ceil(w.t)+'s';col=PW.beans.color}}
@@ -1301,6 +1312,12 @@ function tap(x,y){
   if(w&&w.type==='bun'){lobBun(x,y);if(--w.ammo<=0)bear.weapon=null;return}
   if(w&&w.type==='zooka'){fireAnimal(x,y);if(--w.ammo<=0)bear.weapon=null;return}
   if(w&&w.type==='mitt'&&w.held.length){throwHeld(w);return}
+  if(w&&(w.type==='pie'||w.type==='banana')){if(swotCool>0)return;swotCool=.25;const h=headPos(),pie=w.type==='pie',sx=h.x+30*S*bear.face,sy=h.y,dx=ghost.x-sx,dy=ghost.y+ghost.yOff-sy,d=Math.hypot(dx,dy)||1,v=(pie?950:900)*S;
+    shots.push({kind:w.type,x:sx,y:sy,vx:dx/d*v,vy:dy/d*v-180*S,dmg:pie?4:2,speed:pie?950:900,rot:0,left:pie?1:2,cool:0});bear.swing=.22;pie?sfx.pieToss():sfx.bananaThrow();
+    if(--w.ammo<=0)bear.weapon=null;return}
+  if(w&&w.type==='magnet'&&w.held&&w.held.length){const type=w.held.shift(),m=muzzlePos()||handPos(),dx=ghost.x-m.x,dy=ghost.y+ghost.yOff-m.y,d=Math.hypot(dx,dy)||1,v=1100*S;
+    shots.push({kind:'junk',type,x:m.x,y:m.y,vx:dx/d*v,vy:dy/d*v,dmg:HZ[type].heavy?3:2,speed:1100,rot:0,left:1,cool:0});bear.kick=.14;pop('KA-CHUNK!',m.x,m.y-30*S,'#e8463f',34,.7);sfx.clonk();
+    if(!w.held.length&&w.t<=0)bear.weapon=null;return}
   if(w&&w.type==='ivy'){const h=muzzlePos()||handPos();shots.push({kind:'ivy',t0:now,fl:bear.faceS||bear.face||1,x:h.x,y:h.y,vx:0,vy:-700*S,dmg:superDmg('effective')*.15,speed:650,rot:0,left:1,cool:0});bear.kick=.16;sfx.ivyFire();pop('FWOOMP!',h.x,h.y-30*S,'#4fbf5a',30,.7);if(--w.ammo<=0)bear.weapon=null;return}
   if(w&&w.type==='porcu'){const h=muzzlePos()||handPos(),f=bear.faceS||bear.face||1;bear.kick=.12;
     shots.push({kind:'porc',x:h.x+8*S*f,y:h.y,vx:f*480*S,vy:-380*S,t:0,f,rot:0,left:1,cool:0});
@@ -1385,7 +1402,7 @@ function fireAnimal(x,y){
   const kind=(w&&w.next)||ANIMALS[Math.floor(Math.random()*ANIMALS.length)];
   const an={kind,x:sx,y:sy,vx:vx/vn*sp,vy:vy/vn*sp,rot:0,vr:rnd(-6,6),hitG:false};animals.push(an);
   if(w)w.next=ANIMALS[Math.floor(Math.random()*ANIMALS.length)];
-  bear.recoil=.18; shake=Math.max(shake,.3); burst(sx,sy,'#ffffff',6);fxPlay('zmuz',sx+dx*34*S,sy+dy*34*S,1.1,f>0?Math.atan2(dy,dx):Math.atan2(dy,-dx),f);impact(.05,.3);
+  bear.recoil=.18; shake=Math.max(shake,.3); burst(sx,sy,'#ffffff',6);fxPlay('zmuz',sx+dx*34*S,sy+dy*34*S,1.1,f>0?Math.atan2(dy,dx):Math.atan2(dy,-dx),f);hitImpact(.05,.3);
   pop(MOO[kind],sx,sy-58*S,C.white,32,.8); pops[pops.length-1].follow=an; sfx.boom(); sfx[kind]();
 }
 
@@ -1434,7 +1451,7 @@ function hitGhost(s){
   {const sx0=s.x!=null?s.x:ghost.x,sy0=s.y!=null?s.y:gy,dx=sx0-ghost.x,dy=sy0-gy,d=Math.hypot(dx,dy)||1,R=60*GK*(ghost.mega?2:1)*S,hx=ghost.x+dx/d*Math.min(d,R),hy=gy+dy/d*Math.min(d,R);
     const pw={animal:[.11,.5,1.3],beam:[.025,.12,0],zap:[.09,.4,1.1],smash:[.1,.45,1.2],honk:[.06,.25,1],bubble:[.04,.15,.8]}[s.kind]||[Math.min(.08,.03+dm*.015),Math.min(.35,.12+dm*.05),.85+Math.min(.4,dm*.12)];
     if(s.kind==='animal')fxPlay('zhit',hx,hy,1.15,0,1);else if(s.kind==='beam')fxPlay('bimp',hx,hy,1.25,Math.random()*TAU,1);else fxPlay('spark',hx,hy,pw[2],Math.random()*.6-.3,Math.random()<.5?-1:1);
-    impact(pw[0],pw[1])}
+    hitImpact(pw[0],pw[1])}
   if(s.kind==='quill'){ghost.quills=Math.min(24,(ghost.quills||0)+1);sfx.quillHit()}
   else if(s.kind==='ivy'){ghost.blanket=1.3;ghost.itch=8;ghost.itchRate=superDmg('effective')*.35/8;pop('BLANKETED!',ghost.x,gy-74*GK*S,'#4fbf5a',40);setFx('ivy',2.4);sfx.ivyHit()}
   else if(s.kind==='zap'){pop('ZAP BACK!',ghost.x,gy-84*GK*S,'#fff7a8',50,1.1);sfx.zapBack()}
@@ -1621,7 +1638,7 @@ function update(dt){
   if(bear.weapon&&bear.weapon.type==='beans'&&bear.weapon.t-dt<=0){pop('PFFFT!',bear.x,GY-120*S,C.white,34,.9);sfx.shrink();if(state==='play'&&preBeans!==null)music(preBeans,true);preBeans=null}
   if(state==='play'){if(bearT>0){bearT=Math.max(0,bearT-dt);if(bearT===0)pop('BEAR HANDED OVER',clamp(bear.x,170*S,W-170*S),GY-230*S,C.white,22,1)}if(waffT>0)waffT=Math.max(0,waffT-dt)}
   if(bear.weapon&&bear.weapon.type==='gum'){const w=bear.weapon;if(w.eatT>0)w.eatT-=dt;if(w.blowT>0){w.blowT-=dt;if(w.blowT<=0)releaseBubble(w)}}
-  if(bear.weapon&&(bear.weapon.type==='magnet'||bear.weapon.type==='paddle'||bear.weapon.type==='beans')){bear.weapon.t-=dt;if(bear.weapon.t<=0)bear.weapon=null}
+  if(bear.weapon&&(bear.weapon.type==='magnet'||bear.weapon.type==='paddle'||bear.weapon.type==='beans')){bear.weapon.t-=dt;if(bear.weapon.t<=0&&!(bear.weapon.held&&bear.weapon.held.length))bear.weapon=null}
   if(quip){quip.t-=dt;if(quip.t<=0)quip=null}
   if(bear.ko){bear.koT+=dt;if(state==='ko'&&bear.koT>1.3)afterKO()}
   shake=Math.max(0,shake-dt*1.6);
@@ -1690,7 +1707,7 @@ function update(dt){
     if(g.land)g.lt+=dt;
     else{
       if(!g.chute&&g.vy>30*S){g.chute=.01;sfx.whoosh()}
-      if(g.chute){g.chute=Math.min(1,g.chute+dt*4);g.vy+=(85*S*(1+clamp((level-3)/15,0,1))-g.vy)*Math.min(1,dt*3.5);g.vx*=Math.exp(-2.4*dt);g.x+=Math.sin(g.t*2.3+g.sw)*36*S*dt;g.rot=Math.sin(g.t*2.3+g.sw)*.35}
+      if(g.chute){g.chute=Math.min(1,g.chute+dt*4);g.vy+=(115*S*(1+clamp((level-3)/15,0,1))-g.vy)*Math.min(1,dt*3.5);g.vx*=Math.exp(-2.4*dt);g.x+=Math.sin(g.t*2.3+g.sw)*36*S*dt;g.rot=Math.sin(g.t*2.3+g.sw)*.35}
       else{g.vy+=g.g*dt;g.rot+=4*dt}
       g.x+=g.vx*dt; g.y+=g.vy*dt; g.x=clamp(g.x,34*S,W-34*S);
       if(g.y>=GY-34*S){g.y=GY-34*S;g.land=true;g.lt=0;g.rot=0;burst(g.x,GY-6*S,'#ffffff',5)}
@@ -1769,11 +1786,14 @@ function update(dt){
       if(it.y<-90*S||it.x<-90*S||it.x>W+90*S)it.dead=true;
       continue;
     }
-    if(mag&&state==='play'&&!it.loose&&!it.dead&&METAL[it.type]){
-      const tx=bear.x+56*S*bear.face, ty=GY-196*S;
-      it.mag=true; it.x+=(tx-it.x)*Math.min(1,dt*3.2); it.y+=(ty-it.y)*Math.min(1,dt*2.4); it.rot+=it.vr*dt;
-      if(Math.hypot(tx-it.x,ty-it.y)<34*S){it.dead=true;shots.push({kind:'junk',type:it.type,x:it.x,y:it.y,vx:0,vy:-900*S,dmg:HZ[it.type].heavy?3:2,speed:820,rot:it.rot,left:1,cool:.15});pop('KA-CHUNK!',it.x,it.y-30*S,'#e8463f',34,.7);sfx.clonk()}
-      continue;
+    /* the magnet only grabs metal junk that comes close to Todd; he holds up to 3 and fires them back with the button */
+    if(mag&&W8.t>0&&state==='play'&&!it.loose&&!it.dead&&METAL[it.type]&&W8.held.length<3){
+      const m=muzzlePos()||{x:bear.x+56*S*bear.face,y:GY-196*S}, tx=m.x, ty=m.y-12*S, dd=Math.hypot(tx-it.x,ty-it.y);
+      if(it.mag||(dd<190*S&&it.vy>0)){
+        it.mag=true; const k=Math.min(1,dt*14); it.x+=(tx-it.x)*k; it.y+=(ty-it.y)*k; it.rot+=it.vr*dt;
+        if(dd<26*S){it.dead=true;W8.held.push(it.type);pop('CLANK!',tx,ty-34*S,'#e8463f',30,.6);sfx.clonk()}
+        continue;
+      }
     }
     it.mag=false;
     const st=it.loose?dt:sdt;
@@ -2743,7 +2763,7 @@ let RUNM=false;
 const T2S={sit_eat:[200,.972],sit_huh:[200,.97],angry:[228,.972]};
 const T2A={"angry":[0.3144,276.0,622],"body":[0.3125,193.5,620],"bonked":[0.3379,153.5,622],"bucket":[0.3511,173.0,622],"eat_beans":[0.3284,184.0,624],"full":[0.3107,205.0,623],"hl_ivy":[0.2969,168.5,632],"wl_ivy":[0.2953,167.0,632],"h_banana":[0.3085,194.5,622],"h_beans":[0.3041,187.0,623],"h_bonked":[0.3372,217.5,623],"h_bucket":[0.3511,171.5,623],"h_bun":[0.3052,197.0,623],"h_ivy":[0.3055,176.5,623],"h_jello":[0.3762,191.5,623],"h_magnet":[0.3044,189.0,623],"h_mitt":[0.3278,178.0,624],"h_paddle":[0.3052,195.5,622],"h_pie":[0.3073,187.5,622],"h_porcu":[0.3079,199.0,623],"h_throw":[0.3103,247.0,622],"h_walk":[0.3015,237.5,624],"h_zooka":[0.3534,181.0,554],"ko":[0.375,320,301],"run":[0.2957,320,556],"run_body":[2.0495,108.0,578],"sit_eat":[0.3134,210.5,622],"sit_huh":[0.342,198.0,621],"w_banana":[0.3055,202.5,623],"w_beans":[0.3041,206.0,623],"w_bucket":[0.3446,198.0,624],"w_bun":[0.3029,215.0,623],"w_ivy":[0.3029,173.0,624],"w_jello":[0.37,184.0,625],"w_magnet":[0.3052,214.0,623],"w_mitt":[0.3347,186.5,624],"w_paddle":[0.3041,209.5,624],"w_pie":[0.3017,212.0,623],"w_porcu":[0.3067,211.0,623],"w_zooka":[0.3416,180.5,569],"h_shoe":[0.2936,133.5,631],"w_shoe":[0.295,142.0,631],"eat_oat":[0.3,184.0,631],"cheer":[0.2983,246.5,631],"eat_gum":[0.2864,194.0,631],"blow":[0.2914,197.5,631],"walk_a":[0.3113,210.0,622],"wk0":[0.3303,190.2,586],"wk1":[0.3303,172.1,586],"wk2":[0.3303,181.5,586],"wk3":[0.3303,206.1,586],"wk4":[0.3303,171.3,586],"wk5":[0.3303,208.9,586],"rn0":[0.3894,138.0,428],"rn1":[0.3894,94.1,412],"rn2":[0.3894,130.1,431],"rn3":[0.3894,126.6,476],"rn4":[0.3894,128.2,427],"rn5":[0.3894,124.4,448]};
 /* muzzle points on the held-weapon art (sprite px) */
-const T2MZ={shoe:[441,176],zooka:[600,95],ivy:[455,255],porcu:[525,225]};
+const T2MZ={magnet:[425,64],shoe:[441,176],zooka:[600,95],ivy:[455,255],porcu:[525,225]};
 const T2EX=(193.5-180)*.3125;
 /* which full-art pose Todd shows this frame (all arms and paws are in the Canva art) */
 function todd2Key(b,mv){const k=todd2Key0(b,mv);if((k==='h_ivy'||k==='w_ivy')&&b.weapon&&loadedNow(b.weapon)&&SPR['c_todd_'+k[0]+'l_ivy'])return k[0]+'l_ivy';return k}
@@ -3117,7 +3137,7 @@ const GP={float:[0.205,0.2926,0.5465],throw:[0.2934,0.3138,0.4897],hit:[0.2646,0
 function grumSay(g){
   if(g.say&&!g.ko){
     const bx=g.x+(g.x>W/2?-86:86)*GK*S, byy=g.y+g.yOff-64*GK*S, flip=g.x>W/2?1:-1;
-    ctx.save();ctx.translate(bx,byy);ctx.scale(S,S);
+    ctx.save();ctx.translate(bx,byy);ctx.scale(TS,TS);
     flat(()=>{ctx.ellipse(0,0,40,20,0,0,TAU);ctx.moveTo(flip*12,16);ctx.lineTo(flip*30,32);ctx.lineTo(flip*24,12)},'#ffffff',2);
     ctx.fillStyle='#ffffff';ctx.beginPath();ctx.ellipse(0,0,38,18,0,0,TAU);ctx.fill();
     ctx.fillStyle=INK;ctx.font="17px 'Lilita One', Impact, sans-serif";ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(g.say.txt,0,2);
@@ -3222,7 +3242,7 @@ function beamUpdate(dt){const b=beamer;b.t+=dt;if(b.t>=.5&&!b.sup){b.sup=1;super
   if(b.t<.7){b.x+=(hx-b.x)*Math.min(1,dt*5);b.y+=(gy-b.y)*Math.min(1,dt*4)}
   else if(b.t<2.1){b.x+=(hx-b.x)*Math.min(1,dt*3);b.y+=(gy+10*S-b.y)*Math.min(1,dt*3);if(!b.fired){b.fired=1;snd('beamFire')||sfx.zapBack();pop('BOOSTER BEAM!',W/2,H*.4,'#ffd23f',44,1.2);shake=Math.max(shake,.35)}
     b.hitT-=dt;if(b.hitT<=0&&state==='play'&&!ghost.ko){b.hitT=.2;hitGhost({kind:'beam',dmg:superDmg('beam')/7,x:gx,y:gy});flashT=Math.max(flashT,.05)}}
-  else{b.x+=-b.side*900*S*dt;b.y-=200*S*dt;if(!b.out){b.out=1;sfx.boosterOut();if(!ghost.ko){fxPlay('bimp',gx,gy,2.2,0,1);impact(.16,.7)}}if(b.x<-200*S||b.x>W+200*S)beamer=null}}
+  else{b.x+=-b.side*900*S*dt;b.y-=200*S*dt;if(!b.out){b.out=1;sfx.boosterOut();if(!ghost.ko){fxPlay('bimp',gx,gy,2.2,0,1);hitImpact(.16,.7)}}if(b.x<-200*S||b.x>W+200*S)beamer=null}}
 function beamPaw(){const b=beamer,B=SPR.c_boost_beam,w=BOOSTW*1.05,h=w/(B?B.r:1.44);return{x:b.x+b.side*(BEAM_PAW[0]-.5)*w*S,y:b.y+(BEAM_PAW[1]-.55)*h*S}}
 /* Booster's beam frames: [halo centre x, y in frame px, size factor vs the approved beam pose]; ref = approved pose halo + size */
 const BOOST_F=[[215.5, 37.5, 1.4177], [168.0, 32.5, 1.4737], [160.5, 71.0, 1.5342], [177.5, 32.0, 1.4545], [170.0, 33.5, 1.6]],BOOST_R=[384.0, 49.0, 640, 445];
@@ -3656,12 +3676,12 @@ function updFxs(dt){for(const f of fxs)f.t+=dt;fxs=fxs.filter(f=>f.t<FXA[f.k].n/
 function drawFxs(){for(const f of fxs){const A=FXA[f.k],i=Math.min(A.n-1,Math.floor(f.t*A.fps)),P=SPR['fx_'+f.k+i];if(!P)continue;
   const w=P.img.naturalWidth*A.u*f.sc*S,h=P.img.naturalHeight*A.u*f.sc*S;ctx.save();ctx.translate(f.x,f.y);ctx.rotate(f.ang);ctx.scale(f.flip,1);ctx.drawImage(P.img,-w/2,-h/2,w,h);ctx.restore()}}
 /* how hard a hit lands: freeze frames and shake, scaled to the weapon */
-function impact(stop,sh){hitStop=Math.max(hitStop,stop);shake=Math.max(shake,sh)}
+function hitImpact(stop,sh){hitStop=Math.max(hitStop,stop);shake=Math.max(shake,sh)}
 /* the super flash: everything freezes, the screen dims, a flash, and the hero's cut-in slides across a slanted band */
 function superFlash(img,col,word){superFx={t:0,d:.85,img,col:col||'#ffd23f',word};flashT=Math.max(flashT,.08)}
 function drawSuper(){const F=superFx;if(!F)return;const t=F.t,k=Math.min(1,t/.12)*Math.min(1,(F.d-t)/.15);
   ctx.save();ctx.fillStyle=`rgba(10,8,30,${.55*k})`;ctx.fillRect(0,0,W,H);
-  const sq=t>F.d-.15?Math.max(0,(F.d-t)/.15):1,bh=Math.min(H*.34,190*S*1.4)*sq,cy=H*.42,sk=-.18;
+  const sq=t>F.d-.15?Math.max(0,(F.d-t)/.15):1,bh=Math.min(H*.34,190*TS*1.4)*sq,cy=H*.42,sk=-.18;
   ctx.translate(W/2,cy);ctx.transform(1,0,sk,1,0,0);
   const slide=t<.18?(1-t/.18):0;
   ctx.translate(slide*W*1.2,0);
@@ -3696,12 +3716,12 @@ function drawPops(){
   ctx.textAlign='center';ctx.textBaseline='middle';ctx.lineJoin='round';const hb=hudBottom();
   for(const p of pops){
     const k=p.age/p.life, sc=k<.15?.4+k/.15*.85:1.25-Math.min(.2,(k-.15)*.6);
-    if(p.img){const hh=p.size*S,ww=hh*LOGO_R;ctx.save();ctx.translate(p.x,p.y);ctx.rotate(p.rot);ctx.scale(sc,sc);ctx.globalAlpha=k>.7?1-(k-.7)/.3:1;if(p.img.complete&&p.img.naturalWidth)ctx.drawImage(p.img,-ww/2,-hh/2,ww,hh);ctx.restore();continue}
-    ctx.font=`${p.size*S}px 'Lilita One', 'Arial Black', Impact, sans-serif`;
-    const hw=ctx.measureText(p.txt).width*.5*1.25+p.size*.14*S,hh=p.size*S*.62*1.25,px=clamp(p.x,Math.min(W/2,hw+6),Math.max(W/2,W-hw-6)),py=clamp(p.y,hb+hh+6,Math.max(hb+hh+6,H-hh-6));
+    if(p.img){const hh=p.size*TS,ww=hh*LOGO_R;ctx.save();ctx.translate(p.x,p.y);ctx.rotate(p.rot);ctx.scale(sc,sc);ctx.globalAlpha=k>.7?1-(k-.7)/.3:1;if(p.img.complete&&p.img.naturalWidth)ctx.drawImage(p.img,-ww/2,-hh/2,ww,hh);ctx.restore();continue}
+    ctx.font=`${p.size*TS}px 'Lilita One', 'Arial Black', Impact, sans-serif`;
+    const hw=ctx.measureText(p.txt).width*.5*1.25+p.size*.14*TS,hh=p.size*TS*.62*1.25,px=clamp(p.x,Math.min(W/2,hw+6),Math.max(W/2,W-hw-6)),py=clamp(p.y,hb+hh+6,Math.max(hb+hh+6,H-hh-6));
     ctx.save();ctx.translate(px,py);ctx.rotate(p.rot);ctx.scale(sc,sc);
     ctx.globalAlpha=k>.7?1-(k-.7)/.3:1;
-    {const gw=glossWord(p.txt,p.color,p.size*S);ctx.drawImage(gw.c,-gw.ox,-gw.oy)}
+    {const gw=glossWord(p.txt,p.color,p.size*TS);ctx.drawImage(gw.c,-gw.ox,-gw.oy)}
     ctx.restore();
   }
 }
@@ -3727,6 +3747,7 @@ function render(){
   else if(bear.gs>1.3){const k=Math.min(1,(bear.gs-1)/2),cx=bear.x,cy=GY-100*S*bear.gs,r=(120+Math.sin(now*8)*10)*S*bear.gs;const g=ctx.createRadialGradient(cx,cy,r*.15,cx,cy,r);const hue=(now*160)%360;g.addColorStop(0,`hsla(${hue},100%,70%,${.45*k})`);g.addColorStop(.6,`hsla(${(hue+60)%360},100%,60%,${.22*k})`);g.addColorStop(1,`hsla(${(hue+120)%360},100%,60%,0)`);ctx.fillStyle=g;ctx.beginPath();ctx.ellipse(cx,cy,r*.75,r,0,0,TAU);ctx.fill()}
   for(const r of rings){const k=r.age/.6;ctx.save();ctx.globalAlpha=1-k;ctx.strokeStyle=r.air?'#ffd23f':'#fff3c4';ctx.lineWidth=(r.air?8:6)*S*(1-k*.6);ctx.beginPath();if(r.air)ctx.arc(r.x,r.air,(30+k*130)*S,0,TAU);else ctx.ellipse(r.x,GY+2*S,(40+k*220)*S,(8+k*22)*S,0,0,TAU);ctx.stroke();ctx.restore()}
   drawBear();
+  if(bear.weapon&&bear.weapon.type==='magnet'&&bear.weapon.held.length&&!bear.ko){const m=muzzlePos();if(m)bear.weapon.held.forEach((t,i)=>{ctx.save();ctx.translate(m.x+(i-(bear.weapon.held.length-1)/2)*22*S,m.y-(14+i*6)*S);ctx.scale(S*.62,S*.62);ctx.rotate((i-1)*.25);drawJunk(t);ctx.restore()})}
   drawToddFX();
   if(chap)drawChapterFront();
   if(ghostFront&&state!=='menu'&&state!=='ending'&&!(state==='over'&&bossDone))drawGhost();
@@ -3747,7 +3768,7 @@ function render(){
   for(const s of sparks){ctx.globalAlpha=Math.max(0,1-s.age/.8);drawStar(s.x,s.y,s.r/S*S,s.rot,s.col)}
   ctx.globalAlpha=1;
   drawWeather();
-  if(quip&&!bear.ko){const fs=Math.round(Math.max(29*S,18)*(quip.k||1));ctx.save();ctx.font=fs+"px 'Lilita One', 'Arial Black', Impact, sans-serif";const tw=ctx.measureText(quip.txt).width;
+  if(quip&&!bear.ko){const fs=Math.round(Math.max(29*TS,18)*(quip.k||1));ctx.save();ctx.font=fs+"px 'Lilita One', 'Arial Black', Impact, sans-serif";const tw=ctx.measureText(quip.txt).width;
     const qd=quip.d||2.2,up=Math.min(1,(qd-quip.t)*8),fade=Math.min(1,quip.t*3),x=clamp(bear.x,tw/2+10,W-tw/2-10),y=GY-(186*bear.gs+8)*S-Math.sin(Math.min(1,(qd-quip.t)*3)*Math.PI/2)*14*S;
     ctx.translate(x,y);ctx.rotate(-.04);ctx.scale(.6+.4*up,.6+.4*up);ctx.globalAlpha=fade;ctx.textAlign='center';ctx.textBaseline='middle';ctx.lineJoin='round';
     ctx.lineWidth=Math.max(3,fs*.2);ctx.strokeStyle=INK;ctx.strokeText(quip.txt,0,0);ctx.fillStyle='#ffffff';ctx.fillText(quip.txt,0,0);ctx.restore()}
