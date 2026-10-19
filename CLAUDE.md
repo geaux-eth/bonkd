@@ -147,7 +147,8 @@
 
 ## Title, lettering and music
 - The title is the real logo lettering (logo_text_only: "Don't get BONKD!" cut from the approved sticker logo, finished in ChatGPT; scratchpad sprites/logo.webp, embedded as __LOGO__). The menu shows it pinned near the top; the run start pops the same image sized to stay between the HUD and Todd's head. Never retype the title in a font.
-- Menu: title, Play, then Leaderboard and Waffle Store spaced evenly between the bottom of Play and the backdrop's grass strip (layoutMenuLinks, GRASS_FRAC .833). No controls text on the menu.
+- Menu: centred, in front of everything. Behind it Todd strolls the whole width left to right (off the right edge, back in on the left) while waffles drift down across the whole screen.
+- Menu order: title, Play, then Leaderboard and Waffle Store spaced evenly between the bottom of Play and the backdrop's grass strip (layoutMenuLinks, GRASS_FRAC .833). No controls text on the menu.
 - After the story, a one-line how-to shows for about 4 s (keys or touch wording), centred on the dirt strip under Todd so it never covers him or Grumble.
 - Todd's lump and dizzy stars sit on CROWN[key] (the top of his head between the ears, measured per pose), so they stay on his head in every pose. Steps follow distance: one foot swap per TODD_STEP (46) game units; the run hop follows the same phase.
 - No sprint pose in play: Todd only walks, faster the harder he's dragged. The run art is for the story and chapter scenes only (b.pose==='run').
