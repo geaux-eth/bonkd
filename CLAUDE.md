@@ -113,7 +113,7 @@
 - The gameplay profiles (SETTING.meadow1, forest, mountain) are zeroed in the source, so the planner places nothing there. The forest and meadow scenery sprites stay in art/review in case a piece is ever wanted back.
 
 ## Lives and continues
-- Everyone starts a run with 3 lives. A wallet connected on nibblethis.wtf adds 1 life per Nibble held, up to 25 more. The host page sends the count with postMessage({type:'bonkd:wallet',nibbles:N}) (only nibblethis.wtf origins are accepted) or window.bonkdSetNibbles(N).
+- Lives are DAILY: everyone gets 3 lives a day, shared by every run that day, and the day turns over at midnight GMT (utcDay, dailyUsed in the source; stored on the device as bonkd-lifeday). Getting BONKD with a life left spends one and continues; with none left the run ends. When the day's lives (and any bought lives) are gone, Play shows the OUT OF LIVES card with a countdown to midnight GMT and a buy-a-life button. A wallet connected on nibblethis.wtf adds 1 life per Nibble held, up to 25 more. The host page sends the count with postMessage({type:'bonkd:wallet',nibbles:N}) (only nibblethis.wtf origins are accepted) or window.bonkdSetNibbles(N).
 - The HUD shows Todd's head × lives where the score used to be. The head is a sticker cut from the approved logo head WITH its lump and dizzy stars (white sticker edge, no circle behind it): art/todd_head.webp, made by scratchpad logo/head_icon3.py. The score is still kept for the leaderboard but not shown during play.
 - After getting BONKD, a life continues the run from that point (bonks reset, junk cleared). Free lives are used before bought ones.
 - Extra lives cost 1,000 waffles, at most 10 per rolling 24 hours, and are banked on the profile (Supabase buy_life / use_life; waffle_board.lives, life_buys).
@@ -138,6 +138,7 @@
 - Ending (tap to skip): back at the Maple Meadow picnic, waffles back on the plate, Todd eating (sit_eat) with lots of butterflies (SETTING.ending), two quips, THE END, then the win card "GRUMBLEMAX is DEFEATED!" over the picnic.
 - Harvest level 29 is Pumpkin Patch (the user swapped the moon for a sun).
 - After beating GRUMBLEMAX once (saved on the device as localStorage bonkd-cleared AND on the profile as waffle_board.cleared_at via mark_cleared; isCleared() checks both, and a device flag syncs up to the profile), every new run keeps the unlocks: Lumpy Oatmeal from the start, all chapter items in Booster's pool from level 1, and the chapter scenes are skipped. The win card's button reads "Play again".
+- Store sections: Super Duper Weapons, Quests (coming soon), New Heroes (coming soon: only the next hero's silhouette coin, art/st_carlito.webp, nothing that gives him away) and Tournaments (coming soon, waffle prizes only). Buddies and Legends are gone for good.
 - Store: a "Quests: Coming soon!" section with blurred teaser cards: Space Quest (bd_space, moon surface) and Underwater Quest (bd_sea, sandy sea floor), both Gemini backdrops made to gameplay spec (ground line at 85%) so they can become real levels, plus a "More Quests" card. Quests will be new places to fight Grumble in new ways.
 
 ## Controls
@@ -157,6 +158,15 @@
 - Pop words are rendered at screen resolution (glossWord at DPR*1.3) so they stay crisp.
 - No sprint pose in play: Todd only walks, faster the harder he's dragged. The run art is for the story and chapter scenes only (b.pose==='run').
 - Plain Todd walks with a 6-frame Canva walk cycle (c_todd_wk0 to wk5, one Canva generation from todd_full + h_walk refs, split and cut STRIP=1 SIZE=640 DRAWN=200), one frame per WK_D/6 (118/6) game units walked (bear.wd). Held items, weapons and the bucket still use their two-drawing stand/step pairs; a cycle for each would cost one Canva credit apiece.
-- Lettering: Lilita One for the display font. Headings (.logo, .pre) are drawn as images, word by word, by the same canvas renderer as the in-game pop words (glossWord via glossify): gold or red two-tone fill, a white streak-and-dot shine, a round black outline and a hard shadow, identical on iPhone Safari. Button words are plain text: white on red buttons, red on the other pills.
-- Loading screen (#boot): the logo on blue with a spinning waffle covers the page until the menu art and font are in, so nobody sees a half-built menu. Level names stay plain dark text (bigger), the number a little smaller.
+- Lettering: Lilita One for the display font. Headings (.logo, .pre) are drawn as images, word by word, by the same canvas renderer as the in-game pop words (glossWord via glossify), identical on iPhone Safari: the title's orange-gold ramp (or red, green, white), a thick round black outline, a chunky black extrusion down-right, and thin white highlights hugging each letter's inner top-left edge (never blobs or dots). An exact match needs a letter sheet in the logo style (asked of the user). Button words are plain text: white on red buttons, red on the other pills.
+- Loading screen (#boot): the approved cartridge label art (sprites/label.webp, contained over a blurred copy of itself) with three real w_plain waffles hopping underneath, until the menu art and font are in. Never code-drawn art on anything players look at; code only places and animates real art.
+- The how-to line after the story is outlined text that pops in (no pill).
+- The leaderboard handle box never invites autofill of a real name: autocomplete off, placeholder "Pick a handle", and the card says not to use your real name.
+- The picnic spot is a fraction of the screen width (picnic.x getter), so resizes and restarts can't move it.
+- Level names stay plain dark text (bigger), the number a little smaller.
 - Music: one recorded track ("The Fun Starts Here", Pixabay/mmaudio) makes the set: menu = the song from the top at .82; gameplay = its main section looping (24.87 s to 98.41 s); boss = that loop at 1.12x; win = the song's ending sting. Mega Beans keeps its synth tune.
+
+## Future heroes (planned, not built)
+- kit/WORLD_KIT.md is the formula: every slot a hero's world must fill, what's shared (engine, Grumble and GRUMBLEMAX, waffle values, wallet, lives, leaderboard) and the engine work needed (a WORLD config object, per-world asset bundles, hero select and unlock). kit/todd_world.json is the generated inventory of Todd's world.
+- Nothing from one hero's world is reused in another's. Waffles are waffles on the backend; each world only draws and names them its own way, and each world's store is branded for its hero.
+- Next hero: Carlito (Nibble #8102, raccoon). Night-time, grungy world: diner dumpster, alleyway, underground sewer, drainage pond, then inside the drainage facility for GRUMBLEMAX. Trashy waffles and trash or used-food items. Unlocked for a large waffle price or a small payment. Build only when the user says Todd is done.
