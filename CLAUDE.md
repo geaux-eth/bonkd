@@ -142,6 +142,8 @@
 ## Title, lettering and music
 - The title is the real logo lettering (logo_text_only: "Don't get BONKD!" cut from the approved sticker logo, finished in ChatGPT; scratchpad sprites/logo.webp, embedded as __LOGO__). The menu shows it pinned near the top; the run start pops the same image sized to stay between the HUD and Todd's head. Never retype the title in a font.
 - Menu: title, Play, then Leaderboard and Waffle Store spaced evenly between the bottom of Play and the backdrop's grass strip (layoutMenuLinks, GRASS_FRAC .833). No controls text on the menu.
-- After the story, a one-line how-to shows for about 4 s (keys or touch wording).
+- After the story, a one-line how-to shows for about 4 s (keys or touch wording), centred on the dirt strip under Todd so it never covers him or Grumble.
+- Todd's lump and dizzy stars sit on CROWN[key] (the top of his head between the ears, measured per pose), so they stay on his head in every pose. Steps follow distance: one foot swap per TODD_STEP (46) game units; the run hop follows the same phase.
+- Todd only has two drawings per variation (stand, step) plus one run drawing. A real walk/run cycle needs new frames (6 to 8 per variation, same size, same foot baseline); the sprite sheets went to Nibblethis (CD) for that.
 - Lettering: Lilita One for the display font. Headings, labels and buttons are built per letter by glossify(): gold or red two-tone fill, a white streak-and-dot shine, a thin round black outline and a hard shadow. Words on red buttons are white. Level names stay plain dark text (bigger), the number a little smaller.
 - Music: one recorded track ("The Fun Starts Here", Pixabay/mmaudio) makes the set: menu = the song from the top at .82; gameplay = its main section looping (24.87 s to 98.41 s); boss = that loop at 1.12x; win = the song's ending sting. Mega Beans keeps its synth tune.

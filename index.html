@@ -292,7 +292,7 @@ body.keys .act::after{content:'SPACE';position:absolute;bottom:-18px;left:50%;tr
 .glr .gc .f{background-image:radial-gradient(ellipse 5.5% 15% at 24% 33%,#ffe3e8 0 62%,rgba(255,255,255,0) 100%),radial-gradient(circle at 24% 57%,#ffe3e8 0 3.2%,rgba(255,255,255,0) 4.6%),linear-gradient(180deg,#ff6078 0%,#ff2a4a 49%,#e81e3e 51%,#c9122f 100%)}
 .mlogo-h{margin:0;line-height:0}.mlogo{display:block;width:clamp(240px,min(60vmin,36vw),460px);height:auto;filter:drop-shadow(3px 5px 0 rgba(0,0,0,.18))}
 
-.starthint{position:absolute;left:50%;top:38%;transform:translateX(-50%);z-index:6;pointer-events:none;max-width:94vw;white-space:nowrap;text-align:center;font-family:var(--display);font-size:clamp(15px,3.6vmin,26px);letter-spacing:.03em;line-height:1.2;color:var(--paper);background:rgba(22,22,22,.72);border:3px solid var(--ink);border-radius:16px;padding:10px 20px 8px;box-shadow:4px 4px 0 var(--ink);animation:shin .3s ease-out}
+.starthint{position:absolute;left:50%;top:50%;transform:translateX(-50%);z-index:6;pointer-events:none;max-width:94vw;white-space:nowrap;text-align:center;font-family:var(--display);font-size:clamp(13px,3.2vmin,24px);letter-spacing:.03em;line-height:1.15;color:var(--paper);background:rgba(22,22,22,.78);border:3px solid var(--ink);border-radius:14px;padding:6px 16px 4px;box-shadow:4px 4px 0 var(--ink);animation:shin .3s ease-out}
 .starthint.out{opacity:0;transition:opacity .4s}
 @keyframes shin{from{opacity:0;transform:translate(-50%,10px)}to{opacity:1;transform:translate(-50%,0)}}
 .mlogo-h{margin-bottom:14px}
@@ -1093,7 +1093,7 @@ function beginPlay(chase){
 
 let hintT=0;
 function showStartHint(){const h=$('startHint');h.textContent=INPUT==='keys'?'← → or A / D to move  ·  SPACE uses weapons  ·  P pauses':'Drag to move Todd  ·  tap the red button to use weapons';
-  h.classList.remove('out');h.hidden=false;clearTimeout(hintT);hintT=setTimeout(()=>{h.classList.add('out');hintT=setTimeout(()=>{h.hidden=true},450)},4200)}
+  h.classList.remove('out');h.hidden=false;{const hb=h.offsetHeight||40,g0=GY+10*S;h.style.top=Math.max(g0,g0+(H-g0-hb)/2)+'px'}clearTimeout(hintT);hintT=setTimeout(()=>{h.classList.add('out');hintT=setTimeout(()=>{h.hidden=true},450)},4200)}
 function skipStory(){if(state==='story'){track('story_skip',{lv:null,n:story?story.t*10:0});iris=null;beginPlay()}}
 /* the story beats, in seconds */
 const ST={line:.3,drop:1.7,huh:3.0,beam:3.6,lift:3.85,liftGap:.45,beamOff:5.75,laugh:5.85,flee:6.5,hey:6.9,run:9.0,irisAt:9.55};
@@ -1603,7 +1603,8 @@ function update(dt){
   bear.faceS=bear.face;
   bear.recoil=Math.max(0,(bear.recoil||0)-dt);bear.kick=Math.max(0,(bear.kick||0)-dt);updFlings(dt);
   if(bear.weapon&&bear.weapon.type==='zooka'&&!bear.ko){const ta=Math.atan2(ghost.y+ghost.yOff-(GY+(4+zp()[1])*S),ghost.x-(bear.x+bear.face*zp()[0]*S));bear.aim+=Math.atan2(Math.sin(ta-bear.aim),Math.cos(ta-bear.aim))*Math.min(1,dt*8)}
-  bear.walk+=(Math.min(1,Math.abs(bear.vx)/260)*14+1.5)*dt;
+  /* steps follow the ground he covers: one foot swap per TODD_STEP game units, so the feet keep pace with the drag */
+  bear.walk+=Math.abs(bear.vx)/S*dt/TODD_STEP*Math.PI;
   if(bear.hold){bear.hold.t-=dt;if(bear.hold.t<=0||bear.ko){if(!bear.ko){const h=headPos(),sh=bear.hold.shot;sh.x=h.x+30*S*bear.face;sh.y=h.y;shots.push(sh);bear.swing=.28;sh.kind==='pie'?sfx.pieToss():sfx.bananaThrow()}bear.hold=null}}
   bear.hitT=Math.max(0,bear.hitT-dt); bear.inv=Math.max(0,bear.inv-dt); bear.swing=Math.max(0,bear.swing-dt); if(paddleT>0){paddleT-=dt;paddleHit()} bear.lumpPop=Math.max(0,bear.lumpPop-dt);
   if(bear.jello){bear.jello.t-=dt;bear.jello.q=Math.max(0,bear.jello.q-dt);if(bear.jello.t<=0||(bear.jello.b<=0&&bear.jello.q<=0)){bear.jello=null;pop('SPLOOSH',bear.x,GY-210*S,'#ff9a3c',22,.6)}}
@@ -2754,6 +2755,8 @@ function todd2Key0(b,mv){const w=b.weapon,walk=mv>.15&&Math.floor(b.walk/Math.PI
   if(w&&w.type!=='beans'&&T2A['h_'+w.type])return mov&&walk&&T2A['w_'+w.type]?'w_'+w.type:'h_'+w.type;
   if(mv>.6)return 'run';
   return mov&&walk?'h_walk':'full'}
+/* top of Todd's head (between the ears) in each pose's own pixels, so the lump and the dizzy stars sit on his head in every pose */
+const TODD_STEP=46,CROWN={"angry":[212.1,61],"body":[191.7,42],"bonked":[138.9,24],"bucket":[167.9,17],"eat_beans":[183.0,91],"full":[202.5,42],"hl_ivy":[167.6,31],"wl_ivy":[165.9,30],"h_banana":[187.4,38],"h_beans":[184.6,37],"h_bonked":[203.7,24],"h_bucket":[102.7,33],"h_bun":[195.3,38],"h_ivy":[175.1,39],"h_jello":[189.5,16],"h_magnet":[189.7,34],"h_mitt":[175.7,83],"h_paddle":[195.7,38],"h_pie":[185.0,39],"h_porcu":[195.3,43],"h_throw":[200.0,62],"h_walk":[236.4,33],"h_zooka":[173.4,47],"ko":[163.6,65],"run":[421.1,34],"run_body":[438.0,36],"sit_eat":[236.7,33],"sit_huh":[170.5,72],"w_banana":[196.2,37],"w_beans":[204.0,39],"w_bucket":[150.0,27],"w_bun":[213.4,37],"w_ivy":[171.4,38],"w_jello":[182.5,15],"w_magnet":[213.8,38],"w_mitt":[184.0,97],"w_paddle":[178.7,44],"w_pie":[207.2,33],"w_porcu":[175.7,50],"w_zooka":[172.9,47],"h_shoe":[140.0,36],"w_shoe":[185.2,14],"eat_oat":[176.0,62],"cheer":[241.7,41],"eat_gum":[209.0,10],"blow":[179.0,35],"walk_a":[208.5,40]};
 function todd2Place(key){const a=T2A[key];return{k:a[0],x0:key==='ko'?-a[1]*a[0]:T2EX-a[1]*a[0],y0:-a[2]*a[0]}}
 function todd2Muzzle(){const w=bear.weapon;if(!w||!T2MZ[w.type])return null;const key=todd2Key(bear,Math.min(1,Math.abs(bear.vx)/250)),base=key.replace(/^w_/,'h_').replace(/^[hw]l_/,'h_'),m=T2MZ[w.type];
   const P=todd2Place(base),f=bear.faceS||bear.face,k=S*(bear.gs||1);return{x:bear.x+(P.x0+m[0]*P.k)*k*f,y:GY+4*S+(P.y0+m[1]*P.k)*k}}
@@ -2777,17 +2780,17 @@ function todd2Ammo(key,b){const w=b.weapon,hb=T2HOLE[key],M=SPR['m_'+key],N=SPR[
   const c=put(T2C,a0,M);if(N){put(T2C.d,am,N);c.drawImage(T2C.d,0,0)}
   return T2C}
 function drawTodd3(b,mv,bob){const key=todd2Key(b,mv),A=SPR['c_todd_'+key];if(!A)return false;const P=todd2Place(key);
-  ctx.save();if(key!=='ko'){ctx.translate(0,key==='run'?-Math.abs(Math.sin(now*14))*8:key==='cheer'?-Math.abs(Math.sin(now*7))*34-10:bob*.4);if(b.kick>0&&key.endsWith('_shoe'))ctx.translate(-b.kick*30,0);if(b.hitT>0)ctx.rotate(Math.sin(now*40)*.05)}
+  ctx.save();if(key!=='ko'){ctx.translate(0,key==='run'?-Math.abs(Math.sin(b.walk*.5))*8:key==='cheer'?-Math.abs(Math.sin(now*7))*34-10:bob*.4);if(b.kick>0&&key.endsWith('_shoe'))ctx.translate(-b.kick*30,0);if(b.hitT>0)ctx.rotate(Math.sin(now*40)*.05)}
   else{const t=Math.min(1,b.koT/.45);ctx.translate(0,-Math.sin(t*Math.PI)*12*(1-t*.5))}
   ctx.drawImage(A.img,P.x0,P.y0,A.img.naturalWidth*P.k,A.img.naturalHeight*P.k);
   {const L=todd2Ammo(key,b);if(L)ctx.drawImage(L,P.x0,P.y0,L.width*P.k,L.height*P.k)}
-  const top=P.y0+20*P.k;
+  const cr=CROWN[key],cx=cr?P.x0+cr[0]*P.k:6,top=cr?P.y0+cr[1]*P.k-4:P.y0+20*P.k;
   if(key!=='ko'&&key!=='h_bonked'&&!b.helmet&&!b.jello){const vh=bonkVis(b),n=Math.min(3,vh-1);
-    if(vh>=1){const pp=b.lumpPop>0?1+Math.sin(b.lumpPop/.35*Math.PI)*.3:1,L=11*pp;ctx.save();ctx.translate(6,top+4);ctx.rotate(.12);
+    if(vh>=1){const pp=b.lumpPop>0?1+Math.sin(b.lumpPop/.35*Math.PI)*.3:1,L=11*pp;ctx.save();ctx.translate(cx,top+7);ctx.rotate(.12);
       cel(()=>{ctx.moveTo(-7,2);ctx.quadraticCurveTo(-7.5,-L*.55,-4.5,-L);ctx.quadraticCurveTo(0,-L-4,4.5,-L);ctx.quadraticCurveTo(7.5,-L*.55,7,2)},C.pink,C.pinkSh,-3,0,2);ctx.restore()}
     if(n>0){const ry=top-6;ctx.strokeStyle='#ffffff';ctx.lineCap='round';ctx.lineWidth=3;
-      ctx.beginPath();ctx.ellipse(4,ry,44,9,-.08,.15,2.7);ctx.stroke();ctx.beginPath();ctx.ellipse(4,ry,44,9,-.08,3.2,5.9);ctx.stroke();
-      for(let i=0;i<n;i++){const a=now*3.4+i*TAU/n;drawStar(4+Math.cos(a)*44,ry+Math.sin(a)*9,8.5,a*.5)}}}
+      ctx.beginPath();ctx.ellipse(cx,ry,44,9,-.08,.15,2.7);ctx.stroke();ctx.beginPath();ctx.ellipse(cx,ry,44,9,-.08,3.2,5.9);ctx.stroke();
+      for(let i=0;i<n;i++){const a=now*3.4+i*TAU/n;drawStar(cx+Math.cos(a)*44,ry+Math.sin(a)*9,8.5,a*.5)}}}
   ctx.restore();return true}
 function drawTodd2(b,w,mv,bob,lean){RUNM=false;if(SPR.c_todd_full&&drawTodd3(b,mv,bob))return;let A=SPR.c_todd_body;const H=T2.h,k=H/640;
   /* knocked out: the lying-down art, dropping in with a little bounce */
