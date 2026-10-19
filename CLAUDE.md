@@ -25,6 +25,15 @@
 9. **Sounds**: its own fire sound and its own hit sound, recognizable and funny. Barn-zooka animals are the bar.
 10. **Store icon** and **gift-drop art** checked at real size, in the game, on both phone and computer.
 
+## Animation rule: no still image performs an action
+- A single still drawing may only be shown while the character is holding still (standing, a held reaction). Anything that moves, throws, flies, walks, eats or recovers needs a sprite sheet (6 frames, 2 rows of 3, the pose art as a reference).
+- Until a reaction has its sheet, Grumble is STUNNED while a reaction pose shows (ghostStunned: pie, soot, quills, zap, flat, headache, gum, blanket): no throwing, almost no drifting, just a wobble. It never throws or roams in a still reaction pose.
+- Use this rule to find the next sheets to make. Still poses that still do something today:
+  - Grumble: throw, hit, pie, soot, quills, zap, flat, headache, gum, blanket, blanket_off, itch, slow, poof, eatmagic.
+  - GRUMBLEMAX: throw, hit, roar, deflate.
+  - Todd: bonked, KO, throw, sit_eat, sit_huh, angry, cheer, eat_beans, eat_gum, eat_oat, blow; every held item walks on a 2-drawing step pair (banana, beans, bucket, bun, ivy, jello, magnet, mitt, paddle, pie, porcu, shoe, zooka).
+  - Booster: toss.
+
 ## Character anatomy rules
 - Todd is a grown-up bear. Never make his head bigger or his arms and legs shorter than the approved art; that makes him look like a cub. Check every new pose against the approved body.
 - Keep each character proportionate. Arms have fixed lengths (upper arm and forearm), and they bend only at the elbow. Never stretch an arm to reach a handle.
@@ -134,10 +143,14 @@
 - Backdrop bd_hideout (Gemini): cave lair, far golden waffle heap, syrup cauldron over green ghost fire, no furniture (ghosts don't sit).
 - Intro (skippable): Grumble floats to the cauldron, tosses in 3 normal waffles, the cauldron spits out the magic waffle (w_magic: glowing mint-green waffle with goopy glowing green butter), he eats it (c_grum_eatmagic), swells into GRUMBLEMAX and roars.
 - GRUMBLEMAX art is built on the user's Oswald mega-ghost sheet with Grumble's face: huge saggy body, meaty sagging underside, NO tail. Poses: c_mega_float, throw, hit (dazed and angry, never worried), roar, deflate (waffles bursting out). Hitboxes x2.1.
+- Grumble's health per level: L1-5 = 6, 8, 10, 12, 14 (quick and easy), then +2.6 a level (L10 27, L20 53, L30 79), so no level drags on.
+- Lightning (from level 3): a long, readable build-up (2.3 s at level 3, never under 1.6 s; 1.7 s in the boss rage phase). Grumble casts (beam pose) inside the Canva charge ring (fx_charge0-5, design page 92) with a rising electric whine; the ground target follows Todd for the first 60%, then locks with a crackle and pulses faster; then the Canva bolt (fx_bolt0-5, design page 93) strikes.
 - Fight: 180 HP (lowered from 220 after the playtest; a fight runs about 2 to 2.5 minutes). Phase 1 fast junk; under 2/3 he roars, "SYRUP STORM": syrup drips fall with ground warning shadows; under 1/3 "GRUMBLE RAGE": more junk plus lightning. Hits sometimes burp out waffles; Booster comes more often. Defeat: KA-POP, waffles rain, then the ending.
 - Ending (tap to skip): back at the Maple Meadow picnic, waffles back on the plate, Todd eating (sit_eat) with lots of butterflies (SETTING.ending), two quips, THE END, then the win card "GRUMBLEMAX is DEFEATED!" over the picnic.
 - Harvest level 29 is Pumpkin Patch (the user swapped the moon for a sun).
 - After beating GRUMBLEMAX once (saved on the device as localStorage bonkd-cleared AND on the profile as waffle_board.cleared_at via mark_cleared; isCleared() checks both, and a device flag syncs up to the profile), every new run keeps the unlocks: Lumpy Oatmeal from the start, all chapter items in Booster's pool from level 1, and the chapter scenes are skipped. The win card's button reads "Play again".
+- Special waffles show their name and value only; no quip lines after them.
+- Booster is drawn at BOOSTW 185 (was 150) so his face reads on phones.
 - Store sections: Super Duper Weapons, Quests (coming soon), New Heroes (coming soon: only the next hero's silhouette coin, art/st_carlito.webp, nothing that gives him away) and Tournaments (coming soon, waffle prizes only). Buddies and Legends are gone for good.
 - Store: a "Quests: Coming soon!" section with blurred teaser cards: Space Quest (bd_space, moon surface) and Underwater Quest (bd_sea, sandy sea floor), both Gemini backdrops made to gameplay spec (ground line at 85%) so they can become real levels, plus a "More Quests" card. Quests will be new places to fight Grumble in new ways.
 
