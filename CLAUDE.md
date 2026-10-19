@@ -138,3 +138,10 @@
 - Harvest level 29 is Pumpkin Patch (the user swapped the moon for a sun).
 - After beating GRUMBLEMAX once (saved on the device as localStorage bonkd-cleared AND on the profile as waffle_board.cleared_at via mark_cleared; isCleared() checks both, and a device flag syncs up to the profile), every new run keeps the unlocks: Lumpy Oatmeal from the start, all chapter items in Booster's pool from level 1, and the chapter scenes are skipped. The win card's button reads "Play again".
 - Store: a "Quests: Coming soon!" section with blurred teaser cards: Space Quest (bd_space, moon surface) and Underwater Quest (bd_sea, sandy sea floor), both Gemini backdrops made to gameplay spec (ground line at 85%) so they can become real levels, plus a "More Quests" card. Quests will be new places to fight Grumble in new ways.
+
+## Title, lettering and music
+- The title is the real logo lettering (logo_text_only: "Don't get BONKD!" cut from the approved sticker logo, finished in ChatGPT; scratchpad sprites/logo.webp, embedded as __LOGO__). The menu shows it pinned near the top; the run start pops the same image sized to stay between the HUD and Todd's head. Never retype the title in a font.
+- Menu: title, Play, then Leaderboard and Waffle Store spaced evenly between the bottom of Play and the backdrop's grass strip (layoutMenuLinks, GRASS_FRAC .833). No controls text on the menu.
+- After the story, a one-line how-to shows for about 4 s (keys or touch wording).
+- Lettering: Lilita One for the display font. Headings, labels and buttons are built per letter by glossify(): gold or red two-tone fill, a white streak-and-dot shine, a thin round black outline and a hard shadow. Words on red buttons are white. Level names stay plain dark text (bigger), the number a little smaller.
+- Music: one recorded track ("The Fun Starts Here", Pixabay/mmaudio) makes the set: menu = the song from the top at .82; gameplay = its main section looping (24.87 s to 98.41 s); boss = that loop at 1.12x; win = the song's ending sting. Mega Beans keeps its synth tune.
