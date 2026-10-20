@@ -192,7 +192,7 @@
 - No falling waffles on the menu; they're on the loading screen.
 - The picnic spot is a fraction of the screen width (picnic.x getter), so resizes and restarts can't move it.
 - Level names stay plain dark text (bigger), the number a little smaller.
-- Music: one recorded track ("The Fun Starts Here", Pixabay/mmaudio) makes the set: menu = the song from the top at .82; gameplay = its main section looping (24.87 s to 98.41 s); boss = that loop at 1.12x; win = the song's ending sting. Mega Beans keeps its synth tune.
+- Music: one recorded track ("The Fun Starts Here", Pixabay/mmaudio) makes the set: menu = the song from the top at .82; gameplay = its main section looping (24.87 s to 98.41 s); win = the song's ending sting. Mega Beans keeps its synth tune (it starts after the beans super). GRUMBLEMAX has his own track, "Battle Rage" (Pixabay/desifreemusic, scratchpad music/new/boss.mp3): plays from the top, loops 49.71 s to 151.59 s with a 1 s crossfade baked in. Each store super has its own cue cut from "Boom Mode" (Pixabay/cocamelody, music/new/cue_<k>.mp3, each starting on a big hit: beam 33.11 s, beans 104.44, porcu 120.37, ivy 93.46): the level music dips out at the freeze, the cue plays under the super, the music comes back as the move ends (superMusic).
 
 ## Future heroes (planned, not built)
 - kit/WORLD_KIT.md is the formula: every slot a hero's world must fill, what's shared (engine, Grumble and GRUMBLEMAX, waffle values, wallet, lives, leaderboard) and the engine work needed (a WORLD config object, per-world asset bundles, hero select and unlock). kit/todd_world.json is the generated inventory of Todd's world.
