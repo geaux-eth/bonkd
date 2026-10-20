@@ -1538,6 +1538,9 @@ function hitBear(it){
   bonk(it.x,'BONK!',C.gold,HZ[it.type].heavy);
 }
 function hitGhost(s){
+  if(superBG&&superBG.t>.85&&superBG.t<superBG.life){const B=superBG;B.hits++;
+    /* only the super's own strikes (its barrage, or the beam) move the camera: every second one, never faster than .3 s, and always the last */
+    if(s.kind==='super'||s.kind==='beam'){B.maj=(B.maj||0)+1;const last=s.kind==='super'&&B.bar===0&&!B.bolts.some(b=>!b.hit);if((B.maj%2===0&&B.t-B.cut>.3)||last){B.shot=last?0:B.shot+1;B.cut=B.t;flashT=Math.max(flashT,.05)}}}
   track('ghost_hit',{k:s.kind==='animal'?'zooka':s.kind,n:s.dmg});
   const dm=s.dmg*(bearT>0?2:1);
   if(ghost.mega&&Math.random()<.3){wafs.push({t:'plain',x:ghost.x+rnd(-20,20)*S,y:ghost.y+ghost.yOff+40*S,vx:rnd(-260,260)*S,vy:rnd(-420,-200)*S,g:820*S,rot:rnd(0,TAU),vr:rnd(-5,5),age:0});if(Math.random()<.5)pop('*BURP*',ghost.x+rnd(-40,40)*S,ghost.y+ghost.yOff-20*S,'#9cffb0',30,.7)} ghost.hp-=dm; lvStats.hits++; ghost.hitT=.35; ghost.squash=.3; score+=dm*25;
@@ -3833,12 +3836,17 @@ function superFlash(img,col,word){superFx={t:0,d:.85,img,col:col||'#ffd23f',word
    behind the characters, its loose pieces (sp_<k>N) fly through it, and the anime shout (ss_<k>) slams in when the freeze ends.
    Code only places, scales, spins and fades the real art. */
 /* fz = the freeze sting, sl = the shout slam (the user's picks from the sound samples: F2 F3 F6, S2 S3) */
-const SUPERS={beam:{col:'#ffd23f',hold:1.6,mode:'wind',gnd:.86,fz:'supF3',sl:'supS2'},beans:{col:'#ff7a1a',hold:3.2,mode:'erupt',gnd:.82,fz:'supF2',sl:'supS2'},
-  porcu:{col:'#a86b3c',hold:2.2,mode:'radial',gnd:.86,fz:'supF6',sl:'supS3'},ivy:{col:'#4fbf5a',hold:2.2,mode:'wind',gnd:.9,fz:'supF2',sl:'supS3'}};
+/* bar = the super's own barrage of strikes on Grumble after the slam ([count, art pieces flung, hit effect]); Booster Beam uses the beam's own hits */
+const SUPERS={beam:{col:'#ffd23f',hold:1.6,mode:'wind',gnd:.86,fz:'supF3',sl:'supS2'},beans:{col:'#ff7a1a',hold:3.2,mode:'erupt',gnd:.82,fz:'supF2',sl:'supS2',bar:[7,[0,1,2],'bimp',.12]},
+  porcu:{col:'#a86b3c',hold:2.6,mode:'radial',gnd:.86,fz:'supF6',sl:'supS3',bar:[9,[0,0,2],'quill',.13]},ivy:{col:'#4fbf5a',hold:2.3,mode:'wind',gnd:.9,fz:'supF2',sl:'supS3',bar:[6,[4,0,4],'spark',.14]}};
+/* the camera: every second hit of a super is a "major strike" and hard-cuts to the next angle, like the Marvel vs. Capcom
+   hyper combos: wide, close on Grumble with a dutch tilt, the reverse angle (the whole scene seen from the other side),
+   low and close on the hero, then a wide shot for the last hit. f = what the shot frames. */
+const SHOTS=[{f:'mid',z:1,r:0},{f:'ghost',z:1.6,r:-.075},{f:'mid',z:1.32,r:.05,fl:1},{f:'todd',z:1.55,r:.08},{f:'ghost',z:1.85,r:.045,fl:1},{f:'mid',z:1.4,r:-.06}];
 let superBG=null;
 function startSuper(k,img){const D=SUPERS[k];if(!D||!SPR['sb_'+k])return superFlash(img,D&&D.col);
   superFlash(img,D.col);const n=[];for(let i=0;i<6;i++)if(SPR['sp_'+k+i])n.push('sp_'+k+i);
-  superBG={k,t:0,life:.85+D.hold,D,names:n,ps:[],spawn:0,slam:0};
+  superBG={k,t:0,life:.85+D.hold,D,names:n,ps:[],spawn:0,slam:0,hits:0,shot:0,cut:0,bolts:[],bar:D.bar?D.bar[0]:0,barT:.85+.28};
   clip(D.fz,.9)||clip('power',.8);haptic([30,40,60]);superMusic(k,superBG.life+.5)}
 function superPiece(B){const D=B.D,n=B.names;if(!n.length)return;const nm=n[Math.floor(Math.random()*n.length)],m=D.mode,p={nm,t:0,rot:rnd(0,TAU),vr:rnd(-4,4),sc:rnd(.55,1.1)};
   if(m==='radial'){const a=rnd(0,TAU),v=rnd(380,760)*S;Object.assign(p,{x:W/2,y:H*.45,vx:Math.cos(a)*v,vy:Math.sin(a)*v,g:0,grow:1.6,sc:rnd(.25,.45),life:1.4})}
@@ -3850,6 +3858,21 @@ function superUpdate(dt){const B=superBG;if(!B)return;B.t+=dt;
   const live=B.t<B.life;if(live){B.spawn-=dt;while(B.spawn<=0){B.spawn+=B.D.mode==='erupt'?.05:.07;superPiece(B)}}
   for(const p of B.ps){p.t+=dt;p.x+=p.vx*dt;p.y+=p.vy*dt;p.vy+=(p.g||0)*dt;p.rot+=p.vr*dt;if(p.grow)p.sc+=p.grow*dt*.6}
   B.ps=B.ps.filter(p=>p.t<p.life&&p.x>-300*S&&p.x<W+300*S&&p.y<H+200*S);
+  if(B.bar>0&&B.t>=B.barT&&B.t<B.life-.15&&!ghost.ko&&state==='play'){const D=B.D,a=muzzlePos()||handPos(),nm='sp_'+B.k+D.bar[1][(D.bar[0]-B.bar)%D.bar[1].length];
+    B.bars=(B.bars||0)+1;B.bolts.push({nm:SPR[nm]?nm:B.names[0],x0:a.x,y0:a.y,t:0,d:D.bar[3],rot:rnd(0,TAU),last:B.bar===1});B.bar--;B.barT+=B.bar===1?.36:.21}
+  for(const b of B.bolts){b.t+=dt;if(!b.hit&&b.t>=b.d){b.hit=1;const gx=ghost.x+rnd(-26,26)*S,gy=ghost.y+ghost.yOff+rnd(-30,20)*S;fxPlay(B.D.bar[2],gx,gy,b.last?2:1.2,rnd(-.4,.4),1);
+    if(!ghost.ko)hitGhost({kind:'super',dmg:superDmg(PW[B.k]?PW[B.k].tier:'effective')*(b.last?.05:.018),x:gx,y:gy});clip(b.last?B.D.sl:'quillHit',b.last?.8:.45);if(b.last){hitImpact(.22,1);flashT=Math.max(flashT,.14);haptic([90,40,160])}else{hitImpact(.04,.35);haptic(18)}}}
+  B.bolts=B.bolts.filter(b=>b.t<b.d+.05);
+  /* camera: drifts in slowly inside each shot, hard-cuts on major strikes, eases home as the super ends */
+  {const sh=SHOTS[B.shot%SHOTS.length],live=B.t>.85&&B.t<B.life-.25,tg=live?sh:{f:'mid',z:1,r:0},
+     z=tg.z+(live?(B.t-B.cut)*.05:0),fl=live&&tg.fl?-1:1,c=B.cam||(B.cam={z:1,r:0,fx:W/2,fy:H/2,fl:1});
+     let fx=W/2,fy=H/2;if(tg.f==='ghost'){fx=ghost.x;fy=ghost.y+ghost.yOff+20*S}else if(tg.f==='todd'){fx=bear.x;fy=GY-120*S}else{fx=(bear.x+ghost.x)/2;fy=(GY-110*S+ghost.y+ghost.yOff)/2}
+     /* keep the view inside the painted plate (drawn 1.4x the screen, anchored on the ground line, so close shots can frame Grumble high up) */
+     /* never frame Grumble up under the HUD: his head stays at least a little below it */
+     if(tg.f!=='todd')fy=Math.min(fy,ghost.y+ghost.yOff-60*S-(Math.max(hudBottom(),0)+70*S-H/2)/z);
+     const m=Math.abs(Math.sin(tg.r))*Math.max(W,H)*.5,hx=W/(2*z)+m/z,hy=H/(2*z)+m/z,R=B.rect||[0,0,W,H];
+     fx=clamp(fx,Math.min(R[0]+hx,W/2),Math.max(R[0]+R[2]-hx,W/2));fy=clamp(fy,Math.min(R[1]+hy,H/2),Math.max(R[1]+R[3]-hy,H/2));
+     if(live&&!B.snap){c.z=z;c.r=tg.r;c.fx=fx;c.fy=fy;c.fl=fl}else{const e=Math.min(1,dt*(live?14:5));c.z+=(z-c.z)*e;c.r+=(tg.r-c.r)*e;c.fx+=(fx-c.fx)*e;c.fy+=(fy-c.fy)*e;c.fl=fl}}
   if(B.after&&B.t>=B.life){const f=B.after;B.after=null;f()}
   if(B.t>B.life+.5&&!B.ps.length)superBG=null}
 const SUPER_SND={beam:()=>clip('beamFire',.6,.1),beans:()=>{clip('beansSmash',.8);clip('grow',.6,.2)},
@@ -3859,8 +3882,9 @@ function superK(){const B=superBG;if(!B)return 0;return Math.min(1,B.t/.35)*Math
 function drawSuperBG(){const B=superBG;if(!B)return;const k=superK(),P=SPR['sb_'+B.k];
   if(P&&k>0){const I=P.img,iw=I.naturalWidth,ih=I.naturalHeight,gy=GY+8*BSC,dy=B.D.gnd*ih,
       z=1.03+B.t*.025+(B.slam?Math.max(0,.05-(B.t-.85)*.2):0),
-      sc=Math.max(W/iw,gy/dy,(H-gy)/(ih-dy))*z,w=iw*sc,h=ih*sc,
+      sc=Math.max(W/iw,gy/dy,(H-gy)/(ih-dy))*z*1.4,w=iw*sc,h=ih*sc,
       sx=B.D.mode==='wind'?Math.sin(B.t*1.6)*10*S:0;
+    B.rect=[(W-w)/2+sx,gy-dy*sc,w,h];
     ctx.save();ctx.globalAlpha=k;ctx.drawImage(I,(W-w)/2+sx,gy-dy*sc,w,h);
     /* the plate breathes: a lightened copy of the same painting pulses on the beat */
     const pul=.5+.5*Math.sin(B.t*TAU*2.1);ctx.globalCompositeOperation='lighter';ctx.globalAlpha=k*.12*pul;ctx.drawImage(I,(W-w)/2+sx,gy-dy*sc,w,h);ctx.restore()}
@@ -3868,12 +3892,23 @@ function drawSuperBG(){const B=superBG;if(!B)return;const k=superK(),P=SPR['sb_'
       a=Math.min(1,p.t/.15)*Math.min(1,(p.life-p.t)/.3)*Math.max(k,.0001);
     ctx.save();ctx.globalAlpha=Math.min(1,a);ctx.translate(p.x,p.y+(p.wob!=null?Math.sin(p.t*5+p.wob)*18*S:0));ctx.rotate(p.rot);
     const ww=Q.r>=1?sz:sz*Q.r,hh=Q.r>=1?sz/Q.r:sz;ctx.drawImage(Q.img,-ww/2,-hh/2,ww,hh);ctx.restore()}}
+function camPt(x,y){const c=superBG&&superBG.cam;if(!c)return{x,y};const dx=(x-c.fx)*c.z*c.fl,dy=(y-c.fy)*c.z,co=Math.cos(c.r),si=Math.sin(c.r);return{x:W/2+dx*co-dy*si,y:H/2+dx*si+dy*co}}
+function applyCam(){const c=superBG&&superBG.cam;if(!c||(Math.abs(c.z-1)<.002&&Math.abs(c.r)<.001&&c.fl===1&&Math.abs(c.fx-W/2)<1&&Math.abs(c.fy-H/2)<1))return false;
+  ctx.save();ctx.translate(W/2,H/2);ctx.rotate(c.r);ctx.scale(c.z*c.fl,c.z);ctx.translate(-c.fx,-c.fy);return true}
+function drawSuperBolts(){const B=superBG;if(!B)return;for(const b of B.bolts){const Q=SPR[b.nm];if(!Q||b.hit)continue;const k=Math.min(1,b.t/b.d),gx=ghost.x,gy=ghost.y+ghost.yOff,
+    x=b.x0+(gx-b.x0)*k,y=b.y0+(gy-b.y0)*k-Math.sin(k*Math.PI)*40*S,sz=(b.last?150:95)*S,ww=Q.r>=1?sz:sz*Q.r,hh=Q.r>=1?sz/Q.r:sz;
+  ctx.save();ctx.translate(x,y);ctx.rotate(b.rot+k*9);ctx.drawImage(Q.img,-ww/2,-hh/2,ww,hh);ctx.restore()}}
+/* the combo counter: "N HITS" in the title lettering, top left under the HUD, counting every hit the super lands */
+function drawHits(){const B=superBG;if(!B||B.hits<2||B.t>B.life+.4)return;const top=Math.max(hudBottom(),8*S)+12*S,px=Math.max(26,46*TS),RR=Math.min(3,DPR*1.3),
+  g=glossWord(B.hits+' HITS','#ffd23f',px*RR),bump=1+Math.max(0,.25-(B.t-B.cut))*1.2,a=Math.min(1,(B.life+.4-B.t)/.4);
+  ctx.save();ctx.globalAlpha=a;ctx.translate(18*S+g.c.width/RR/2,top+g.c.height/RR/2);ctx.scale(bump,bump);ctx.drawImage(g.c,-g.c.width/RR/2,-g.c.height/RR/2,g.c.width/RR,g.c.height/RR);ctx.restore()}
 /* the anime shout: slams in big as the freeze ends, shudders, holds, then punches out */
 function drawShout(){const B=superBG;if(!B)return;const Q=SPR['ss_'+B.k];if(!Q)return;const t=B.t-.85,dur=1.25;if(t<0||t>dur+.22)return;
-  const top=Math.max(hudBottom(),8*S),w=Math.min(W*.74,(H-top)*.42*Q.r,900*S*1.4),h=w/Q.r;
+  const top=Math.max(hudBottom(),8*S),w=Math.min(W*.42,(H-top)*.34*Q.r,700*S*1.4),h=w/Q.r,gs=camPt(ghost.x,ghost.y+ghost.yOff),
+    side=gs.x>W*.5?w/2+14*S:W-w/2-14*S;if(B.sx==null)B.sx=side;B.sx+=(side-B.sx)*.08;
   let sc=t<.12?2.3-1.3*(t/.12):1,a=1;if(t>dur){const u=(t-dur)/.22;sc=1+u*.5;a=1-u}
   const jx=t<.35?(Math.random()-.5)*14*S*(1-t/.35):0,jy=t<.35?(Math.random()-.5)*10*S*(1-t/.35):0;
-  ctx.save();ctx.globalAlpha=a;ctx.translate(W/2+jx,top+h*.62+jy);ctx.rotate(-.04);ctx.scale(sc,sc);ctx.drawImage(Q.img,-w/2,-h/2,w,h);ctx.restore()}
+  ctx.save();ctx.globalAlpha=a;ctx.translate(B.sx+jx,top+h*.62+jy);ctx.rotate(-.04);ctx.scale(sc,sc);ctx.drawImage(Q.img,-w/2,-h/2,w,h);ctx.restore()}
 function drawSuper(){const F=superFx;if(!F)return;const t=F.t,k=Math.min(1,t/.12)*Math.min(1,(F.d-t)/.15);
   ctx.save();ctx.fillStyle=`rgba(10,8,30,${.55*k})`;ctx.fillRect(0,0,W,H);
   const sq=t>F.d-.15?Math.max(0,(F.d-t)/.15):1,bh=Math.min(H*.34,190*TS*1.4)*sq,cy=H*.42,sk=-.18;
@@ -3958,6 +3993,7 @@ function render(){
   ensureBG();
   ctx.save();
   if(shake>0)ctx.translate((Math.random()-.5)*16*shake,(Math.random()-.5)*16*shake);
+  const camOn=applyCam();
   ctx.drawImage(bgCan,0,0,W,H);
   drawLiveBG();
   drawSuperBG();
@@ -3987,6 +4023,7 @@ function render(){
   for(const g of gifts)drawGift(g);
   for(const w of wafs){ctx.save();ctx.translate(w.x,w.y);const T=WTK[w.t]||WT[0],k=1.4+Math.min(.6,Math.log10(T.v/5)*.2);ctx.scale(S*k,S*k);if(w.sq>0){const q=Math.sin(w.sq/.16*Math.PI)*.2;ctx.translate(0,12);ctx.scale(1+q,1-q);ctx.translate(0,-12)}ctx.rotate(w.rot);drawWaffle(w.t,w.age);ctx.restore()}
   for(const s of shots)drawShot(s);
+  drawSuperBolts();
   drawFxs();
   if(strike&&strike.t>strike.warn*.3){const k=strike.t/strike.warn,a=(.35+.45*Math.abs(Math.sin(now*(8+k*26))))*Math.min(1,(k-.3)*5);ctx.save();ctx.globalAlpha=a;ctx.setLineDash([8*S,6*S]);ctx.beginPath();ctx.ellipse(strike.tx,GY+2*S,(54-k*14)*S,10*S,0,0,TAU);ctx.lineWidth=4*S;ctx.strokeStyle='#fff7a8';ctx.stroke();ctx.setLineDash([]);ctx.restore()}
   for(const z of zaps){const a=z.pts[0],b=z.pts[z.pts.length-1],fi=Math.min(5,Math.floor(z.age/.075)),F=SPR['fx_bolt'+fi];
@@ -4003,6 +4040,7 @@ function render(){
     const qd=quip.d||2.2,up=Math.min(1,(qd-quip.t)*8),fade=Math.min(1,quip.t*3),x=clamp(bear.x,tw/2+10,W-tw/2-10),y=Math.min(GY-(186*bear.gs+8)*S,(bear.topY||GY-200*S)-fs*.75-22*TS)-Math.sin(Math.min(1,(qd-quip.t)*3)*Math.PI/2)*14*S;
     ctx.translate(x,y);ctx.rotate(-.04);ctx.scale(.6+.4*up,.6+.4*up);ctx.globalAlpha=fade;ctx.textAlign='center';ctx.textBaseline='middle';ctx.lineJoin='round';
     ctx.lineWidth=Math.max(3,fs*.2);ctx.strokeStyle=INK;ctx.strokeText(quip.txt,0,0);ctx.fillStyle='#ffffff';ctx.fillText(quip.txt,0,0);ctx.restore()}
+  if(camOn)ctx.restore();
   drawPops();
   for(const p of poofs){p.age+=1/60;const k=p.age/.6;ctx.save();ctx.globalAlpha=Math.max(0,1-k);for(let i=0;i<7;i++){const a=i*TAU/7,r=(20+k*70)*S;puff(p.x+Math.cos(a)*r-26*S*(.6+k*.5),p.y+Math.sin(a)*r*.7,(.5+k*.5)*S,'#ffffff')}ctx.restore()}
   poofs=poofs.filter(p=>p.age<.6);
@@ -4016,6 +4054,7 @@ function render(){
   if(flashT>0){ctx.fillStyle=`rgba(255,255,255,${flashT*1.6})`;ctx.fillRect(0,0,W,H)}
   ctx.restore();
   drawShout();
+  drawHits();
   drawSuper();
 }
 
