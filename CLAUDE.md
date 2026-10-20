@@ -119,7 +119,8 @@
   3. Mountain (bd_mountain): Biscuit Bluff, Switchback Summit, Eagle's Perch, Thunderhead Peak, Avalanche Alley.
   4. River canyon: Muddy River Crossing, Echo Canyon, Coyote Crag, Red Rock Rapids, Cattail Creek.
   5. Desert: Tumbleweed Trail, Rattlesnake Ridge, Cactus Flats, Dusty Dunes, Sidewinder Sands.
-  6. Harvest, heading home: Pickleberry Pasture, Corny Maze, Hayride Hill, Pumpkin Patch, Home Sweet Home.
+  6. Harvest, heading home: Pickleberry Pasture, Corny Maze, Hayride Hill, Pumpkin Patch, Orchard's Edge (renamed from Home Sweet Home: Todd isn't home yet).
+  7. Level 31 on its own: Grumble's Doorstep (bd_doorstep, the user's Gemini night painting: the edge of the harvest under a full moon, the glowing cave mouth from the lair; ground .873). LAST_LV=31 in the source. Clearing it plays the cave run (startCaveRun/caveUpdate): Grumble flees across the field into the cave ("FOLLOW ME IF YOU DARE!"), shrinking and fading; Todd runs after him ("HEY! GET BACK HERE!"); the iris closes on the cave mouth; then Grumble's Hideout.
 - The opening picnic uses bd_meadow plus its props through the scenery planner (planSetting, SETTING.meadow): the shade tree (pr_tree), pr_blanket with pr_stack1 to 4, the U-Pick berry bush (picnic only), a few plants, butterflies (Canva bf_* frames that steer clear of Todd, Grumble and the speech line) and the ladybug. Layering is by size: taller things behind shorter ones. Plants never overlap each other, props or Todd.
 - The gameplay profiles (SETTING.meadow1, forest, mountain) are zeroed in the source, so the planner places nothing there. The forest and meadow scenery sprites stay in art/review in case a piece is ever wanted back.
 
@@ -144,11 +145,11 @@
 - The ivy, porcu and zooka walk frames' barrel masks are the still's masks scaled onto each frame's barrel hole; on the ivy walk frames the rolled blanket sits deep in the barrel (T2AMMO.ivy_walk) like the loaded hold art.
 - Todd pose prompts use the locked block in scratchpad audit/todd_spec.txt (references: h_zooka/w_zooka for 2-hand holds, beans_eat for eating, todd_full for others).
 
-## The boss: Grumble's Hideout (after level 30)
+## The boss: Grumble's Hideout (after level 31)
 - Backdrop bd_hideout (Gemini): cave lair, far golden waffle heap, syrup cauldron over green ghost fire, no furniture (ghosts don't sit).
 - Intro (skippable, one smooth timeline BI in the source, ~13.6 s; normal Grumble drift paused while it runs, Booster kept away): Grumble glides in to the cauldron and says the user's lines as green pop words: "I'M GOING TO STOP YOU FOR GOOD!", "GET READY FOR...", tosses in 3 normal waffles, the cauldron spits out the magic waffle (w_magic: glowing mint-green waffle with goopy glowing green butter), he eats it (c_grum_eatmagic), swells smoothly into GRUMBLEMAX (no jitter) and roars "GRUMBLEMAX!!".
 - GRUMBLEMAX art is built on the user's Oswald mega-ghost sheet with Grumble's face: huge saggy body, meaty sagging underside, NO tail. Poses: c_mega_float, throw, hit (dazed and angry, never worried), roar, deflate (waffles bursting out). Hitboxes x2.1. Drawn MEGAW 345 wide (was 300); the throw and hit frames are scaled (MEGA_F, audit/mega_norm.py) so his body is as wide as in the float cycle (he used to shrink when hit).
-- Grumble's health (user: low to start, growing with each setting): GHP/grumHP in the source. Meadow 3,4,5,6,8; forest 10-18; mountain 20-28; canyon 34-46; desert 50-66; harvest 70-86. His side-to-side speed climbs slowly: frequency .55 + (level-1)*.03, capped at +.9.
+- Grumble's health (user: low to start, growing with each setting): GHP/grumHP in the source. Meadow 3,4,5,6,8; forest 10-18; mountain 20-28; canyon 34-46; desert 50-66; harvest 70-86; Grumble's Doorstep 90. His side-to-side speed climbs slowly: frequency .55 + (level-1)*.03, capped at +.9.
 - Lightning (from level 3): a long, readable build-up (2.3 s at level 3, never under 1.6 s; 1.7 s in the boss rage phase). Grumble casts (beam pose) inside the Canva charge ring (fx_charge0-5, design page 92) with a rising electric whine; the ground target follows Todd for the first 60%, then locks with a crackle and pulses faster; then the Canva bolt (fx_bolt0-5, design page 93) strikes.
 - Fight: 180 HP (lowered from 220 after the playtest; a fight runs about 2 to 2.5 minutes). Phase 1 fast junk; under 2/3 he roars, "SYRUP STORM": syrup drips fall with ground warning shadows; under 1/3 "GRUMBLE RAGE": more junk plus lightning. Hits sometimes burp out waffles; Booster comes more often. Defeat: KA-POP, waffles rain, then the ending.
 - Ending (tap to skip): back at the Maple Meadow picnic, waffles back on the plate, Todd eating on the sit_eat sheet from the start (only the opening story uses the still) with lots of butterflies (SETTING.ending), two quips, THE END, then the win card "GRUMBLEMAX is DEFEATED!" over the picnic.
@@ -240,4 +241,11 @@
 - Touch: a second finger only takes over steering once it actually drags (16 px), so a quick tap with another finger fires without breaking the steering thumb. Paddle: the swing turns to the nearest incoming junk and its hit window is wider and longer. Waffles are grabbed by any part of Todd, in the air or bouncing at his feet.
 
 ## Playtest links
-- ?lv=N (1-30), ?lv=boss, ?lv=end jump straight into a level, the GRUMBLEMAX fight or the ending (JUMP / jumpTo in the source). It's a test run: nothing saved, no lives used (shows 9), normal Booster drops, the chapter unlocks before that level are given. Add &fx for the special-weapon drop order. The user's link page is the "Bonkd Level Jump" artifact.
+- ?lv=N (1-31), ?lv=boss, ?lv=end jump straight into a level, the GRUMBLEMAX fight or the ending (JUMP / jumpTo in the source). It's a test run: nothing saved, no lives used (shows 9), normal Booster drops, the chapter unlocks before that level are given. Add &fx for the special-weapon drop order. The user's link page is the "Bonkd Level Jump" artifact.
+
+## Planned: the Light-M-Upper (chapter item after level 30, not built yet)
+- User's design: a heavy-duty spinning artillery machine gun that shoots fireflies. Todd wears a big see-through backpack full of glowing fireflies, hosed to the gun as its ammo. The shots are fiery neon balls with wings tucked back from the force. Todd makes an intense yelling face (X eyes, wide-open mouth) while firing. It "lights 'em up": NO sleeping. Intense and exciting. Each tap fires a long burst (more rounds than a short 12-round burst); the backpack glow dims as the ammo runs out.
+- Needs the full weapon checklist; Booster can toss it from level 31 on.
+- Grumble's Doorstep flyers: bats (Canva sheet), behind the fence and trees.
+- Per-setting music: the user is picking tracks on Pixabay (pixabay.com/music).
+
