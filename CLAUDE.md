@@ -207,3 +207,14 @@
 - kit/WORLD_KIT.md is the formula: every slot a hero's world must fill, what's shared (engine, Grumble and GRUMBLEMAX, waffle values, wallet, lives, leaderboard) and the engine work needed (a WORLD config object, per-world asset bundles, hero select and unlock). kit/todd_world.json is the generated inventory of Todd's world.
 - Nothing from one hero's world is reused in another's. There is ONE leaderboard for every hero: waffles are waffles on the backend; each world only draws and names them its own way, and each world's store is branded for its hero.
 - Next hero: Carlito (Nibble #8102, raccoon). Night-time, grungy world: diner dumpster, alleyway, underground sewer, drainage pond, the junkyard outside the drainage facility, then inside it for GRUMBLEMAX (5 settings, 25 levels plus the boss). Trashy waffles and trash or used-food items. Unlocked for a large waffle price or a small payment. Build only when the user says Todd is done.
+
+## Batch v24 notes
+- Mega Beans super: Todd eats, grows giant, then hulk-smashes Grumble twice on his own (c_todd_smash_0..5, SUPERS.beans.smash times, SMT frame timings, SMREACH): he leaps to Grumble, the slam pins Grumble flat on the ground (ghost.pin, c_grum_flat; no new Grumble sheet needed) and he pops back up. Wider camera shots for beans (SUPERS.beans.shots) so the giant stays in frame. The beans weapon ends when the super ends.
+- During any super: Todd can't be bonked, Grumble is stunned (no throws or lightning), Booster doesn't come and gifts can't be caught, weapon chips and tip pops are hidden.
+- The shout word flies in, holds still, then flies out (drawShout).
+- Lightning charge: any hit cancels it (FIZZLE!), Grumble plays his hit reaction, then charges again later.
+- Lumpy Oatmeal: a solid bright yellow ring per meter icon (bear.oat); each ring absorbs one bonk and blinks 3 times as it breaks; Booster can toss more oatmeal (PW.oat, unlock 5).
+- Ivy Launcher has 1 shot. Stampede: all three animals home in and hit.
+- HUD waffle icon is the real w_plain art.
+- Background flyers (FLY, no white edge, always behind everything): meadow levels 2-3 small butterflies (bfn_*); Piney Woods 1-2 shadowy owls (owl_0..5, cut on fixed cells by sheets/owl_cut.py) gliding behind the near trees (bd_woods_front, lifted from the backdrop by woods/front.py on hue/saturation). Other settings' flyers: confirm with the user before generating art.
+- Ladybug Lane: 1-3 ladybugs walk gently on the Canva walk cycle (cr_lbw_0..5, LBW_A anchors), pausing and turning now and then.
