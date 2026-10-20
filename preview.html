@@ -378,6 +378,7 @@ body.ready #boot{opacity:0;pointer-events:none}
       <h2 class="logo" aria-label="Clear!"><span>C</span><span>L</span><span>E</span><span>A</span><span>R</span><span>!</span></h2>
       <dl class="stats" id="clrStats"></dl>
       <div class="btns"><button class="btn red" id="nextBtn">Next level</button></div>
+      <button class="link" id="clrStore" type="button">Waffle Store</button>
       <a class="link" id="shareClear" href="#" target="_blank" rel="noopener" hidden>Brag about it on X</a>
     </div>
   </div>
@@ -640,14 +641,16 @@ let SEEN={};try{SEEN=JSON.parse(localStorage.getItem('bonkd-seen')||'{}')||{}}ca
 const FIRST={beam:'BOOSTER BLASTS GRUMBLE FOR YOU',shoe:'# TO HONK · 5 BLASTS',bearhand:'DOUBLE DAMAGE FOR 20 SECONDS',gum:'# TO BLOW A BUBBLE · 3 BUBBLES',waffli:'GRUMBLE THROWS WAFFLES FOR 10 SECONDS',pie:'2 PIES · # TO THROW · THEY FIND GRUMBLE',banana:'# TO THROW · HITS GRUMBLE TWICE',jello:'JUNK BOUNCES OFF IT',bun:'# TO LOB · 3 PER SOCK',zooka:'# TO FIRE · 6 BARNYARD BLASTS',
   bucket:'BLOCKS 2 BONKS · CATCHES LIGHTNING',mitt:'CATCHES UP TO 3 PIECES OF JUNK · # TO THROW',magnet:'CATCHES METAL JUNK NEAR YOU · # TO FIRE IT BACK',paddle:'12 SECONDS · # TO SWOT',snail:'EVERYTHING SLOWS DOWN',kit:'HEALS ALL YOUR BONKS',ivy:'# TO LAUNCH · GRUMBLE GETS ITCHY',porcu:'# TO POP · QUILL STORM!',beans:'TODD GOES GIANT · # TO SMASH'};
 const HAND={pie:1,banana:1,shoe:1,gum:1,jello:1,bun:1,zooka:1,mitt:1,magnet:1,paddle:1,ivy:1,porcu:1,beans:1};
-const SUPER={beam:{price:5000,tier:'beam',label:'Heavenly',desc:'Booster swoops in and blasts Grumble with a holy laser!'},ivy:{price:1000,tier:'effective',label:'Effective',desc:'The itchiest threads in town!'},
-  porcu:{price:2500,tier:'omghost',label:'Really Effective',desc:'Ouch is right!'},
-  beans:{price:10000,tier:'unbearable',label:'Really Really Effective',desc:"They're good for your heart!"}};
+const SUPER={beam:{price:10000,tier:'beam',label:'Heavenly',desc:'Booster swoops in and blasts Grumble with a holy laser!'},ivy:{price:2500,tier:'effective',label:'Effective',desc:'The itchiest threads in town!'},
+  porcu:{price:5000,tier:'omghost',label:'Really Effective',desc:'Ouch is right!'},
+  beans:{price:25000,tier:'unbearable',label:'Really Really Effective',desc:"They're good for your heart!"}};
 const SUPER_BASE={effective:.45,omghost:.7,beam:.85,unbearable:1.1};
 /* what each store super deals in one go, as a share of Grumble's full health (GRUMBLEMAX takes half): blanket < porcu < beam < beans */
-const SFRAC={ivy:.25,porcu:.35,beam:.45,beans:.6};
-function superHit(k){return (SFRAC[k]||.25)*ghost.max*(ghost.mega?.5:1)}
-function superDmg(tier){return SUPER_BASE[tier]*Math.max(.35,1-(level-1)*.08)*ghost.max}
+const SHIT={ivy:15,porcu:22,beam:30,beans:40};   /* what each super deals in one go: blanket < porcu < beam < beans */
+function superHit(k){return SHIT[k]||15}
+/* store weapons hit for SET amounts (user): Grumble's health grows each level (6 at L1, 27 at L10, 53 at L20, 79 at L30, 180 for GRUMBLEMAX), so later levels need you to stay alive and use more weapons */
+const SUPER_FIX={effective:12,omghost:18,beam:24,unbearable:30};
+function superDmg(tier){return SUPER_FIX[tier]||12}
 /* lives: 3 for everyone, +1 per Nibble in the wallet connected on nibblethis.wtf (up to 25 more),
    plus lives bought with waffles (1,000 each, 10 per 24 hours), banked between runs. Free lives are spent first. */
 /* beaten the game: on this device, or on the player's profile (follows them across devices) */
@@ -754,7 +757,7 @@ let state='menu',mode='free',level=1,lvlTime=0;
 let items=[],pops=[],sparks=[],shots=[],gifts=[],buns=[],animals=[],impacts=[],splats=[],wafs=[],angel=null,angelT=7;
 let preBeans=null,rings=[];
 let strike=null,zapT=5,zaps=[],runId=0,showQ=[],showCur=null,clrT=0;
-let paddleT=0,poofs=[],paused=false,runWaffles=0,runCounts={},lvStats={hits:0,bonks:0,waffles:0};
+let paddleT=0,poofs=[],paused=false,runWaffles=0,runCounts={},bankedCounts={},bankedW=0,lvStats={hits:0,bonks:0,waffles:0};
 let t=0,score=0,shake=0,now=0,slowT=0,swotCool=0,levelT=0,shownScore=-1,chipKey='',flashT=0,boltT=4,bolt=null;
 const clouds=[0,1,2,3].map(i=>({x:Math.random(),y:.36+i*.07+Math.random()*.03,s:.55+Math.random()*.45,v:.006+Math.random()*.008}));
 const menuWafs=Array.from({length:10},(_,i)=>({x:(.05+i*.1)*innerWidth,y:Math.random()*300,v:40+Math.random()*30,rot:Math.random()*6,vr:Math.random()*2-1,p:Math.random()*6,t:'plain'}));
@@ -1131,6 +1134,7 @@ $('resumeBtn').onclick=()=>setPause(false);
 $('restartBtn').onclick=()=>{setPause(false);start(mode)};
 $('quitBtn').onclick=goMenu;
 $('nextBtn').onclick=()=>nextLevel();
+$('clrStore').onclick=async()=>{const b=$('clrStore');b.disabled=true;try{await bankLevel()}catch(e){}b.disabled=false;openStore()};
 $('chGo').onclick=chapGo;$('chSkip').onclick=()=>{if(state==='bossintro'){track('boss_skip',{});finishBossIntro();return}skipChapter()};
 document.addEventListener('visibilitychange',()=>{if(document.hidden)setPause(true)});
 
@@ -1142,7 +1146,7 @@ function start(m){
   audio();
   if(livesLeft()<=0){showOutOfLives();return}
   mode=m; rng=m==='daily'?mulberry(dayNum()*9973+7):Math.random;
-  resetBoard(); chap=null; bossMode=false; bossDone=false; bossPhase=1; bossI=null; drips=[]; for(const k in chapDone)delete chapDone[k]; if(isCleared())for(const k in CHAPTERS)chapDone[k]=true; bearT=0; waffT=0; beamer=null;  shownLives=-1; t=0; score=0; shownScore=-1; level=1; lvlTime=0; angelT=2.5; bgKey=''; paused=false; runWaffles=0; runCounts={}; updateWaf();
+  resetBoard(); chap=null; bossMode=false; bossDone=false; bossPhase=1; bossI=null; drips=[]; for(const k in chapDone)delete chapDone[k]; if(isCleared())for(const k in CHAPTERS)chapDone[k]=true; bearT=0; waffT=0; beamer=null;  shownLives=-1; t=0; score=0; shownScore=-1; level=1; lvlTime=0; angelT=2.5; bgKey=''; paused=false; runWaffles=0; runCounts={}; bankedCounts={}; bankedW=0; updateWaf();
   Object.assign(bear,{oat:isCleared(),pose:null,x:W/2,tx:W/2,hits:0,hitT:0,inv:0,ko:false,koT:0,helmet:0,zap:0,weapon:null,jello:null,swing:0,face:1,faceS:1,gs:1}); fx=null; runTop=null; lvTop=null;
   setGhost(); ghost.x=W/2;
   ['menu','over','cont','pause','clear','chapCard','chSkip','boardPanel','settings'].forEach(k=>$(k).hidden=true); renderMeter();
@@ -1595,7 +1599,7 @@ function ghostDown(){
   },650);
 }
 function showClear(){
-  state='clear';
+  state='clear';bankLevel().then(()=>{if(!$('storePage').hidden)renderStore()}).catch(()=>{});
   const rows=[['Grumble hits',lvStats.hits],['Bonks taken',lvStats.bonks]];
   rows.push(['Waffles grabbed',lvStats.waffles]);
   rows.push(['Clear bonus','+'+500*level]);
@@ -2153,14 +2157,25 @@ async function loadTop(){
 async function flushEv(){if(!SB||!myId||!EVQ.length||flushEv.busy)return;flushEv.busy=1;const b=EVQ.splice(0,60);
   try{const {error}=await SB.rpc('log_events',{p_sess:SESS,p_dev:DEV,p_ev:b});if(error)throw error}catch(e){if(EVQ.length<240)EVQ.unshift(...b)}flushEv.busy=0}
 setInterval(flushEv,15000);document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden')flushEv()});
+/* waffles are banked at every level clear (bank_waffles: adds them to the board without counting a run), so the store can be used between levels */
+function unbankedCounts(){const d={};for(const k in runCounts){const n=(runCounts[k]||0)-(bankedCounts[k]||0);if(n>0)d[k]=n}return d}
+let bankBusy=null;
+async function bankLevel(){if(TEST)return;if(bankBusy)return bankBusy;
+  bankBusy=(async()=>{const c=unbankedCounts(),w=runWaffles-bankedW;if(!Object.keys(c).length)return;
+    if(!SB||!myId){store('bonkd-waffles',localWaf()+w);bankedCounts=Object.assign({},runCounts);bankedW=runWaffles;return}
+    try{const {data,error}=await SB.rpc('bank_waffles',{p_counts:c,p_level:level,p_seconds:Math.round(t)});if(error)throw error;
+      store('bonkd-waffles',localWaf()+w);bankedCounts=Object.assign({},runCounts);bankedW=runWaffles;
+      prof.waffles=data.waffles;prof.best=data.best;prof.wallet=(+data.waffles||0)+(+data.bought||0)-(+data.spent||0);prof.owned=data.owned||prof.owned}
+    catch(e){}})();
+  try{await bankBusy}finally{bankBusy=null}}
 async function saveRun(){
   setTimeout(flushEv,1500);
   if(TEST){$('saveNote').textContent='Test mode: this run is not saved.';$('saveNote').hidden=false;return}
-  store('bonkd-waffles',localWaf()+runWaffles);
+  store('bonkd-waffles',localWaf()+runWaffles-bankedW);
   if(!SB||!myId)return;
   {
     try{
-      const {data,error}=await SB.rpc('submit_run',{p_counts:runCounts,p_level:level,p_seconds:Math.round(t)});
+      const {data,error}=await SB.rpc('submit_run',{p_counts:unbankedCounts(),p_level:level,p_seconds:Math.round(t)});bankedCounts=Object.assign({},runCounts);bankedW=runWaffles;
       if(error)throw error;
       prof.waffles=data.waffles;prof.best=data.best;prof.wallet=(+data.waffles||0)+(+data.bought||0)-(+data.spent||0);prof.owned=data.owned||prof.owned;
       if(runWaffles){$('saveNote').textContent=(prof.nick?prof.nick+"'s":'Your')+' Leaderboard total: '+(+data.waffles).toLocaleString()+'.';$('saveNote').hidden=false}
