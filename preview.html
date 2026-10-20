@@ -603,7 +603,7 @@ function dayNum(){const n=new Date();return Math.floor((Date.UTC(n.getFullYear()
 function store(k,v){try{if(v===undefined)return +localStorage.getItem(k)||0;localStorage.setItem(k,String(v))}catch(e){return 0}}
 const bestKey=m=>m==='daily'?'bonkd-daily-'+dayNum():'bonkd-best';
 
-function refreshMenuBest(){const b=store(bestKey('free')),wf=store('bonkd-waffles');$('menuBest').textContent=(wf?wf.toLocaleString()+' waffles · ':'')+'Best '+b.toLocaleString();$('menuBest').hidden=!b&&!wf}
+function refreshMenuBest(){const b=store(bestKey('free')),wf=store('bonkd-waffles');$('menuBest').textContent=(wf?wf.toLocaleString()+' waffles · ':'')+'Best '+b.toLocaleString();$('menuBest').hidden=true} /* user: no waffle total or best score on the main menu */
 refreshMenuBest();
 const lumpSVG='<svg class="lump" viewBox="0 0 24 24"><path d="M7.5 21.5C6.5 13 8 3 12 3s5.5 10 4.5 18.5z"/></svg>';
 const starSVG='<svg class="star" viewBox="0 0 24 24"><path d="M12 2.2l2.9 6.5 7.1.7-5.4 4.7 1.6 7-6.2-3.8-6.2 3.8 1.6-7L2 9.4l7.1-.7z"/></svg>';
