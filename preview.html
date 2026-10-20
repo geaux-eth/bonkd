@@ -48,13 +48,15 @@ canvas{display:block;width:100%;height:100%;touch-action:none;cursor:grab}
 .st-card.quest .qimg b{position:relative}
 .st-card.quest span{white-space:nowrap;font-size:.9em}
 .st-card.quest .qimg b{font:44px 'Lilita One',Impact,sans-serif;color:#fff;-webkit-text-stroke:2px #161616}
-.chap img{display:block;width:118px;height:118px;object-fit:contain;margin:4px auto 0}
+#chImg{display:block;width:118px;height:118px;object-fit:contain;margin:4px auto 0}
 .chap .logo{font-size:clamp(24px,4.6vw,38px);white-space:nowrap}
 .chap .note{max-width:30ch;margin:6px auto 0;font-size:15px;line-height:1.35}
 .chskip{position:absolute;right:max(16px,env(safe-area-inset-right,0px));bottom:max(16px,env(safe-area-inset-bottom,0px));z-index:6;font-size:15px;padding:8px 14px}
 #outLives{z-index:40}
 .ol-clock{margin:2px 0 6px;font-family:var(--display);font-size:clamp(34px,8vmin,52px);line-height:1;letter-spacing:.04em;color:var(--paper);-webkit-text-stroke:5px var(--ink);paint-order:stroke fill;text-shadow:3px 4px 0 var(--ink);font-variant-numeric:tabular-nums}
 .cont-lives{display:flex;align-items:center;justify-content:center;gap:6px;font-size:40px;line-height:1;margin:6px 0 2px}
+#cont .logo{font-size:clamp(56px,15vmin,92px)}
+.short .cont-lives{font-size:32px;margin:2px 0 0}.short .cont-lives img{width:56px;height:56px}.short #cont .card{gap:5px;padding-top:10px;padding-bottom:12px}.short #contBuy{margin-top:2px}
 .cont-lives img{width:76px;height:76px;filter:drop-shadow(3px 3px 0 rgba(0,0,0,.35))}
 #contBuy{margin-top:10px}
 #contBuy:disabled,.st-item .buy:disabled:not(.owned){opacity:.45;filter:grayscale(.7);cursor:default}
@@ -263,7 +265,6 @@ body.keys .act::after{content:'SPACE';position:absolute;bottom:-18px;left:50%;tr
 /* tight level card: the three lines sit close together (the user found it too airy) */
 #lvlCard .lv-pre{line-height:1;margin:0}
 #lvlCard #lvNum{line-height:.78;margin:0;font-size:clamp(48px,11vmin,80px)!important}
-#lvlCard .gwi{margin:-.3em -.05em -.34em!important}
 #lvlCard #lvName{line-height:1.05;margin:0}
 #profPage{z-index:14}#profile{z-index:15}
 .pf-pre{font-size:22px;-webkit-text-stroke:2px var(--ink);text-shadow:2px 2px 0 var(--ink)}
@@ -755,7 +756,7 @@ function setFx(kind,dur){fx={kind,t:dur,dur}}
 const ghost={x:0,y:0,yOff:0,t:0,hp:10,max:10,throwT:2,squash:0,hitT:0,splat:0,ko:false,koT:0,say:null,sayT:3,face:1,faceS:1,px:0};
 let state='menu',mode='free',level=1,lvlTime=0;
 let items=[],pops=[],sparks=[],shots=[],gifts=[],buns=[],animals=[],impacts=[],splats=[],wafs=[],angel=null,angelT=7;
-let preBeans=null,rings=[];
+let preBeans=null,rings=[],lostItem=null;
 let strike=null,zapT=5,zaps=[],runId=0,showQ=[],showCur=null,clrT=0;
 let paddleT=0,poofs=[],paused=false,runWaffles=0,runCounts={},bankedCounts={},bankedW=0,lvStats={hits:0,bonks:0,waffles:0};
 let t=0,score=0,shake=0,now=0,slowT=0,swotCool=0,levelT=0,shownScore=-1,chipKey='',flashT=0,boltT=4,bolt=null;
@@ -766,6 +767,9 @@ const rain=Array.from({length:60},()=>({x:Math.random(),y:Math.random(),v:.9+Mat
 bear.x=bear.tx=W/2; ghost.x=W/2;
 const HUDTOP=(window.BONKD_TOP||12);document.documentElement.style.setProperty('--top',HUDTOP+'px');
 /* Grumble hovers with his hood (plus bob) clear of the top HUD */
+/* Grumble's health: low to start, a step up with each new setting, a smaller climb within it (user) */
+const GHP=[[3,4,5,6,8],[10,12,14,16,18],[20,22,24,26,28],[34,37,40,43,46],[50,54,58,62,66],[70,74,78,82,86]];
+function grumHP(l){const s=Math.min(5,Math.floor((l-1)/5)),i=(l-1)%5;return l>30?86+(l-30)*4:GHP[s][i]}
 const ghostBaseY=()=>ghost.mega?Math.max(hudBottom()+72*S,H*.17):ghostBaseY0();
 const ghostBaseY0=()=>Math.max(H<600?Math.max((HUDTOP+30)*UIZ+64*S,H*.2):Math.max((HUDTOP+38)*UIZ+90*S,H*.3),typeof hudBottom==='function'?hudBottom()+100*S:0);
 let bossMode=false,bossDone=false,bossPhase=1,bossI=null,drips=[],dripT=0,megaK=1;
@@ -1139,14 +1143,14 @@ $('chGo').onclick=chapGo;$('chSkip').onclick=()=>{if(state==='bossintro'){track(
 document.addEventListener('visibilitychange',()=>{if(document.hidden)setPause(true)});
 
 function resetBoard(){strike=null;zaps=[];showQ=[];showCur=null;items=[];pops=[];sparks=[];shots=[];gifts=[];buns=[];animals=[];impacts=[];splats=[];wafs=[];angel=null;slowT=0}
-function setGhost(){lvTop=null;ghost.mega=false;ghost.roarT=0;megaK=1;$('bossName').textContent='GRUMBLE';ghost.pose=null;ghost.fxT=0;ghost.offT=0;ghost.throwA=0;ghost.hold=0;$("hud").classList.remove("intro");ghost.blanket=0;ghost.itch=0;ghost.quills=0;ghost.max=level<=5?4+level*2:Math.round(14+(level-5)*2.6);if(FXTEST)ghost.max*=4;ghost.hp=ghost.max;ghost.ko=false;ghost.koT=0;ghost.yOff=-280*S;ghost.splat=0;ghost.throwT=1.6;ghost.say=null;ghost.sayT=2.5;ghost.kdT=-1;ghost.kd=0;strike=null;zapT=6;lvStats={hits:0,bonks:0,waffles:0};updateHp()}
+function setGhost(){lvTop=null;ghost.mega=false;ghost.roarT=0;megaK=1;$('bossName').textContent='GRUMBLE';ghost.pose=null;ghost.fxT=0;ghost.offT=0;ghost.throwA=0;ghost.hold=0;$("hud").classList.remove("intro");ghost.blanket=0;ghost.itch=0;ghost.quills=0;ghost.max=grumHP(level);if(FXTEST)ghost.max*=4;ghost.hp=ghost.max;ghost.ko=false;ghost.koT=0;ghost.yOff=-280*S;ghost.splat=0;ghost.throwT=1.6;ghost.say=null;ghost.sayT=2.5;ghost.kdT=-1;ghost.kd=0;strike=null;zapT=6;lvStats={hits:0,bonks:0,waffles:0};updateHp()}
 function updateHp(){const el=$('hp');el.style.width=Math.max(0,ghost.hp/ghost.max*100)+'%';el.style.background=ghost.hp/ghost.max<.35?'#df3a4e':'#8ee26b';$('lvl').textContent=bossMode?'BOSS':'LV '+level}
 
 function start(m){
   audio();
   if(livesLeft()<=0){showOutOfLives();return}
   mode=m; rng=m==='daily'?mulberry(dayNum()*9973+7):Math.random;
-  resetBoard(); chap=null; bossMode=false; bossDone=false; bossPhase=1; bossI=null; drips=[]; for(const k in chapDone)delete chapDone[k]; if(isCleared())for(const k in CHAPTERS)chapDone[k]=true; bearT=0; waffT=0; beamer=null;  shownLives=-1; t=0; score=0; shownScore=-1; level=1; lvlTime=0; angelT=2.5; bgKey=''; paused=false; runWaffles=0; runCounts={}; bankedCounts={}; bankedW=0; updateWaf();
+  resetBoard(); chap=null; lostItem=null; bossMode=false; bossDone=false; bossPhase=1; bossI=null; drips=[]; for(const k in chapDone)delete chapDone[k]; if(isCleared())for(const k in CHAPTERS)chapDone[k]=true; bearT=0; waffT=0; beamer=null;  shownLives=-1; t=0; score=0; shownScore=-1; level=1; lvlTime=0; angelT=2.5; bgKey=''; paused=false; runWaffles=0; runCounts={}; bankedCounts={}; bankedW=0; updateWaf();
   Object.assign(bear,{oat:isCleared(),pose:null,x:W/2,tx:W/2,hits:0,hitT:0,inv:0,ko:false,koT:0,helmet:0,zap:0,weapon:null,jello:null,swing:0,face:1,faceS:1,gs:1}); fx=null; runTop=null; lvTop=null;
   setGhost(); ghost.x=W/2;
   ['menu','over','cont','pause','clear','chapCard','chSkip','boardPanel','settings'].forEach(k=>$(k).hidden=true); renderMeter();
@@ -1517,6 +1521,9 @@ function fireAnimal(x,y){
 }
 
 /* ---------- hits ---------- */
+/* Booster's drops are caught by any part of Todd: from the tip of his lump to his feet, his body width plus the front where his arms and weapon are */
+function giftTouch(g){const gs=bear.gs||1,top=(bear.topY||GY-200*S)-24*S,f=bear.face||1,r=34*S,dx=(g.x-bear.x)*f;
+  return g.y>top-r&&g.y<GY+r&&dx>-(58*S*gs+r)&&dx<(84*S*gs+r)}
 function headPos(){return{x:bear.x,y:GY-112*S}}
 function boltPts(x0,y0,x1,y1){const pts=[[x0,y0]],n=9;for(let i=1;i<n;i++){const k=i/n;pts.push([x0+(x1-x0)*k+rnd(-24,24)*S,y0+(y1-y0)*k])}pts.push([x1,y1]);return pts}
 function doStrike(tx){
@@ -1592,6 +1599,7 @@ function ghostDown(){
   const gx0=ghost.x, gy0=ghost.y+ghost.yOff;
   setTimeout(()=>{
     poofs.push({x:gx0,y:gy0,age:0}); sfx.poof(); pop('POOF!',gx0,gy0-50*S,C.white,40,.9);
+    if(!bossMode&&CHAPTERS[level]&&!chapDone[level]){lostItem={x:gx0,y:gy0,vx:(gx0>W/2?-1:1)*rnd(90,170)*S,vy:-420*S,rot:0,vr:rnd(5,8)*(Math.random()<.5?-1:1),land:false,b:0};setTimeout(()=>pop('UH OH!',gx0,gy0-90*S,'#9cffb0',30,.9),250)}
     const gy=gy0, kinds=[];
     const reg=1+Math.floor(rng()*5); for(let i=0;i<reg;i++)kinds.push('plain');
     if(rng()<Math.min(.9,.55+level*.05))kinds.push(pickWaffle());
@@ -1621,10 +1629,10 @@ let chap=null; const chapDone={};
 function snd(k,v){return clip(k,v)}
 function chapArt(c){return c.gift==='waffli'?'w_plain':'x_'+c.gift}
 function startChapter(){const c=CHAPTERS[level];$('clear').hidden=true;state='chapter';track('chapter',{k:c.k});
-  chap={lv:level,c,t:0,ph:'fly',gx:-180*S,gy:Math.max(hudBottom()+90*S,H*.24),item:null,ut:0,ct:0};
-  gifts=[];shots=[];bear.weapon=null;bear.jello=null;bear.pose=null;bear.tx=bear.x;$('chSkip').hidden=false;sfx.boosterOut&&sfx.whoosh()}
+  const L=lostItem&&lostItem.land?lostItem:{x:clamp(bear.x+(bear.x<W/2?1:-1)*W*.25,120*S,W-120*S),y:GY-52*S};lostItem=null;
+  chap={lv:level,c,t:0,ph:'fly',gx:W+999*S,gy:0,item:{x:L.x,y:GY-52*S,vy:0,chute:0,land:true},ut:0,ct:0};
+  gifts=[];shots=[];bear.weapon=null;bear.jello=null;bear.pose=null;bear.tx=bear.x;$('chSkip').hidden=false}
 function chapterUpdate(dt){const h=chap;if(!h)return;h.t+=dt;
-  if(h.gx<W+260*S){h.gx+=860*S*dt;if(!h.item&&h.gx>W*.4){h.item={x:h.gx,y:h.gy+50*S,vy:0,chute:0,land:false};pop('DRAT!',h.gx,h.gy-70*S,C.white,30,.8);sfx.toss()}}
   const it=h.item;
   if(it&&!it.land){it.chute=Math.min(1,it.chute+dt*2.4);it.vy+=(150*S-it.vy)*Math.min(1,dt*3);it.y+=it.vy*dt;it.x+=Math.sin(h.t*2.2)*24*S*dt;
     if(it.y>=GY-52*S){it.y=GY-52*S;it.land=true;it.x=clamp(it.x,120*S,W-120*S)}}
@@ -1762,7 +1770,7 @@ function update(dt){
   if(ghost.gumT>0){ghost.gumT-=dt;if(ghost.gumT<=0&&!ghost.ko){pop('SCHLORP!',ghost.x,ghost.y+ghost.yOff-80*GK*S,'#ff7fb8',34,.8);burst(ghost.x,ghost.y+ghost.yOff,'#ff7fb8',10);snd('gumPeel')}}
   if(ghost.hold>0){ghost.hold-=dt;ghost.yOff=-280*S;if(ghost.hold<=0)$('hud').classList.remove('intro')}
   else ghost.yOff+=(0-ghost.yOff)*Math.min(1,dt*2.5);
-  const gtx=W/2+Math.sin(ghost.t*(.55+level*.09))*W*.27+Math.sin(ghost.t*1.9+1)*W*.05+(level>=3?(bear.x-W/2)*.15:0);
+  const gtx=W/2+Math.sin(ghost.t*(.55+Math.min(.9,(level-1)*.03)))*W*.27+Math.sin(ghost.t*1.9+1)*W*.05+(level>=3?(bear.x-W/2)*.15:0);
   if(!ghost.ko)ghost.x+=(gtx-ghost.x)*Math.min(1,dt*(ghostStunned()?.6:3));
   const gvx=(ghost.x-ghost.px)/Math.max(dt,1e-3); ghost.px=ghost.x;
   if(SPR.c_grum_float){const dx=bear.x-ghost.x;if(!ghost.ko&&Math.abs(dx)>40*S)ghost.face=Math.sign(dx)}
@@ -1779,6 +1787,8 @@ function update(dt){
   if(state==='story'&&story)storyUpdate(dt);
   if(state==='bossintro'&&bossI)bossIntroUpdate(dt);
   if(state==='ending'&&ending)endingUpdate(dt);
+  if(lostItem&&!lostItem.land){const L=lostItem;L.vy+=1500*S*dt;L.x+=L.vx*dt;L.y+=L.vy*dt;L.rot+=L.vr*dt;L.x=clamp(L.x,120*S,W-120*S);
+    if(L.y>=GY-52*S){L.y=GY-52*S;if(L.b<2&&L.vy>200*S){L.vy*=-.38;L.vx*=.6;L.vr*=.5;L.b++;sfx.clonk&&sfx.clonk();burst(L.x,GY-10*S,'#ffffff',4)}else{L.land=true;L.vy=0;L.rot=0}}}
   if(state==='chapter')chapterUpdate(dt);
   if(beamer)beamUpdate(dt);
   if(iris){iris.t+=dt;if(!iris.mid&&iris.t>=.5){iris.mid=true;beginPlay(true)}if(iris.t>1.05)iris=null}
@@ -1832,7 +1842,7 @@ function update(dt){
       g.x+=g.vx*dt; g.y+=g.vy*dt; g.x=clamp(g.x,34*S,W-34*S);
       if(g.y>=GY-34*S){g.y=GY-34*S;g.land=true;g.lt=0;g.rot=0;burst(g.x,GY-6*S,'#ffffff',5)}
     }
-    if(state==='play'&&(Math.hypot(g.x-hp.x,g.y-hp.y)<62*S||Math.hypot(g.x-bear.x,g.y-by)<58*S)){g.gone=true;track('gift',{k:g.type});activate(g.type,g.x,g.y)}
+    if(state==='play'&&(giftTouch(g)||Math.hypot(g.x-hp.x,g.y-hp.y)<62*S||Math.hypot(g.x-bear.x,g.y-by)<58*S)){g.gone=true;track('gift',{k:g.type});activate(g.type,g.x,g.y)}
     else if(g.land&&g.lt>1.5){g.gone=true;track('gift_miss',{k:g.type});pop('MISSED!',g.x,GY-50*S,C.white,22,.7);burst(g.x,GY-20*S,'#ffffff',8)}
   }
   gifts=gifts.filter(g=>!g.gone);
@@ -2705,7 +2715,7 @@ const BGART={"GRUMBLE'S HIDEOUT":['bd_hideout',.875],'PICNIC':['bd_meadow',.875]
   'MUDDY RIVER CROSSING':['bd_canyon',.875],'ECHO CANYON':['bd_canyon',.875,1],'COYOTE CRAG':['bd_canyon',.875],'RED ROCK RAPIDS':['bd_canyon',.875,1],'CATTAIL CREEK':['bd_canyon',.875],'TUMBLEWEED TRAIL':['bd_desert',.875],'RATTLESNAKE RIDGE':['bd_desert',.875,1],'CACTUS FLATS':['bd_desert',.875],'DUSTY DUNES':['bd_desert',.875,1],'SIDEWINDER SANDS':['bd_desert',.875],'PICKLEBERRY PASTURE':['bd_harvest',.875],'CORNY MAZE':['bd_harvest',.875,1],'HAYRIDE HILL':['bd_harvest',.875],'PUMPKIN PATCH':['bd_harvest',.875,1],'HOME SWEET HOME':['bd_harvest',.875]};
 /* each level's scenery set once its setting has a backdrop */
 const BOSS_SCENE={n:"GRUMBLE'S HIDEOUT",song:2,tr:-3,cl:null,bg(){sky('#2a2340','#4a3d6b')}};
-const LEVELSET={"GRUMBLE'S HIDEOUT":'bare','MUDDY RIVER CROSSING':'bare','ECHO CANYON':'bare','COYOTE CRAG':'bare','RED ROCK RAPIDS':'bare','CATTAIL CREEK':'bare','TUMBLEWEED TRAIL':'bare','RATTLESNAKE RIDGE':'bare','CACTUS FLATS':'bare','DUSTY DUNES':'bare','SIDEWINDER SANDS':'bare','PICKLEBERRY PASTURE':'bare','CORNY MAZE':'bare','HAYRIDE HILL':'bare','PUMPKIN PATCH':'bare','HOME SWEET HOME':'bare','BISCUIT BLUFF':'mountain','SWITCHBACK SUMMIT':'mountain',"EAGLE'S PERCH":'mountain','THUNDERHEAD PEAK':'mountain','AVALANCHE ALLEY':'mountain','PINEY WOODS':'forest','HOOT OWL HIDEOUT':'forest','FOXGLOVE BEND':'forest','MOSSY HOLLOW':'forest','CONIFER CORNER':'forest'};
+const LEVELSET={'LADYBUG LANE':'ladybug',"GRUMBLE'S HIDEOUT":'bare','MUDDY RIVER CROSSING':'bare','ECHO CANYON':'bare','COYOTE CRAG':'bare','RED ROCK RAPIDS':'bare','CATTAIL CREEK':'bare','TUMBLEWEED TRAIL':'bare','RATTLESNAKE RIDGE':'bare','CACTUS FLATS':'bare','DUSTY DUNES':'bare','SIDEWINDER SANDS':'bare','PICKLEBERRY PASTURE':'bare','CORNY MAZE':'bare','HAYRIDE HILL':'bare','PUMPKIN PATCH':'bare','HOME SWEET HOME':'bare','BISCUIT BLUFF':'mountain','SWITCHBACK SUMMIT':'mountain',"EAGLE'S PERCH":'mountain','THUNDERHEAD PEAK':'mountain','AVALANCHE ALLEY':'mountain','PINEY WOODS':'forest','HOOT OWL HIDEOUT':'forest','FOXGLOVE BEND':'forest','MOSSY HOLLOW':'forest','CONIFER CORNER':'forest'};
 /* front-layer prop sprites, bottom-centred on the ground line: [sprite, x as fraction of width, width in S units] */
 function prop(k,fx,w,sway){const A=SPR[k];if(!A)return;const h=w/A.r,x=W*fx,y=GY+7*S;ctx.save();ctx.translate(x,y);ctx.scale(S,S);if(sway)ctx.rotate(Math.sin(now*1.3+fx*9)*.012);ctx.drawImage(A.img,-w/2,-h,w,h);ctx.restore()}
 /* ---------- setting planner: scenery and wildlife share one ground line ----------
@@ -2727,6 +2737,8 @@ SETTING.meadow1={busy:10,
   short:{n:[0,1],items:[['pl_bush',84,2],['pl_rock',62,1]]},
   ground:{n:[1,3],items:SETTING.meadow.ground.items},
   flutter:{n:[2,3],items:[['butterfly',0,1]]},small:{n:[0,1],items:[['cr_ladybug',30,1,'crawl']]},medium:{n:[0,0],items:[]},large:{n:[0,0],items:[]}};
+/* Ladybug Lane (user): a few happy ladybugs crawl along the ground, nothing else added */
+SETTING.ladybug={busy:6,tall:{n:[0,0],items:[]},short:{n:[0,0],items:[]},ground:{n:[0,0],items:[]},flutter:{n:[0,0]},small:{n:[4,5],items:[['cr_ladybug',30,1,'crawl']]},medium:{n:[0,0],items:[]},large:{n:[0,0],items:[]}};
 /* setting 1 placeholders until its own scenery sheet: green prairie, then dry range */
 SETTING.prairie={busy:8,tall:{n:[0,1],items:[['pr_tree',400,1]]},short:{n:[0,2],items:[['pl_bush',84,2],['pl_rock',62,1]]},
   ground:{n:[3,5],items:[['pl_grass',66,4],['pl_clover',46,2],['pl_daisy',70,2],['pl_buttercup',66,2]]},
@@ -3687,8 +3699,9 @@ function giftShape(type){
   ctx.beginPath();rr(-12,-29,24,14,3);stroke(2.2);
   ctx.restore();
 }
-function drawChapterBack(){const h=chap,A=SPR.c_grum_flee;if(!A||h.gx>W+250*S)return;const p=GP.flee,k=GU/p[2],w=A.img.naturalWidth*k,hh=A.img.naturalHeight*k;
+function drawChapterBack(){const h=chap,A=SPR.c_grum_flee;if(!A||h.gx>W+250*S||h.gx<-400*S)return;const p=GP.flee,k=GU/p[2],w=A.img.naturalWidth*k,hh=A.img.naturalHeight*k;
   ctx.save();ctx.translate(h.gx,h.gy+Math.sin(h.t*9)*6*S);ctx.scale(S,S);ctx.scale(-1,1);ctx.drawImage(A.img,GEX-p[0]*w,GEY-p[1]*hh,w,hh);ctx.restore()}
+function drawLost(){const L=lostItem,c=CHAPTERS[level];if(!c||!SPR[chapArt(c)])return;ctx.save();ctx.translate(L.x,L.y);ctx.scale(S*1.5,S*1.5);ctx.rotate(L.land?0:L.rot);drawGiftArt({type:c.gift,chute:0,land:true});ctx.restore()}
 function drawChapterFront(){const it=chap.item;if(!it)return;ctx.save();ctx.translate(it.x,it.y);ctx.scale(S*1.5,S*1.5);ctx.rotate(it.land?0:Math.sin(chap.t*2.2)*.12);
   if(SPR.x_canopy&&SPR[chapArt(chap.c)])drawGiftArt({type:chap.c.gift,chute:it.chute,land:it.land});ctx.restore()}
 /* Bear Handed: a hot red-orange glow behind Todd while his hits count double */
@@ -4043,7 +4056,7 @@ function render(){
   drawBear();
   if(bear.weapon&&bear.weapon.type==='magnet'&&bear.weapon.held.length&&!bear.ko){const m=muzzlePos();if(m)bear.weapon.held.forEach((t,i)=>{ctx.save();ctx.translate(m.x+(i-(bear.weapon.held.length-1)/2)*22*S,m.y-(14+i*6)*S);ctx.scale(S*.62,S*.62);ctx.rotate((i-1)*.25);drawJunk(t);ctx.restore()})}
   drawToddFX();
-  if(chap)drawChapterFront();
+  if(chap)drawChapterFront();else if(lostItem&&(state==='levelup'||state==='clear'))drawLost();
   if(ghostFront&&state!=='menu'&&state!=='ending'&&!(state==='over'&&bossDone))drawGhost();
   drawGrumFX();
   drawFlings();
@@ -4126,8 +4139,12 @@ function glRed(el){return el.matches('.logo.red,.btn:not(.red),[data-g=red]')&&!
 /* headings are drawn as images by the same renderer as the in-game pop words (glossWord), so every browser,
    iPhone Safari included, shows the same chunky outline, two-tone fill, streak-and-dot shine and hard shadow */
 function glCol(el){return el.matches('[data-g=white]')?'#f6f7f9':glRed(el)?'#ff2a4a':'#ffd23f'}
-function glImg(img,el){const fs=parseFloat(getComputedStyle(el).fontSize)||24,RR=Math.min(4,(window.devicePixelRatio||1)*1.6),g=glossWord(img.dataset.w,glCol(el),fs*RR);
-  img.src=g.c.toDataURL();img.style.height=(g.c.height/(fs*RR))+'em';img.style.margin='0 -.05em'}
+/* the lettering canvas carries empty rows above and below the ink (room for the outline and shadow); measure them once and
+   pull the image's margins in by that much, so headings sit as close as normal text (user: too much space in the cards) */
+function glPad(c){if(c._pad)return c._pad;let t=0,b=0;try{const d=c.getContext('2d').getImageData(0,0,c.width,c.height).data,W=c.width,H=c.height,row=y=>{for(let x=0;x<W;x+=2)if(d[(y*W+x)*4+3]>16)return true;return false};
+  while(t<H-1&&!row(t))t++;while(b<H-1&&!row(H-1-b))b++}catch(e){}return c._pad=[t,b]}
+function glImg(img,el){const fs=parseFloat(getComputedStyle(el).fontSize)||24,RR=Math.min(4,(window.devicePixelRatio||1)*1.6),g=glossWord(img.dataset.w,glCol(el),fs*RR),P=glPad(g.c),u=fs*RR;
+  img.src=g.c.toDataURL();img.style.height=(g.c.height/u)+'em';img.style.margin=(-P[0]/u+.04).toFixed(3)+'em -.05em '+(-P[1]/u+.04).toFixed(3)+'em';img.style.verticalAlign='middle'}
 function glossify(el){
   el.classList.add('glz');
   /* headings written as one span per letter become one word again, so each word is one image with real letter spacing */

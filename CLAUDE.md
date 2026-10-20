@@ -104,7 +104,7 @@
    2400x1200 (2:1). Save the source as art/src_bd_<name>, write art/review/r_bd_<name>.webp at 2048 wide.
 2. **Its own world.** The backdrop is filled by that world and its own ground strip (meadow: orange dirt; forest: dark brown earth under moss; mountain: orange dirt). Never reuse another setting's look.
 3. **Names match.** Every level name matches what the backdrop shows. Nothing from the Nibbles cast, the Barn-zooka animals or the item list appears in it.
-4. **Backdrop only in play.** Gameplay levels show the backdrop with no extra scenery or wildlife: added props read as items because of their white edge. Only the opening picnic keeps props.
+4. **Backdrop only in play.** Exception the user asked for: Ladybug Lane has 4-5 happy ladybugs (cr_ladybug) crawling on the ground line (LEVELSET 'LADYBUG LANE':'ladybug'). Gameplay levels show the backdrop with no extra scenery or wildlife: added props read as items because of their white edge. Only the opening picnic keeps props.
 5. **Ground line.** In BGART, set the ground fraction so Todd's feet sit just under the black top line, on the strip (about the line's fraction plus 0.02; for a thick grass or moss band, where it meets the dirt). Approved: meadow .875, forest .895, mountain .872. Alternate levels mirror the backdrop.
 6. **Check before showing.** Computer and real touch phone, zoomed on the ground line, mirrored and unmirrored.
 
@@ -131,7 +131,7 @@
 - Extra lives cost 1,000 waffles, at most 10 per rolling 24 hours, and are banked on the profile (Supabase buy_life / use_life; waffle_board.lives, life_buys).
 
 ## Chapter scenes and unlocks
-- After levels 5, 10, 15, 20 and 25 a skippable scene plays (CHAPTERS in the source): Grumble flies over and drops the new thing on the bandana parachute, Todd grabs it and uses it, an info card explains it, Todd celebrates (c_todd_cheer), then runs off after Grumble.
+- After levels 5, 10, 15, 20 and 25 the new ability is something Grumble LOSES, never a gift: when he poofs, it falls out of the poof cloud (lostItem, "UH OH!"), bounces and lies on the ground through the level-up. After Next level a skippable scene plays (CHAPTERS in the source): Todd walks over, grabs it and uses it, an info card explains it, Todd celebrates (c_todd_cheer), then runs off after Grumble.
   - 5: LUMPY OATMEAL: plain, gloppy, grayish oatmeal, no spoon, no toppings. Doubles how many bonks Todd can take; each meter icon gets a rainbow outline that the first bonk removes, then the icon fills.
   - 10: SHOE HORN (weapon): an old boot that's also a tuba, 2 hands, 5 honks of gold music notes; Grumble gets a headache (c_grum_headache, notes circling).
   - 15: BEAR HANDED (power-up): double damage for 20 s, red glow on Todd and a countdown chip.
@@ -148,7 +148,7 @@
 - Backdrop bd_hideout (Gemini): cave lair, far golden waffle heap, syrup cauldron over green ghost fire, no furniture (ghosts don't sit).
 - Intro (skippable): Grumble floats to the cauldron, tosses in 3 normal waffles, the cauldron spits out the magic waffle (w_magic: glowing mint-green waffle with goopy glowing green butter), he eats it (c_grum_eatmagic), swells into GRUMBLEMAX and roars.
 - GRUMBLEMAX art is built on the user's Oswald mega-ghost sheet with Grumble's face: huge saggy body, meaty sagging underside, NO tail. Poses: c_mega_float, throw, hit (dazed and angry, never worried), roar, deflate (waffles bursting out). Hitboxes x2.1.
-- Grumble's health per level: L1-5 = 6, 8, 10, 12, 14 (quick and easy), then +2.6 a level (L10 27, L20 53, L30 79), so no level drags on.
+- Grumble's health (user: low to start, growing with each setting): GHP/grumHP in the source. Meadow 3,4,5,6,8; forest 10-18; mountain 20-28; canyon 34-46; desert 50-66; harvest 70-86. His side-to-side speed climbs slowly: frequency .55 + (level-1)*.03, capped at +.9.
 - Lightning (from level 3): a long, readable build-up (2.3 s at level 3, never under 1.6 s; 1.7 s in the boss rage phase). Grumble casts (beam pose) inside the Canva charge ring (fx_charge0-5, design page 92) with a rising electric whine; the ground target follows Todd for the first 60%, then locks with a crackle and pulses faster; then the Canva bolt (fx_bolt0-5, design page 93) strikes.
 - Fight: 180 HP (lowered from 220 after the playtest; a fight runs about 2 to 2.5 minutes). Phase 1 fast junk; under 2/3 he roars, "SYRUP STORM": syrup drips fall with ground warning shadows; under 1/3 "GRUMBLE RAGE": more junk plus lightning. Hits sometimes burp out waffles; Booster comes more often. Defeat: KA-POP, waffles rain, then the ending.
 - Ending (tap to skip): back at the Maple Meadow picnic, waffles back on the plate, Todd eating (sit_eat) with lots of butterflies (SETTING.ending), two quips, THE END, then the win card "GRUMBLEMAX is DEFEATED!" over the picnic.
@@ -173,6 +173,7 @@
 - Every hero world gets its own version of all of this (Carlito's supers, backdrops, sounds, lettering words and jokes); nothing is shared between heroes.
 
 ## Controls
+- Booster's drops are caught by any part of Todd (giftTouch): from the tip of his lump to his feet, his body width plus the front where his arms and weapon are.
 - Touch: drag anywhere to move Todd, tap anywhere to use the weapon (a quick touch under 350 ms that doesn't move). The red badge only shows the weapon and ammo; it isn't a button. Two thumbs work: the newest finger steers, and the one still down takes over when it lifts.
 - Keys: arrows or A/D move, Space uses weapons, P pauses.
 - Pie (2) and Boomer-nana (1) are held and thrown with the weapon control. The Junk Magnet (12 s) only grabs metal junk that comes near Todd, holds up to 3, and fires them back with the weapon control.
@@ -198,6 +199,7 @@
 - Booster's flight and beam frames carry the approved head pasted from c_boost_fly / c_boost_beam (anim/boost_head.py, lined up on the halo), because the Canva frames' faces came out muddy.
 - No falling waffles on the menu; they're on the loading screen.
 - The picnic spot is a fraction of the screen width (picnic.x getter), so resizes and restarts can't move it.
+- Card lettering: glImg measures the empty rows above and below each lettering image and pulls its margins in by that much, so headings sit tight in every card (user: too much space). The chapter card's art uses #chImg (a bare .chap img rule once blew the lettering images up). BONKD on the continue card is bigger; on short screens the continue card compacts so the Buy a life button isn't cut off.
 - Level names stay plain dark text (bigger), the number a little smaller. The level card is tight (user: too much white space): the lettering images' built-in padding is trimmed (#lvlCard .gwi margins).
 - Music: one recorded track ("The Fun Starts Here", Pixabay/mmaudio) makes the set: menu = the song from the top at .82; gameplay = its main section looping (24.87 s to 98.41 s); win = the song's ending sting. Mega Beans keeps its synth tune (it starts after the beans super). GRUMBLEMAX has his own track, "Battle Rage" (Pixabay/desifreemusic, scratchpad music/new/boss.mp3): plays from the top, loops 49.71 s to 151.59 s with a 1 s crossfade baked in. Each store super has its own cue cut from "Boom Mode" (Pixabay/cocamelody, music/new/cue_<k>.mp3, each starting on a big hit: beam 33.11 s, beans 104.44, porcu 120.37, ivy 93.46): the level music dips out at the freeze, the cue plays under the super, the music comes back as the move ends (superMusic).
 
