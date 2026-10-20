@@ -1708,23 +1708,30 @@ function skipChapter(){if(!chap)return;track('chapter_skip',{k:chap.c.k,n:chap.t
 function bgPt(u,v){const a=bgArt();if(!a)return{x:u*W,y:v*H};const I=SPR[a[0]].img,iw=I.naturalWidth,ih=I.naturalHeight,dy=a[1]*ih,gy=GY+8*BSC,k=Math.max(W/iw,gy/dy,(H-gy)/(ih-dy)),w=iw*k,h=ih*k;let x=(W-w)/2+u*w;if(a[2])x=W-x;return{x,y:gy-dy*k+v*h}}
 function startBoss(){$('clear').hidden=true;bossMode=true;bossPhase=1;drips=[];bgKey='';setGhost();ghost.max=ghost.hp=180;updateHp();$('lvl').textContent='BOSS';
   state='bossintro';bossI={t:0,tossed:0,fl:[],magic:null,glow:0};ghost.hold=0;ghost.yOff=0;ghost.pose=null;ghost.x=W+120*S;ghost.y=H*.3;
-  bear.weapon=null;bear.jello=null;items=[];gifts=[];shots=[];playLevel();$('chSkip').hidden=false;
+  bear.weapon=null;bear.jello=null;items=[];gifts=[];shots=[];angel=null;beamer=null;strike=null;angelT=99;playLevel();$('chSkip').hidden=false;
   const n=$('lvNum');n.textContent='';for(const ch of 'BOSS'){const sp=document.createElement('span');sp.textContent=ch;n.append(sp)}$('lvName').textContent=BOSS_SCENE.n;
   const c=$('lvlCard');c.classList.remove('out');c.hidden=false;clearTimeout(lvTimer);lvTimer=setTimeout(()=>{c.classList.add('out');lvTimer=setTimeout(()=>{c.hidden=true;c.classList.remove('out')},420)},1300);track('boss_start',{})}
-function bossIntroUpdate(dt){const b=bossI;b.t+=dt;const cm=bgPt(.75,.642),gx=cm.x-150*S,gy=cm.y-210*S;
-  if(b.t<1.4){ghost.x+=(gx-ghost.x)*Math.min(1,dt*3);ghost.y+=(gy-ghost.y)*Math.min(1,dt*3)}else{ghost.x=gx;ghost.y=gy+Math.sin(now*2.4)*5*S}
+/* the GRUMBLEMAX intro (user script): Grumble glides in to his cauldron, "I'M GOING TO STOP YOU FOR GOOD!", "GET READY FOR...",
+   tosses three waffles in, the cauldron spits out the magic waffle, he gobbles it, swells smoothly into GRUMBLEMAX and roars "GRUMBLEMAX!!".
+   One timeline drives everything (no chasing, no jitter); the normal Grumble movement is paused while it plays. */
+const BI={glide:1.8,say1:2.0,say2:4.6,toss:5.6,spit:7.7,chomp:9.4,grow:10.0,growD:1.7,roar:11.9,end:13.6};
+function bossIntroUpdate(dt){const b=bossI;b.t+=dt;const T=b.t,cm=bgPt(.75,.642),gx=cm.x-150*S,gy=cm.y-210*S;
+  if(b.x0===undefined){b.x0=ghost.x;b.y0=ghost.y}
+  const say=(txt,sz,life)=>pop(txt,clamp(ghost.x-40*S,190*S,W-190*S),Math.max(hudBottom()+40*S,ghost.y+ghost.yOff-(ghost.mega?250:150)*S),'#b9f27a',sz,life);
+  if(!ghost.mega){const k=Math.min(1,T/BI.glide),e=1-Math.pow(1-k,3);ghost.x=b.x0+(gx-b.x0)*e;ghost.y=b.y0+(gy-b.y0)*e+(k>=1?Math.sin((T-BI.glide)*2.4)*5*S:0);ghost.yOff=0}
   ghost.face=ghost.faceS=-1;
-  if(b.t>1.9&&b.tossed<3&&b.t>1.9+b.tossed*.55){b.tossed++;ghost.throwA=.35;sfx.toss();const T=.65;b.fl.push({x:ghost.x+60*S,y:ghost.y,vx:(cm.x-ghost.x-60*S)/T,vy:-420*S,g:2*((cm.y-ghost.y)+420*S*T)/(T*T),rot:0,t:0,T})}
-  for(const f of b.fl){f.t+=dt;f.vy+=f.g*dt;f.x+=f.vx*dt;f.y+=f.vy*dt;f.rot+=7*dt;if(f.t>=f.T&&!f.done){f.done=1;snd('cauldronPlop')||sfx.whoosh();burst(cm.x,cm.y,'#7cff6b',8);b.glow=Math.min(1,b.glow+.35)}}
+  if(T>BI.say1&&!b.s1){b.s1=1;say("I'M GOING TO STOP YOU FOR GOOD!",30,2.4);sfx.whoosh()}
+  if(T>BI.say2&&!b.s2){b.s2=1;say('GET READY FOR...',34,1.8)}
+  if(T>BI.toss+b.tossed*.55&&b.tossed<3){b.tossed++;ghost.throwA=.35;sfx.toss();const TT=.65;b.fl.push({x:ghost.x+60*S,y:ghost.y,vx:(cm.x-ghost.x-60*S)/TT,vy:-420*S,g:2*((cm.y-ghost.y)+420*S*TT)/(TT*TT),rot:0,t:0,T:TT})}
+  for(const f of b.fl){f.t+=dt;f.vy+=f.g*dt;f.x+=f.vx*dt;f.y+=f.vy*dt;f.rot+=7*dt;if(f.t>=f.T&&!f.done){f.done=1;snd('cauldronPlop')||sfx.whoosh();b.glow=Math.min(1,b.glow+.35)}}
   b.fl=b.fl.filter(f=>!f.done);b.glow=Math.max(0,b.glow-dt*.25);
-  if(b.t>3.8&&!b.magic){b.magic={x:cm.x,y:cm.y,vx:(ghost.x-55*S-cm.x)/.8,vy:-900*S,t:0};b.glow=1;flashT=.12;snd('waffli')||sfx.power();pop('BLOOP!',cm.x,cm.y-60*S,'#9cffb0',36,.8)}
-  if(b.magic&&!b.magic.got){const m=b.magic;m.t+=dt;m.x+=m.vx*dt;m.vy+=(2*((ghost.y+20*S-cm.y)+900*S*.8)/(.64))*dt;m.y+=m.vy*dt;if(m.t>=.8){m.got=1;ghost.pose='eatmagic';ghost.poseT=now;pop('MAGIC WAFFLE!',ghost.x,ghost.y-110*S,'#9cffb0',30,1.1)}}
-  if(b.t>5.0&&!b.ate){b.ate=1;snd('oatEat');pop('CHOMP!',ghost.x-40*S,ghost.y-60*S,C.white,40,.8)}
-  if(b.t>6.0&&!ghost.mega){ghost.mega=true;ghost.pose=null;megaK=.42;snd('megaGrow')||clip('grow');flashT=.3;shake=.8}
-  if(ghost.mega&&b.t<7.6){megaK=Math.min(1,.42+(b.t-6.0)/1.4*.58)*(1+Math.sin((b.t-6.0)*22)*.06*(7.6-b.t));if(Math.random()<.6)burst(ghost.x+rnd(-120,120)*S,ghost.y+rnd(-40,160)*S,'#9cffb0',3)}
-  if(b.t>=7.6&&!b.roared){b.roared=1;megaK=1;ghost.roarT=1.3;snd('megaRoar');shake=1;pop('GRUMBLEMAX!',W/2,H*.42,'#9cffb0',64,1.6);$('bossName').textContent='GRUMBLEMAX'}
-  if(ghost.mega)ghost.y=ghostBaseY();
-  if(b.t>=9.0)finishBossIntro()}
+  if(T>BI.spit&&!b.magic){b.magic={x:cm.x,y:cm.y,vx:(ghost.x-55*S-cm.x)/.8,vy:-900*S,t:0};b.glow=1;flashT=.12;snd('waffli')||sfx.power();pop('BLOOP!',cm.x,cm.y-60*S,'#9cffb0',36,.8)}
+  if(b.magic&&!b.magic.got){const m=b.magic;m.t+=dt;m.x+=m.vx*dt;m.vy+=(2*((ghost.y+20*S-cm.y)+900*S*.8)/(.64))*dt;m.y+=m.vy*dt;if(m.t>=.8){m.got=1;ghost.pose='eatmagic';ghost.poseT=now}}
+  if(T>BI.chomp&&!b.ate){b.ate=1;snd('oatEat');pop('CHOMP!',ghost.x-40*S,ghost.y-60*S,C.white,40,.8)}
+  if(T>BI.grow&&!ghost.mega){ghost.mega=true;ghost.pose=null;megaK=.42;b.mx0=ghost.x;snd('megaGrow')||clip('grow');flashT=.3;shake=.6}
+  if(ghost.mega){const k=Math.min(1,(T-BI.grow)/BI.growD),e=k<1?1-Math.pow(1-k,3)*(1-2.2*k*(1-k)):1;megaK=.42+.58*e;ghost.x=b.mx0+(W*.6-b.mx0)*(1-Math.pow(1-k,3));ghost.y=ghostBaseY();ghost.yOff=0}
+  if(T>=BI.roar&&!b.roared){b.roared=1;megaK=1;ghost.roarT=1.4;snd('megaRoar');shake=1;$('bossName').textContent='GRUMBLEMAX';say('GRUMBLEMAX!!',60,1.7)}
+  if(T>=BI.end)finishBossIntro()}
 function finishBossIntro(){if(!bossI)return;bossI=null;ghost.mega=true;megaK=1;ghost.pose=null;ghost.roarT=Math.max(ghost.roarT,.6);ghost.throwT=1.4;angelT=3;zapT=9;state='play';$('chSkip').hidden=true;$('bossName').textContent='GRUMBLEMAX'}
 function bossUpdate(dt){if(ghost.roarT>0)ghost.roarT-=dt;const f=ghost.hp/ghost.max;
   if(bossPhase===1&&f<.66){bossPhase=2;ghost.roarT=1.4;snd('megaRoar');shake=.9;pop('SYRUP STORM!',W/2,H*.4,'#f2b544',56,1.5);dripT=1.6}
@@ -1820,14 +1827,14 @@ function update(dt){
   ghost.t+=dt*(ghostStunned()?.12:1); ghost.throwA=Math.max(0,(ghost.throwA||0)-dt); ghost.fxT=Math.max(0,(ghost.fxT||0)-dt); ghost.offT=Math.max(0,(ghost.offT||0)-dt); ghost.squash=Math.max(0,ghost.squash-dt); ghost.hitT=Math.max(0,ghost.hitT-dt); ghost.splat=Math.max(0,ghost.splat-dt); ghost.notes=Math.max(0,(ghost.notes||0)-dt);
   if(ghost.gumT>0){ghost.gumT-=dt;if(ghost.gumT<=0&&!ghost.ko){pop('SCHLORP!',ghost.x,ghost.y+ghost.yOff-80*GK*S,'#ff7fb8',34,.8);burst(ghost.x,ghost.y+ghost.yOff,'#ff7fb8',10);snd('gumPeel')}}
   if(ghost.hold>0){ghost.hold-=dt;ghost.yOff=-280*S;if(ghost.hold<=0)$('hud').classList.remove('intro')}
-  else ghost.yOff+=(0-ghost.yOff)*Math.min(1,dt*2.5);
+  else if(state!=='bossintro')ghost.yOff+=(0-ghost.yOff)*Math.min(1,dt*2.5);
   const gtx=W/2+Math.sin(ghost.t*(.55+Math.min(.9,(level-1)*.03)))*W*.27+Math.sin(ghost.t*1.9+1)*W*.05+(level>=3?(bear.x-W/2)*.15:0);
-  if(!ghost.ko)ghost.x+=(gtx-ghost.x)*Math.min(1,dt*(ghostStunned()?.6:3));
+  if(!ghost.ko&&state!=='bossintro')ghost.x+=(gtx-ghost.x)*Math.min(1,dt*(ghostStunned()?.6:3));
   const gvx=(ghost.x-ghost.px)/Math.max(dt,1e-3); ghost.px=ghost.x;
   if(SPR.c_grum_float){const dx=bear.x-ghost.x;if(!ghost.ko&&Math.abs(dx)>40*S)ghost.face=Math.sign(dx)}
   else if(!ghost.ko&&Math.abs(gvx)>25)ghost.face=Math.sign(gvx);
   ghost.faceS=ghost.face; ghost.vx=gvx;
-  ghost.y=ghostBaseY()+Math.sin(ghost.t*1.3)*20*S+Math.sin(ghost.t*3.4)*6*S;
+  if(state!=='bossintro')ghost.y=ghostBaseY()+Math.sin(ghost.t*1.3)*20*S+Math.sin(ghost.t*3.4)*6*S;
   if(ghost.kdT!==undefined&&ghost.kdT>=0){ghost.kdT+=dt;const k=ghost.kdT,dep=k<.2?Math.sin(k/.2*Math.PI/2):Math.max(0,1-(k-.2)/2.2);ghost.kd=dep;ghost.y+=dep*(GY-ghost.y)*.42;if(k<.6)ghost.x+=(Math.random()-.5)*14*S;if(dep<=0)ghost.kdT=-1}else ghost.kd=0;
   if(ghost.pin){const p=ghost.pin;p.t+=dt;const dep=p.t<p.h?1:Math.max(0,1-(p.t-p.h)/.6);ghost.y+=dep*(GY-GPIN*GK*S-ghost.y);if(p.t>p.h&&dep<=0)ghost.pin=null}
   if(ghost.ko)ghost.koT+=dt;
@@ -3001,7 +3008,7 @@ function walkKey(it,b){return SPR['c_todd_w_'+it+'_0']&&WALKSHEET[it]?'w_'+it+'_
 function todd2Key0(b,mv){const w=b.weapon,walk=mv>.15&&Math.floor(b.walk/Math.PI)%2,mov=mv>.15;
   if(b.ko)return SPR.c_todd_ko_0?'ko_'+(b.koT<.55?Math.min(3,Math.floor(b.koT/.55*4)):4+Math.floor(now*3)%2):'ko';
   /* the opening story and the ending keep the original single drawings for sitting, startled and angry (the user preferred them to the sheets) */
-  if(b.pose)return b.pose==='run'?(SPR.c_todd_rn0?'rn'+(Math.floor(now*13)%6):'run'):(state==='story'||state==='ending'?(T2A[b.pose]?b.pose:null):todd2Pose(b));
+  if(b.pose)return b.pose==='run'?(SPR.c_todd_rn0?'rn'+(Math.floor(now*13)%6):'run'):(state==='story'?(T2A[b.pose]?b.pose:null):todd2Pose(b));
   if(b.hitT>0)return SPR.c_todd_bonked_0?'bonked_'+Math.max(0,Math.min(5,Math.floor((1-b.hitT/.55)*6))):'h_bonked';
   if(b.hold&&T2A['h_'+b.hold.k])return mov?(walkKey(b.hold.k,b)||(walk&&T2A['w_'+b.hold.k]?'w_'+b.hold.k:'h_'+b.hold.k)):'h_'+b.hold.k;
   if(b.jello)return mov?(walkKey('jello',b)||(walk?'w_jello':'h_jello')):'h_jello';
@@ -3422,7 +3429,7 @@ function grumSparks(){
     ctx.strokeStyle=INK;ctx.lineWidth=7;ctx.stroke();ctx.strokeStyle='#ffe14d';ctx.lineWidth=3.6;ctx.stroke();ctx.restore()}
   ctx.restore();
 }
-const MEGA_F={"throw": [[0.4717, 0.1769, 0.7677], [0.4749, 0.1526, 0.6935], [0.4311, 0.2424, 0.7145], [0.4265, 0.0817, 0.8371], [0.3861, 0.164, 0.7226], [0.4815, 0.1635, 0.7419]], "hit": [[0.6321, 0.1079, 0.6696], [0.505, 0.1821, 0.5714], [0.4613, 0.1808, 0.5776], [0.5608, 0.1714, 0.5764], [0.4921, 0.1718, 0.5727], [0.4949, 0.1401, 0.5689]], "roar": [[0.4965, 0.1922, 0.8325], [0.5323, 0.1729, 0.8803], [0.4901, 0.1822, 0.8632], [0.492, 0.1761, 0.8684], [0.4997, 0.1711, 0.8342], [0.55, 0.0756, 0.8188]], "deflate": [[0.4948, 0.0936, 0.9074], [0.4759, 0.0722, 0.7917], [0.7552, 0.1288, 0.762], [0.4594, 0.0808, 0.6182], [0.6146, -0.128, 0.3223], [0.5426, -0.0053, 0.4083]]};
+const MEGA_F={"throw": [[0.4717, 0.1769, 0.8995], [0.4749, 0.1526, 0.8792], [0.4311, 0.2424, 0.9058], [0.4265, 0.0817, 1.0498], [0.3861, 0.164, 0.8641], [0.4815, 0.1635, 0.8827]], "hit": [[0.6321, 0.1079, 0.8263], [0.505, 0.1821, 0.8721], [0.4613, 0.1808, 0.8816], [0.5608, 0.1714, 0.8798], [0.4921, 0.1718, 0.8572], [0.4949, 0.1401, 0.8198]], "roar": [[0.4965, 0.1922, 0.8325], [0.5323, 0.1729, 0.8803], [0.4901, 0.1822, 0.8632], [0.492, 0.1761, 0.8684], [0.4997, 0.1711, 0.8342], [0.55, 0.0756, 0.8188]], "deflate": [[0.4948, 0.0936, 0.9074], [0.4759, 0.0722, 0.7917], [0.7552, 0.1288, 0.762], [0.4594, 0.0808, 0.6182], [0.6146, -0.128, 0.3223], [0.5426, -0.0053, 0.4083]]};
 const MEGA_EYE={float:[.457,.178],throw:[.507,.259],roar:[.471,.141],hit:[.399,.225],deflate:[.37,.21]};
 function drawGrum(){
   const g=ghost;if(g.mega){drawMega(g);return}
@@ -3446,9 +3453,10 @@ function drawGrum(){
   ctx.restore();
   grumSay(g);
 }
+const MEGAW=345; /* GRUMBLEMAX drawn width in game units (user: a bit bigger; was 300) */
 function drawMega(g){if(g.ko&&g.koT>2.2)return;
   const key=g.ko?'deflate':g.roarT>0||g.pose==='roar'?'roar':(g.hitT>0||g.fxT>0)?'hit':g.throwA>0?'throw':'float';let A=SPR['c_mega_'+key]||SPR.c_mega_float;if(!A)return;
-  let e=MEGA_EYE[key]||MEGA_EYE.float,wU=300*megaK;
+  let e=MEGA_EYE[key]||MEGA_EYE.float,wU=MEGAW*megaK;
   if(key==='float'&&SPR.c_mega_af0){const fi=Math.floor(g.fph||0)%6;if(SPR['c_mega_af'+fi]){A=SPR['c_mega_af'+fi];e=MEGA_A[fi];wU*=e[2]}}
   else if(MEGA_F[key]&&SPR['c_mega_'+key+'_a0']){const pr=(t,d)=>Math.max(0,Math.min(5,Math.floor((1-Math.max(0,t)/d)*6)));
     const fi=key==='throw'?3+Math.min(2,Math.floor((1-g.throwA/(g.throwD||.4))*3)):key==='hit'?pr(Math.max(g.hitT,g.fxT||0),.7):key==='roar'?(g.roarT>0?pr(g.roarT,1.4):Math.floor(now*8)%6):Math.min(5,Math.floor(g.koT/1.6*6));
@@ -4053,18 +4061,22 @@ function flyKindNow(){const a=bgArt();if(!a||!(state==='play'||state==='levelup'
   if(scene().n==='PINEY WOODS')return SPR.owl_0?'woods':null;const k=FLYBG[a[0]];return k&&(k==='meadow'||SPR[FLY[k].k+'_0'])?k:null}
 /* one bird of a group: its own size, wingbeat speed and phase, place in the group and little weave, so no two flap alike */
 const flyM=(dx,dy,h)=>({dx,dy,h:h*rnd(.86,1.12),fps:rnd(.85,1.18),ph:rnd(0,6),wf:rnd(1.6,3.2),wa:rnd(4,12),wp:rnd(0,9),a:rnd(.88,1)});
-function spawnFlyer(kind){const D=FLY[kind],fromL=Math.random()<.5,gw=W/S,s=fromL?1:-1;
+/* where the open sky is in each painting (fractions of the backdrop's height): sky flyers spawn inside it, under the HUD (user: river and desert flyers were too low, the geese got lost) */
+const SKYV={dfly:[.2,.34],vulture:[.1,.3],goose:[.08,.24]};
+function skyY(v){const top=(GY-(hudBottom()+30*S))/S,y=(GY-bgPt(.5,v).y)/S;return Math.min(top,y)}
+function spawnFlyer(kind){const f=spawnFlyer0(kind),V=SKYV[f.k];if(V){f.yb=[skyY(V[1]),skyY(V[0])];f.y=rnd(f.yb[0],f.yb[1])}return f}
+function spawnFlyer0(kind){const D=FLY[kind],fromL=Math.random()<.5,gw=W/S,s=fromL?1:-1;
   if(D.k==='bf'){const c=['pink','blue','yellow'][Math.floor(Math.random()*3)];return{k:'bf',c,x:fromL?-30:gw+30,y:rnd(150,330),vx:s*rnd(28,48),ph:rnd(0,9),wait:rnd(0,6),h:rnd(16,22),m:[flyM(0,0,1)]}}
   if(D.k==='owl')return{k:'owl',x:fromL?-80:gw+80,y:rnd(260,420),vx:s*rnd(90,140),ph:rnd(0,9),wait:rnd(1,9),m:[Object.assign(flyM(0,0,rnd(64,84)),{a:.85})]};
   /* swifts: a pair, fast, one trailing the other at its own height, each weaving on its own */
   if(D.k==='swift'){const h=rnd(19,24);return{k:'swift',x:fromL?-60:gw+60,y:rnd(330,470),vx:s*rnd(150,210),wait:rnd(1,7),m:[flyM(0,0,h),flyM(-rnd(45,85),rnd(-34,34),h)].map(b=>(b.wa=rnd(10,24),b.fps*=1.4,b))}}
   /* dragonflies: hover, then dart to a new spot, back and forth, before zipping off */
-  if(D.k==='dfly')return{k:'dfly',x:rnd(.2,.8)*gw,y:rnd(60,140),vx:0,tx:null,hv:rnd(.4,1.4),life:rnd(9,16),wait:rnd(1,6),fade:0,m:[Object.assign(flyM(0,0,rnd(30,36)),{fps:1.9,wa:3})]};
+  if(D.k==='dfly')return{k:'dfly',x:rnd(.2,.8)*gw,y:rnd(60,140),vx:0,tx:null,hv:rnd(.4,1.4),life:rnd(9,16),wait:rnd(1,6),fade:0,m:[Object.assign(flyM(0,0,rnd(40,46)),{fps:1.9,wa:3})]};
   /* vultures: one or two circling high up, each on its own loop, slowly drifting across */
   if(D.k==='vulture'){const n=Math.random()<.55?2:1,m=[];for(let i=0;i<n;i++)m.push(Object.assign(flyM(rnd(-60,60),rnd(-30,30),rnd(32,42)),{rx:rnd(90,160),ry:rnd(20,36),av:rnd(.42,.62)*(Math.random()<.5?1:-1),ang:rnd(0,TAU),flap:rnd(3,9)}));
     return{k:'vulture',x:fromL?-260:gw+260,y:rnd(400,480),vx:s*rnd(18,30),wait:rnd(0,4),m}}
   /* geese: a V (or a loose few), each goose flapping on its own beat */
-  const n=3+Math.floor(Math.random()*3),v=Math.random()<.65,h=rnd(26,32),m=[flyM(0,0,h)];
+  const n=3+Math.floor(Math.random()*3),v=Math.random()<.65,h=rnd(32,38),m=[flyM(0,0,h)];
   for(let i=1;i<n;i++){const k=Math.ceil(i/2),sd=i%2?1:-1;m.push(v?flyM(-k*rnd(36,44),sd*k*rnd(16,22),h):flyM(-rnd(30,52)*i,rnd(-30,30),h))}
   return{k:'goose',x:fromL?-60:gw+60,y:rnd(380,470),vx:s*rnd(75,100),wait:rnd(2,10),m}}
 function flyOut(f,gw){const pad=f.k==='vulture'?300:f.k==='goose'?360:160;return f.x<-pad||f.x>gw+pad}
@@ -4074,7 +4086,7 @@ function updFlyers(dt){const k=flyKindNow();if(k!==flyKind){flyKind=k;flyers=[]}
   for(let i=0;i<flyers.length;i++){const f=flyers[i];if(f.wait>0){f.wait-=dt;continue}f.t=(f.t||0)+dt;
     if(f.k==='dfly'){f.life-=dt;f.fade=Math.min(1,f.fade+dt*2);
       if(f.life<=0){if(!f.out){f.out=1;f.tx=null;f.vx=(f.x<gw/2?-1:1)*420}}
-      else{f.hv-=dt;if(f.hv<=0&&f.tx==null){f.tx=clamp(f.x+(Math.random()<.5?-1:1)*rnd(120,300),.08*gw,.92*gw);f.ty=clamp(f.y+rnd(-40,40),55,150)}
+      else{f.hv-=dt;if(f.hv<=0&&f.tx==null){f.tx=clamp(f.x+(Math.random()<.5?-1:1)*rnd(120,300),.08*gw,.92*gw);f.ty=f.yb?clamp(f.y+rnd(-40,40),f.yb[0],f.yb[1]):clamp(f.y+rnd(-40,40),55,150)}
         if(f.tx!=null){const dx=f.tx-f.x;f.vx+=(Math.sign(dx)*520-f.vx)*Math.min(1,dt*6);if(Math.abs(dx)<14){f.tx=null;f.vx=0;f.hv=rnd(.5,1.8)}f.y+=(f.ty-f.y)*Math.min(1,dt*3)}
         else f.vx*=Math.max(0,1-dt*10)}
       f.x+=f.vx*dt;if(f.vx)f.dir=Math.sign(f.vx)}
