@@ -239,3 +239,5 @@
 - Booster Beam: Booster always hovers on the roomy side of Grumble and switches sides if Grumble drifts past the screen edge, so the beam never fires out of his back.
 - Touch: a second finger only takes over steering once it actually drags (16 px), so a quick tap with another finger fires without breaking the steering thumb. Paddle: the swing turns to the nearest incoming junk and its hit window is wider and longer. Waffles are grabbed by any part of Todd, in the air or bouncing at his feet.
 
+## Playtest links
+- ?lv=N (1-30), ?lv=boss, ?lv=end jump straight into a level, the GRUMBLEMAX fight or the ending (JUMP / jumpTo in the source). It's a test run: nothing saved, no lives used (shows 9), normal Booster drops, the chapter unlocks before that level are given. Add &fx for the special-weapon drop order. The user's link page is the "Bonkd Level Jump" artifact.

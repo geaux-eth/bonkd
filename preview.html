@@ -699,7 +699,7 @@ function spendDaily(){const n=dailyUsed()+1;try{localStorage.setItem('bonkd-life
 function freeLeft(){return Math.max(0,freeLives()-dailyUsed())}
 function msToReset(){const n=new Date();return Date.UTC(n.getUTCFullYear(),n.getUTCMonth(),n.getUTCDate()+1)-n.getTime()}
 function lifeBuys(){try{const d=Date.now()-864e5;return (JSON.parse(localStorage.getItem('bonkd-lifebuys')||'[]')||[]).filter(x=>x>d)}catch(e){return[]}}
-function livesLeft(){return freeLeft()+(wallet.lives?wallet.lives():0)}
+function livesLeft(){if(typeof JUMP!=='undefined'&&JUMP)return 9;return freeLeft()+(wallet.lives?wallet.lives():0)}
 function freeLives(){return BASE_LIVES+Math.min(nibbles,NIB_MAX)}
 /* the host page tells the game how many Nibbles the connected wallet holds:
    iframe: parent.postMessage({type:'bonkd:wallet',nibbles:N},'*') from nibblethis.wtf; same page: window.bonkdSetNibbles(N) */
@@ -720,7 +720,7 @@ function renderCont(){toddHead();const n=livesLeft(),left=LIFE_DAY_MAX-(wallet.l
   b.textContent=left<1?'Bought 10 today':'Buy a life · '+LIFE_PRICE.toLocaleString();if(left>=1)b.append(wafImg());b.disabled=left<1||wallet.bal()<LIFE_PRICE;
   $('contNote').textContent=n>0?'Use a life to keep going?':left<1?"No lives left, and you've bought your 10 for today.":wallet.bal()<LIFE_PRICE?'No lives left.':'No lives left. Buy one with waffles?'}
 async function useLife(){if(state!=='cont')return;
-  if(freeLeft()>0)spendDaily();else{const r=await wallet.useLife();if(!r||!r.ok){$('contMsg').textContent="Couldn't use a life. Try again.";$('contMsg').hidden=false;renderCont();return}}
+  if(JUMP){}else if(freeLeft()>0)spendDaily();else{const r=await wallet.useLife();if(!r||!r.ok){$('contMsg').textContent="Couldn't use a life. Try again.";$('contMsg').hidden=false;renderCont();return}}
   track('continue',{n:livesLeft()});$('cont').hidden=true;
   Object.assign(bear,{hits:0,hitT:0,inv:2.5,ko:false,koT:0,lumpPop:0});items=[];strike=null;renderMeter();shownLives=-1;renderLives();
   state='play';pop('BACK IN IT!',W/2,H*.4,C.gold,52,1.3);sfx.power();playLevel()}
@@ -1188,8 +1188,16 @@ function start(m){
   ['menu','over','cont','pause','clear','chapCard','chSkip','boardPanel','settings'].forEach(k=>$(k).hidden=true); renderMeter();
   const run=++runId; store('bonkd-runs',store('bonkd-runs')+1);
   track('run_start',{lv:1,n:store('bonkd-runs')});
+  if(JUMP){jumpTo(JUMP);return}
   beginStory();
 }
+function jumpTo(j){
+  if(j==='end'||j==='ending'){beginEnding();return}
+  const n=j==='boss'?30:clamp(parseInt(j)||1,1,30);
+  level=n;for(const k in CHAPTERS)if(+k<n)chapDone[k]=true;if(n>5){bear.oat=MAXH}
+  setGhost();beginPlay();renderMeter();pops=pops.filter(p=>!p.img);clearTimeout(hintT);ghost.hold=.6;ghost.throwT=3;
+  if(j==='boss'){startBoss();return}
+  showLevelCard()}
 /* ---------- the picnic: Grumble beams up Todd's waffles, Todd gives chase (tap or any key skips) ---------- */
 let story=null,picnic=null,storyWafs=[],iris=null;
 /* the picnic spot: its own little hilltop under a big shade tree, never seen again once Todd gives chase */
@@ -1360,6 +1368,9 @@ function ghostThrow(){
   ghost.throwT=fast*(.75+rng()*.5);
 }
 let TEST=false;try{TEST=/[?&]test\b/.test(location.search)}catch(e){}
+/* level jump for playtesting (?lv=7, ?lv=boss, ?lv=end): Play drops you straight into that level with the unlocks you'd have by then.
+   It's a test run: nothing is saved, no lives are used, and the normal Booster drops are kept. */
+let JUMP=null;try{const m=location.search.match(/[?&]lv=(\w+)/);if(m)JUMP=m[1].toLowerCase()}catch(e){}if(JUMP)TEST=true;
 /* ?fx: a test run where Booster brings every super and signature move in turn, every few seconds */
 let FXTEST=false;try{FXTEST=/[?&]fx\b/.test(location.search)}catch(e){}if(FXTEST)TEST=true;
 /* ---------- anonymous play stats: queued here, sent in batches by the web build (no names, no personal info) ---------- */
@@ -1371,7 +1382,7 @@ setTimeout(()=>{let r=0;try{r=+localStorage.getItem('bonkd-runs')||0}catch(e){}t
 document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden'&&(state==='play'||state==='ko'||state==='story'||state==='levelup'))track('left',{k:state,n:lvlTime})});
 let testI=0;
 const HELP={oat:1,beam:1,shoe:1,gum:1,bearhand:1,waffli:1,pie:1,banana:1,jello:1,bun:1,zooka:1,mitt:1,magnet:1,paddle:1,ivy:1,porcu:1,beans:1};
-function pickPower(){if(FXTEST)return ['ivy','bearhand','zooka','shoe','porcu','beam','beans'][testI++%7];if(TEST)return ['ivy','porcu','beans'][testI++%3];const cur=bear.jello?'jello':bear.weapon&&bear.weapon.type, armed=!!cur;if(bear.hits>=2&&rng()<.45)return 'kit';const own=wallet.owned();const pool=Object.keys(PW).filter(k=>k!==cur&&(!SUPER[k]||own.has(k))&&(armed||HELP[k]||(k==='bucket'&&level>=3))&&(k!=='kit'||bear.hits>0)&&(k!=='bucket'||!bear.helmet)&&(k!=='snail'||slowT<=0)&&!(PW[k].unlock&&level<=PW[k].unlock&&!isCleared())&&(k!=='bearhand'||bearT<=0)&&(k!=='beam'||!beamer)&&(k!=='waffli'||waffT<=0)&&(k!=='oat'||(bear.oat|0)<MAXH));const wt=k=>PW[k].w*(k==='bucket'&&level>=3?1.8:1);const tot=pool.reduce((a,k)=>a+wt(k),0);let r=rng()*tot;for(const k of pool){r-=wt(k);if(r<=0)return k}return pool[0]}
+function pickPower(){if(FXTEST)return ['ivy','bearhand','zooka','shoe','porcu','beam','beans'][testI++%7];if(TEST&&!JUMP)return ['ivy','porcu','beans'][testI++%3];const cur=bear.jello?'jello':bear.weapon&&bear.weapon.type, armed=!!cur;if(bear.hits>=2&&rng()<.45)return 'kit';const own=wallet.owned();const pool=Object.keys(PW).filter(k=>k!==cur&&(!SUPER[k]||own.has(k))&&(armed||HELP[k]||(k==='bucket'&&level>=3))&&(k!=='kit'||bear.hits>0)&&(k!=='bucket'||!bear.helmet)&&(k!=='snail'||slowT<=0)&&!(PW[k].unlock&&level<=PW[k].unlock&&!isCleared())&&(k!=='bearhand'||bearT<=0)&&(k!=='beam'||!beamer)&&(k!=='waffli'||waffT<=0)&&(k!=='oat'||(bear.oat|0)<MAXH));const wt=k=>PW[k].w*(k==='bucket'&&level>=3?1.8:1);const tot=pool.reduce((a,k)=>a+wt(k),0);let r=rng()*tot;for(const k of pool){r-=wt(k);if(r<=0)return k}return pool[0]}
 function spawnAngel(){const side=rng()<.5?-1:1;angel={side,x:side<0?-80*S:W+80*S,y:H*.46,phase:'in',t:0,fs:-side};sfx.boosterIn()}
 function tossGift(){
   const type=pickPower(), ax=angel.x, ay=angel.y+10*S, tx=rnd(.15,.85)*W;
@@ -1850,7 +1861,7 @@ function update(dt){
     const armed=!!bear.weapon||!!bear.jello, busy=!!angel||gifts.length>0||ghost.yOff<-30*S||!!superBG;
     if(!armed&&!busy)angelT=Math.min(angelT,1.6+rng()*1.4);
     if(!busy)angelT-=dt*(armed?.35:1)*(bossMode?1.8:1);
-    if(angelT<=0&&!busy){spawnAngel();angelT=TEST?4:12+rng()*4}
+    if(angelT<=0&&!busy){spawnAngel();angelT=TEST&&!JUMP?4:12+rng()*4}
   }
   /* the clear card follows soon after the last waffle is grabbed (user: the wait was too long); a special waffle's name only needs its first 1.4 s */
   if(state==='levelup'){levelT+=dt;if(levelT>2&&!wafs.length&&(!showCur||showCur.t>1.6)&&!showQ.length){clrT+=dt;if(clrT>.45)showClear()}else clrT=0}
