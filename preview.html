@@ -50,7 +50,9 @@ canvas{display:block;width:100%;height:100%;touch-action:none;cursor:grab}
 /* New Heroes coin: white disc, ink ring as heavy as the section rules, the raccoon in solid black */
 .st-card.hero .coin{width:96px;height:96px;border-radius:50%;background:#fff;border:2px solid var(--ink);display:flex;align-items:flex-end;justify-content:center;overflow:hidden;box-sizing:border-box}
 .st-card.hero .coin img{width:auto;height:84%;margin-bottom:6%}
-.st-item .buy.done{background:#d6d6d6;color:#6b6b6b;border-color:#8a8a8a;box-shadow:none;opacity:1;filter:none}
+.st-life{margin-top:2px}
+.st-left{display:block}
+.st-item .buy.done{font-variant-numeric:tabular-nums;white-space:pre-line;line-height:1.15;padding-top:7px;padding-bottom:5px;background:#d6d6d6;color:#6b6b6b;border-color:#8a8a8a;box-shadow:none;opacity:1;filter:none}
 .st-card.quest .qimg b{position:relative}
 .st-card.quest span{white-space:nowrap;font-size:.9em}
 .st-card.quest .qimg b{font:44px 'Lilita One',Impact,sans-serif;color:#fff;-webkit-text-stroke:2px #161616}
@@ -457,18 +459,19 @@ body.ready #boot{opacity:0;pointer-events:none}
       <p class="pre outline st-pre">The Waffle</p>
       <h2 class="logo st-logo" aria-label="Store"><span>S</span><span>T</span><span>O</span><span>R</span><span>E</span></h2>
       <p class="wallet" id="stWallet"><span>BALANCE:</span><b id="stBal">0</b><img class="wicon" alt="waffles"></p>
+      <div class="st-list st-life" id="stLife"></div>
       <section class="st-sec">
         <h3 class="st-h">Super Duper Weapons</h3>
-        <p class="st-sub">Add these to your arsenal and Booster will toss 'em to ya in the game!</p>
+        <p class="st-sub">Add these to your in-game arsenal.</p>
         <div class="st-list" id="stWeapons"></div>
       </section>
       <section class="st-sec">
         <h3 class="st-h">Quests <span class="sticker">Coming soon!</span></h3>
-        <p class="st-sub">Take on Grumble in brand new places.</p>
+        <p class="st-sub">Take on Grumble in brand new adventures!</p>
         <div class="st-row" id="stQuests"></div>
       </section>
       <section class="st-sec">
-        <h3 class="st-h">New Heroes <span class="sticker">Coming soon!</span></h3>
+        <h3 class="st-h">Legends <span class="sticker">Coming soon!</span></h3>
         <p class="st-sub">A new hero emerges...</p>
         <div class="st-row" id="stHeroes"></div>
       </section>
@@ -666,7 +669,7 @@ let SEEN={};try{SEEN=JSON.parse(localStorage.getItem('bonkd-seen')||'{}')||{}}ca
 const FIRST={oat:'YELLOW RINGS SOAK UP BONKS',beam:'BOOSTER BLASTS GRUMBLE FOR YOU',shoe:'# TO HONK · 5 BLASTS',bearhand:'DOUBLE DAMAGE UNTIL YOU GET BONKED',gum:'# TO BLOW A BUBBLE · 3 BUBBLES',waffli:'GRUMBLE THROWS WAFFLES FOR 10 SECONDS',pie:'2 PIES · # TO THROW · THEY FIND GRUMBLE',banana:'# TO THROW · HITS GRUMBLE TWICE',jello:'JUNK BOUNCES OFF IT',bun:'# TO LOB · 3 PER SOCK',zooka:'# TO FIRE · 6 BARNYARD BLASTS',
   bucket:'BLOCKS 2 BONKS · CATCHES LIGHTNING',mitt:'CATCHES UP TO 3 PIECES OF JUNK · # TO THROW',magnet:'CATCHES METAL JUNK NEAR YOU · # TO FIRE IT BACK',paddle:'12 SECONDS · # TO SWOT',snail:'EVERYTHING SLOWS DOWN',kit:'HEALS ALL YOUR BONKS',ivy:'# TO LAUNCH · GRUMBLE GETS ITCHY',porcu:'# TO POP · QUILL STORM!',beans:'TODD GOES GIANT · # TO SMASH'};
 const HAND={pie:1,banana:1,shoe:1,gum:1,jello:1,bun:1,zooka:1,mitt:1,magnet:1,paddle:1,ivy:1,porcu:1,beans:1};
-const SUPER={beam:{price:10000,tier:'beam',label:'Heavenly',desc:'Booster swoops in and blasts Grumble with a holy laser!'},ivy:{price:2500,tier:'effective',label:'Effective',desc:'The itchiest threads in town!'},
+const SUPER={beam:{price:10000,tier:'beam',label:'Heavenly',desc:'Booster to the rescue!'},ivy:{price:2500,tier:'effective',label:'Effective',desc:'The itchiest threads in town!'},
   porcu:{price:5000,tier:'omghost',label:'Really Effective',desc:'Ouch is right!'},
   beans:{price:25000,tier:'unbearable',label:'Really Really Effective',desc:"They're good for your heart!"}};
 const SUPER_BASE={effective:.45,omghost:.7,beam:.85,unbearable:1.1};
@@ -736,7 +739,7 @@ async function buyLife(){const r=await wallet.buyLife(),m=$('contMsg');
 let wallet={
   bal(){return Math.max(0,store('bonkd-waffles')-store('bonkd-spent'))},
   owned(){try{return new Set(JSON.parse(localStorage.getItem('bonkd-owned')||'[]'))}catch(e){return new Set()}},
-  lives(){return store('bonkd-lives')},lifeToday(){return lifeBuys().length},
+  lives(){return store('bonkd-lives')},lifeToday(){return lifeBuys().length},lifeNext(){const b=lifeBuys();return b.length?Math.min(...b)+864e5:0},
   async buyLife(){const b=lifeBuys();if(b.length>=LIFE_DAY_MAX)return{ok:false,reason:'limit'};if(this.bal()<LIFE_PRICE)return{ok:false,reason:'not_enough'};store('bonkd-spent',store('bonkd-spent')+LIFE_PRICE);store('bonkd-lives',store('bonkd-lives')+1);b.push(Date.now());try{localStorage.setItem('bonkd-lifebuys',JSON.stringify(b))}catch(e){};return{ok:true}},
   async useLife(){const n=store('bonkd-lives');if(n<1)return{ok:false,reason:'none'};store('bonkd-lives',n-1);return{ok:true}},
   async buy(k){const p=SUPER[k].price,o=this.owned();if(o.has(k))return{ok:true};if(this.bal()<p)return{ok:false,reason:'not_enough'};store('bonkd-spent',store('bonkd-spent')+p);o.add(k);try{localStorage.setItem('bonkd-owned',JSON.stringify([...o]))}catch(e){};return{ok:true}}
@@ -2072,12 +2075,12 @@ let stConfirm=null;
 function renderStore(){
   $('stBal').textContent=wallet.bal().toLocaleString();
   const own=wallet.owned(), box=$('stWeapons'); box.textContent='';
-  {const row=document.createElement('div');row.className='st-item';const img=document.createElement('img');img.alt='';img.src=toddHead();img.style.borderRadius='50%';
+  {const box=$('stLife');box.textContent='';const row=document.createElement('div');row.className='st-item';const img=document.createElement('img');img.alt='';img.src=toddHead();img.style.borderRadius='50%';
     const mid=document.createElement('div');const nm=document.createElement('div');nm.className='nm';nm.textContent='EXTRA LIFE';const p=document.createElement('p');
     const left=LIFE_DAY_MAX-(wallet.lifeToday?wallet.lifeToday():0),have=wallet.lives?wallet.lives():0;
-    p.textContent='Keep going after you get BONKD. '+Math.max(0,left)+' of '+LIFE_DAY_MAX+' left to buy today.';mid.append(nm,p);
+    p.textContent='Keep going after you get BONKD.';const p2=document.createElement('span');p2.className='st-left';p2.textContent=Math.max(0,left)+' of '+LIFE_DAY_MAX+' left to buy today.';p.append(p2);mid.append(nm,p);
     const b=document.createElement('button');b.type='button';b.className='btn small buy';
-    if(left<1){b.textContent='Sold out today';b.disabled=true;b.classList.add('done')}
+    if(left<1){b.disabled=true;b.classList.add('done');b.dataset.next=wallet.lifeNext?wallet.lifeNext():0;lifeTick(b)}
     else if(stConfirm==='life'){b.textContent='Buy for '+LIFE_PRICE.toLocaleString()+'?';b.classList.add('red')}else{b.textContent=LIFE_PRICE.toLocaleString();b.append(wafImg())}
     b.onclick=storeLife;row.append(img,mid,b);box.append(row)}
   for(const k of['ivy','porcu','beam','beans']){const it=SUPER[k];
@@ -2094,6 +2097,12 @@ function renderStore(){
       if(bg&&SPR[bg]){const im=document.createElement('i');im.style.backgroundImage='url('+SPR[bg].img.src+')';i.append(im)}const q=document.createElement('b');q.textContent='?';i.append(q);d.setAttribute('aria-label',nm);d.append(i);$('stQuests').append(d)}}
   if(!$('stHeroes').childElementCount&&SPR.st_raccoon){const d=document.createElement('div');d.className='st-card hero';const c=document.createElement('div');c.className='coin';const i=document.createElement('img');i.alt='Mystery hero';i.src=SPR.st_raccoon.img.src;c.append(i);d.append(c);$('stHeroes').append(d)}
 }
+/* the 10-a-day extra-life limit is a rolling 24 hours: the gray button counts down live to when the next one can be bought */
+let lifeTimer=0;
+function lifeTick(b){clearInterval(lifeTimer);const t=+b.dataset.next||0;const f=()=>{if(!b.isConnected||$('storePage').hidden){clearInterval(lifeTimer);return}
+    let ms=t-Date.now();if(t&&ms<=0){clearInterval(lifeTimer);if(window.bonkdRefreshMe)window.bonkdRefreshMe().then(renderStore);else renderStore();return}
+    ms=Math.max(0,ms);const h=Math.floor(ms/36e5),m=Math.floor(ms/6e4)%60,sec=Math.floor(ms/1e3)%60,z=n=>String(n).padStart(2,'0');
+    b.textContent=t?'Available in\n'+z(h)+':'+z(m)+':'+z(sec):'Available tomorrow'};f();lifeTimer=setInterval(f,1000)}
 function showNoWaffles(k){track('no_waffles',{k});const need=k&&SUPER[k]?Math.max(1,SUPER[k].price-wallet.bal()):0;
   $('noTxt').textContent=need?"You don't have enough waffles for the "+PW[k].name+". You need "+need.toLocaleString()+" more. Wanna buy some?":"You don't have enough waffles. Wanna buy some?";$('stNo').hidden=false}
 function buyWaffles(){track('buy_waffles_tap');$('stNo').hidden=true;const m=$('stMsg');m.textContent='Waffle packs are coming soon! Until then, bonk Grumble to earn more.';m.hidden=false}
@@ -2169,6 +2178,7 @@ let askedSession=false;
 const localWaf=()=>store('bonkd-waffles');
 async function newSession(){const r=await SB.auth.signInAnonymously();if(r.error)throw r.error;myId=r.data.session.user.id}
 let dayInfo=null;
+window.bonkdRefreshMe=()=>SB?loadMe():Promise.resolve();
 async function loadMe(){try{const {data}=await SB.rpc('my_profile');prof=data||{};if(prof.id)myId=prof.id}catch(e){}try{const {data}=await SB.rpc('daily_lives');if(data&&data.day)dayInfo=data}catch(e){}renderProfile()}
 let legendRows=[];
 async function loadLegends(){try{const {data}=await SB.from('tournaments').select('id,title,legend,legend_name,ends_at').not('legend','is',null).order('ends_at');legendRows=data||[]}catch(e){}}
@@ -2186,11 +2196,11 @@ async function loadTop(){
       await loadMe(); await loadTop();
       wallet={bal(){return Math.max(0,+prof.wallet||0)},owned(){return new Set(prof.owned||[])},
         cleared(){return !!prof.cleared},async markCleared(){if(prof.cleared)return;prof.cleared=true;try{await SB.rpc('mark_cleared')}catch(e){}},
-        lives(){return +prof.lives||0},lifeToday(){return +prof.lives_today||0},
+        lives(){return +prof.lives||0},lifeToday(){return +prof.lives_today||0},lifeNext(){return prof.lives_next?Date.parse(prof.lives_next):0},
         /* daily lives are also counted on the server (life_days), so clearing the browser doesn't hand out fresh ones */
         dayUsed(){return dayInfo&&dayInfo.day===utcDay()?+dayInfo.used||0:0},
         spendDay(allow){SB.rpc('use_daily_life',{p_allow:allow}).then(({data})=>{if(data&&data.day)dayInfo=data}).catch(()=>{})},
-        async buyLife(){try{const {data,error}=await SB.rpc('buy_life');if(error)throw error;if(data.wallet!==undefined)prof.wallet=data.wallet;if(data.lives!==undefined)prof.lives=data.lives;if(data.today!==undefined)prof.lives_today=data.today;return data}catch(e){return{ok:false,reason:'offline'}}},
+        async buyLife(){try{const {data,error}=await SB.rpc('buy_life');if(error)throw error;if(data.wallet!==undefined)prof.wallet=data.wallet;if(data.lives!==undefined)prof.lives=data.lives;if(data.today!==undefined)prof.lives_today=data.today;if(data.next!==undefined)prof.lives_next=data.next;return data}catch(e){return{ok:false,reason:'offline'}}},
         async useLife(){try{const {data,error}=await SB.rpc('use_life');if(error)throw error;if(data.lives!==undefined)prof.lives=data.lives;return data}catch(e){return{ok:false,reason:'offline'}}},
         async buy(k){try{const {data,error}=await SB.rpc('buy_item',{p_item:k});if(error)throw error;if(data.ok){prof.wallet=data.wallet;prof.owned=data.owned}return data}catch(e){return{ok:false,reason:'offline'}}}};
       if(store('bonkd-cleared')&&prof.id&&!prof.cleared)wallet.markCleared();
