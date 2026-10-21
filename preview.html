@@ -775,7 +775,7 @@ let bearT=0,waffT=0,beamer=null;
 const HB=()=>ghost.mega?2.1:1;
 /* RULE: a still image never performs an action. While Grumble shows a reaction pose (pie, soot, quills, zap, blanket...) he is stunned: he doesn't throw or roam, he just reacts. */
 /* during a super Grumble is just getting hit: no throwing, no lightning */
-const ghostStunned=()=>!ghost.ko&&((superBG&&!superBG.ended&&superBG.t<superBG.life)||(ghost.fx==='lit'&&ghost.fxT>0)||(!ghost.mega&&(ghost.blanket>0||ghost.offT>0||ghost.splat>0||(ghost.fxT>0&&ghost.fx&&ghost.fx!=='hit'&&ghost.fx!=='burn'))));
+const ghostStunned=()=>!ghost.ko&&((superBG&&!superBG.ended&&superBG.t<superBG.life)||(ghost.fxT>0&&(ghost.fx==='lit'||ghost.fx==='burn'))||(!ghost.mega&&(ghost.blanket>0||ghost.offT>0||ghost.splat>0||(ghost.fxT>0&&ghost.fx&&ghost.fx!=='hit'&&ghost.fx!=='burn'))));
 /* Grumble's whole body (hood to the bottom of his body, not just his face): an ellipse from the face anchor down */
 function ghostBodyHit(x,y,r){const k=GK*S*HB(),cx=ghost.x,cy=ghost.y+ghost.yOff+52*k,rx=92*k+r,ry=122*k+r;return ((x-cx)/rx)**2+((y-cy)/ry)**2<1}
 /* Lumpy Oatmeal: a yellow ring on every bonk icon; each ring soaks up one bonk before the meter starts to fill */
@@ -1628,8 +1628,8 @@ function hitGhost(s){
     if(!(s.kind==='fly'&&ghost.fxT>0&&ghost.fx!=='burn'&&ghost.fx!=='hit')){ghost.fx=fk[0];ghost.fxT=fk[1];ghost.fxD=fk[1]}}
   const gy=ghost.y+ghost.yOff;
   {const sx0=s.x!=null?s.x:ghost.x,sy0=s.y!=null?s.y:gy,dx=sx0-ghost.x,dy=sy0-gy,d=Math.hypot(dx,dy)||1,R=60*GK*(ghost.mega?2:1)*S,hx=ghost.x+dx/d*Math.min(d,R),hy=gy+dy/d*Math.min(d,R);
-    const pw={fly:[0,.07,.5],quill:[s.sup?.06:0,s.sup?.3:.08,.7],animal:[.11,.5,1.3],beam:[.025,.12,0],zap:[.09,.4,1.1],smash:[.1,.45,1.2],honk:[.06,.25,1],bubble:[.04,.15,.8]}[s.kind]||[Math.min(.08,.03+dm*.015),Math.min(.35,.12+dm*.05),.85+Math.min(.4,dm*.12)];
-    const HFX={pie:'pie',banana:'banana',bun:'bun',quill:'quill',bubble:'gum'};if(HFX[s.kind])fxPlay(HFX[s.kind],hx,hy,ghost.mega?1.6:1,Math.random()*.4-.2,Math.random()<.5?-1:1);else if(s.kind==='fly')fxPlay('lember',hx,hy,(ghost.mega?1.2:.8)*rnd(.8,1.15),rnd(0,TAU),1);else if(s.kind==='smash')fxPlay('smash',ghost.x,GY+4*S,1,0,1);else if(s.kind==='animal')fxPlay('zhit',hx,hy,1.15,0,1);else if(s.kind==='beam')fxPlay('bimp',hx,hy,1.25,Math.random()*TAU,1);else fxPlay('spark',hx,hy,pw[2],Math.random()*.6-.3,Math.random()<.5?-1:1);
+    const pw={fly:[0,.16,.5],quill:[s.sup?.06:0,s.sup?.3:.08,.7],animal:[.11,.5,1.3],beam:[.025,.12,0],zap:[.09,.4,1.1],smash:[.1,.45,1.2],honk:[.06,.25,1],bubble:[.04,.15,.8]}[s.kind]||[Math.min(.08,.03+dm*.015),Math.min(.35,.12+dm*.05),.85+Math.min(.4,dm*.12)];
+    const HFX={pie:'pie',banana:'banana',bun:'bun',quill:'quill',bubble:'gum'};if(HFX[s.kind])fxPlay(HFX[s.kind],hx,hy,ghost.mega?1.6:1,Math.random()*.4-.2,Math.random()<.5?-1:1);else if(s.kind==='fly'){fxPlay('lember',hx,hy,(ghost.mega?1.5:1.05)*rnd(.85,1.2),rnd(0,TAU),1);if(Math.random()<.35)fxPlay('lspark',hx,hy,(ghost.mega?.9:.6)*rnd(.8,1.1),rnd(0,TAU),1)}else if(s.kind==='smash')fxPlay('smash',ghost.x,GY+4*S,1,0,1);else if(s.kind==='animal')fxPlay('zhit',hx,hy,1.15,0,1);else if(s.kind==='beam')fxPlay('bimp',hx,hy,1.25,Math.random()*TAU,1);else fxPlay('spark',hx,hy,pw[2],Math.random()*.6-.3,Math.random()<.5?-1:1);
     hitImpact(pw[0],pw[1])}
   if(s.kind==='quill'){ghost.quills=Math.min(24,(ghost.quills||0)+(s.sup?12:1));sfx.quillHit()}
   else if(s.kind==='ivy'){ghost.blanket=1.3;ghost.itch=8;ghost.itchRate=superDmg('effective')*.35/8;pop('BLANKETED!',ghost.x,gy-74*GK*S,'#4fbf5a',40);if(!(superBG&&superBG.k==='ivy'))setFx('ivy',2.4);sfx.ivyHit()}
@@ -1683,11 +1683,12 @@ function showClear(){
    muzzle and embers flickering around every bug. Each one stings a little and heats Grumble up (orange glow, steam wisps); a rip
    that mostly lands TOASTS him: the lit-up sheet plays, he's stunned for a beat, then shakes it off. 4 rips per backpack, and the
    backpack's glow dims as the bugs run out. GRUMBLEMAX gets the same. */
-const LMU={dur:2.6,spin:.3,rate:16,dmg:.3,rips:4,toast:22,speed:1250};
+const LMU={dur:2.6,spin:.1,rate:16,dmg:.5,rips:4,toast:22,speed:2700}; /* user: fire on the first tap, much faster bullets that hit harder */
 let lmuB=[],lmuSrc=null,lmuSndT=0;
+function segDist(px,py,ax,ay,bx,by){const dx=bx-ax,dy=by-ay,l=dx*dx+dy*dy||1,t=clamp(((px-ax)*dx+(py-ay)*dy)/l,0,1);return Math.hypot(px-ax-dx*t,py-ay-dy*t)}
 function lmuNew(){return{type:'lmu',ammo:LMU.rips,rip:0,t:0,acc:0,hits:0}}
 function lmuStop(){if(lmuSrc){try{lmuSrc.stop()}catch(e){}lmuSrc=null}}
-function lmuRip(w){if(w.rip>0||w.ammo<=0)return;w.ammo--;w.rip=LMU.dur;w.t=0;w.acc=0;w.hits=0;lmuStop();
+function lmuRip(w){if(w.rip>0||w.ammo<=0)return;w.ammo--;w.rip=LMU.dur;w.t=0;w.acc=1/LMU.rate;w.hits=0;lmuStop();lmuShot(w);
   if(AC&&SFXBUF.lmuRip){const src=AC.createBufferSource(),g=AC.createGain();src.buffer=SFXBUF.lmuRip;g.gain.value=.8;src.connect(g);g.connect(sfxGain||AC.destination);src.start();lmuSrc=src;src.onended=()=>{if(lmuSrc===src)lmuSrc=null}}
   const hp=headPos();pop(["LIGHT 'EM UP!",'BRRRRRRT!','FIREFLY FURY!'][w.ammo===LMU.rips-1?0:Math.floor(Math.random()*3)],clamp(bear.x,170*S,W-170*S),hp.y-70*S,'#ffb000',w.ammo===LMU.rips-1?44:34,.9);haptic([30,20,30])}
 /* one firefly out of the barrels: aimed at Grumble with a little spread, homing gently; in the chapter scene it just flies off */
@@ -1700,14 +1701,14 @@ function lmuShot(w,key){const f=bear.faceS||bear.face||1;let m=null;
 function updLmu(dt){lmuSndT=Math.max(0,lmuSndT-dt);const w=bear.weapon;
   if(w&&w.type==='lmu'&&w.rip>0){if(state!=='play'||bear.ko){w.rip=0;lmuStop()}
     else{w.t+=dt;w.rip-=dt;shake=Math.max(shake,.12);
-      if(w.t>LMU.spin&&w.rip>0){w.acc+=dt;while(w.acc>1/LMU.rate){w.acc-=1/LMU.rate;lmuShot(w)}}
+      if(w.rip>0){w.acc+=dt;while(w.acc>1/LMU.rate){w.acc-=1/LMU.rate;lmuShot(w)}}
       if(w.rip<=0){w.rip=0;if(w.hits>=LMU.toast&&!ghost.ko)lmuToast();if(w.ammo<=0)setTimeout(()=>{if(bear.weapon===w)bear.weapon=null},350)}}}
   else if(!(state==='chapter'&&chap&&chap.c.k==='lmu'))lmuStop();
   const gx=ghost.x,gy=ghost.y+ghost.yOff,R=46*GK*S*HB();
   for(const b of lmuB){b.t+=dt;
     if(b.home&&state==='play'&&!ghost.ko){const dx=gx-b.x,dy=gy-b.y,d=Math.hypot(dx,dy)||1,sp=Math.hypot(b.vx,b.vy),k=Math.min(1,dt*(b.t<.12?4:10));b.vx+=(dx/d*sp-b.vx)*k;b.vy+=(dy/d*sp-b.vy)*k} /* fireflies chase him hard: a stream that misses isn't fun */
-    b.x+=b.vx*dt;b.y+=b.vy*dt;
-    if(b.home&&state==='play'&&!ghost.ko&&Math.hypot(gx-b.x,gy-b.y)<R){b.gone=true;const w2=bear.weapon;if(w2&&w2.type==='lmu')w2.hits++;hitGhost({kind:'fly',dmg:LMU.dmg,x:b.x,y:b.y});continue}
+    const ox=b.x,oy=b.y;b.x+=b.vx*dt;b.y+=b.vy*dt;
+    if(b.home&&state==='play'&&!ghost.ko&&segDist(gx,gy,ox,oy,b.x,b.y)<R){b.gone=true;const w2=bear.weapon;if(w2&&w2.type==='lmu')w2.hits++;hitGhost({kind:'fly',dmg:LMU.dmg,x:b.x,y:b.y});continue}
     if(b.x<-80*S||b.x>W+80*S||b.y<-80*S||b.y>H+40*S||b.t>2.5)b.gone=true}
   lmuB=lmuB.filter(b=>!b.gone);
   /* Grumble cools off between rips; hot enough and he steams */
@@ -1914,7 +1915,7 @@ function update(dt){
   if(ghost.hold>0){ghost.hold-=dt;ghost.yOff=-280*S;if(ghost.hold<=0)$('hud').classList.remove('intro')}
   else if(state!=='bossintro'&&state!=='cave')ghost.yOff+=(0-ghost.yOff)*Math.min(1,dt*2.5);
   const gtx=W/2+Math.sin(ghost.t*(.55+Math.min(.9,(level-1)*.03)))*W*.27+Math.sin(ghost.t*1.9+1)*W*.05+(level>=3?(bear.x-W/2)*.15:0);
-  if(!ghost.ko&&state!=='bossintro'&&state!=='cave')ghost.x+=(gtx-ghost.x)*Math.min(1,dt*(ghostStunned()?.6:3));
+  if(!ghost.ko&&state!=='bossintro'&&state!=='cave')ghost.x+=(gtx-ghost.x)*Math.min(1,dt*(ghostStunned()?(ghost.fxT>0&&(ghost.fx==='burn'||ghost.fx==='lit')?.04:.6):3)); /* pinned in place while the fireflies light him up */
   const gvx=(ghost.x-ghost.px)/Math.max(dt,1e-3); ghost.px=ghost.x;
   if(SPR.c_grum_float){const dx=bear.x-ghost.x;if(!ghost.ko&&Math.abs(dx)>40*S)ghost.face=Math.sign(dx)}
   else if(!ghost.ko&&Math.abs(gvx)>25)ghost.face=Math.sign(gvx);
@@ -3507,7 +3508,7 @@ function grumKey(g){
   if(g.blanket>0)return 'blanket';
   if(g.offT>0)return 'blanket_off';
   if(g.splat>0)return 'pie';
-  if(g.fxT>0&&g.fx&&!(g.fx==='burn'&&(g.throwA>0||(state==='play'&&!g.mega&&g.throwT<.3&&SPR.c_grum_throw_a0))))return g.fx; /* a throw shows over the burning */
+  if(g.fxT>0&&g.fx)return g.fx;
   if(strike)return 'beam';
   if(g.throwA>0||(state==='play'&&!g.mega&&!ghostStunned()&&g.throwT<.3&&SPR.c_grum_throw_a0))return 'throw';
   if(g.itch>0)return 'itch';
@@ -4147,7 +4148,7 @@ function superK(){const B=superBG;if(!B)return 0;return Math.min(1,B.t/.35)*Math
    (drawn before the tree layer, see woodsFront). Mountain: swifts in pairs. River canyon: dragonflies darting back and forth.
    Desert: vultures circling high up. Harvest: geese in a V or a loose few. Every bird in a group has its own size, wingbeat
    rate and phase so they never flap in step. Each kind keeps 'n' groups alive and respawns them off-screen at random. */
-const FLY={meadow:{n:[2,3],k:'bf'},woods:{n:[1,2],k:'owl'},mountain:{n:[1,2],k:'swift'},canyon:{n:[1,2],k:'dfly'},desert:{n:[1,2],k:'vulture'},harvest:{n:[1,1],k:'goose'},doorstep:{n:[1,2],k:'bat'}};
+const FLY={meadow:{n:[2,3],k:'bf'},woods:{n:[1,2],k:'owl'},mountain:{n:[1,2],k:'swift'},canyon:{n:[1,2],k:'dfly'},desert:{n:[1,2],k:'vulture'},harvest:{n:[1,1],k:'goose'},doorstep:{n:[1,3],k:'bat'}};
 const FLYBG={bd_meadow:'meadow',bd_mountain:'mountain',bd_canyon:'canyon',bd_desert:'desert',bd_harvest:'harvest',bd_doorstep:'doorstep'};
 let flyers=[],flyKind=null;
 function flyKindNow(){const a=bgArt();if(!a||!(state==='play'||state==='levelup'||state==='clear'||state==='chapter'))return null;
@@ -4168,9 +4169,9 @@ function spawnFlyer0(kind){const D=FLY[kind],fromL=Math.random()<.5,gw=W/S,s=fro
   /* vultures: one or two circling high up, each on its own loop, slowly drifting across */
   if(D.k==='vulture'){const n=Math.random()<.55?2:1,m=[];for(let i=0;i<n;i++)m.push(Object.assign(flyM(rnd(-60,60),rnd(-30,30),rnd(32,42)),{rx:rnd(90,160),ry:rnd(20,36),av:rnd(.42,.62)*(Math.random()<.5?1:-1),ang:rnd(0,TAU),flap:rnd(3,9)}));
     return{k:'vulture',x:fromL?-260:gw+260,y:rnd(400,480),vx:s*rnd(18,30),wait:rnd(0,4),m}}
-  /* bats (Grumble's Doorstep): one to three, fast and jittery, each zig-zagging on its own, flitting past the moon and behind the trees */
-  if(D.k==='bat'){const n=1+Math.floor(Math.random()*3),m=[];for(let i=0;i<n;i++)m.push(Object.assign(flyM(-i*rnd(55,110),rnd(-40,40),rnd(42,52)),{wf:rnd(4,7),wa:rnd(10,22),fps:rnd(1.1,1.5)}));
-    return{k:'bat',x:fromL?-80:gw+80,y:rnd(380,470),vx:s*rnd(120,170),wait:rnd(1,7),m}}
+  /* bats (Grumble's Doorstep, user: they flew like birds and flocked): always alone, never in a group. A bat flits: quick
+     wingbeats, sudden zigs up and down, darting dips, a sharp turn back now and then, then it's gone. */
+  if(D.k==='bat')return{k:'bat',x:fromL?-60:gw+60,y:rnd(380,470),vx:s*rnd(140,220),vy:0,tvx:s*rnd(140,220),tvy:0,turn:rnd(.1,.4),life:rnd(5,10),wait:rnd(1,9),m:[Object.assign(flyM(0,0,rnd(42,52)),{wa:0,fps:rnd(1.25,1.6)})]};
   /* geese: a V (or a loose few), each goose flapping on its own beat */
   const n=3+Math.floor(Math.random()*3),v=Math.random()<.65,h=rnd(32,38),m=[flyM(0,0,h)];
   for(let i=1;i<n;i++){const k=Math.ceil(i/2),sd=i%2?1:-1;m.push(v?flyM(-k*rnd(36,44),sd*k*rnd(16,22),h):flyM(-rnd(30,52)*i,rnd(-30,30),h))}
@@ -4186,20 +4187,25 @@ function updFlyers(dt){const k=flyKindNow();if(k!==flyKind){flyKind=k;flyers=[]}
         if(f.tx!=null){const dx=f.tx-f.x;f.vx+=(Math.sign(dx)*520-f.vx)*Math.min(1,dt*6);if(Math.abs(dx)<14){f.tx=null;f.vx=0;f.hv=rnd(.5,1.8)}f.y+=(f.ty-f.y)*Math.min(1,dt*3)}
         else f.vx*=Math.max(0,1-dt*10)}
       f.x+=f.vx*dt;if(f.vx)f.dir=Math.sign(f.vx)}
+    else if(f.k==='bat'){f.life-=dt;f.turn-=dt;
+      if(f.turn<=0){f.turn=rnd(.12,.5);const sd=Math.sign(f.tvx)||1,rev=f.life>0&&Math.random()<.14&&f.x>.1*gw&&f.x<.9*gw;
+        f.tvx=(rev?-sd:sd)*rnd(110,260);f.tvy=rnd(-280,280);if(Math.random()<.2)f.tvy=-rnd(300,420)} /* now and then a quick dive */
+      if(f.yb){if(f.y<f.yb[0])f.tvy=Math.abs(f.tvy)+60;if(f.y>f.yb[1])f.tvy=-Math.abs(f.tvy)-60}
+      const k=Math.min(1,dt*11);f.vx+=(f.tvx-f.vx)*k;f.vy+=(f.tvy-f.vy)*k;f.x+=f.vx*dt;f.y+=f.vy*dt}
     else f.x+=f.vx*dt*(f.k==='bf'?(.6+.6*Math.abs(Math.sin(f.t*.7+f.ph))):1);
     if(f.k==='bf'&&Math.random()<dt*.15)f.vx*=-1;
     if(f.k==='vulture')for(const b of f.m){b.ang+=b.av*dt;b.flap-=dt;if(b.flap<-.7)b.flap=rnd(4,10)}
     if(flyOut(f,gw)||(f.k==='dfly'&&f.out&&(f.x<-80||f.x>gw+80))){flyers[i]=spawnFlyer(k);flyers[i].wait=rnd(2,8)}}}
 /* frame for each bird: wingbeat loops at its own rate; the vulture glides, banks on the turns of its circle and flaps now and then */
 function flyFrame(f,b){if(f.k==='owl')return Math.floor(f.t*9+b.ph)%6;if(f.k==='swift')return Math.floor(f.t*11*b.fps+b.ph)%6;
-  if(f.k==='dfly')return Math.floor(f.t*24*b.fps+b.ph)%6;if(f.k==='bat')return Math.floor(f.t*13*b.fps+b.ph)%6;if(f.k==='goose')return Math.floor(f.t*7*b.fps+b.ph)%6;
+  if(f.k==='dfly')return Math.floor(f.t*24*b.fps+b.ph)%6;if(f.k==='bat')return Math.floor(f.t*16*b.fps+b.ph)%6;if(f.k==='goose')return Math.floor(f.t*7*b.fps+b.ph)%6;
   if(b.flap<0)return b.flap>-.35?4:5;const c=Math.abs(Math.cos(b.ang));return c>.75?0:c>.4?1:c>.15?2:3}
 function drawFlyers(){for(const f of flyers){if(f.wait>0)continue;
   for(const b of f.m){let A,x=f.x+b.dx,y=f.y+b.dy,dir=(f.k==='dfly'?(f.dir||1):f.vx<0?-1:1),h=b.h,rot=0,al=b.a;
     if(f.k==='bf'){y+=Math.sin(f.t*2.2+f.ph)*18+Math.sin(f.t*5+f.ph)*5;A=SPR['bfn_'+f.c+(Math.sin(now*13+f.ph)>-.2?'_o':'_c')];h=f.h;rot=Math.sin(f.t*2+f.ph)*.12}
     else{const fr=flyFrame(f,b);A=SPR[f.k+'_'+fr];
       if(f.k==='vulture'){x+=Math.cos(b.ang)*b.rx;y+=Math.sin(b.ang)*b.ry;dir=Math.sign(-Math.sin(b.ang)*b.av)||1;h*=1+Math.sin(b.ang)*.08;rot=-Math.cos(b.ang)*.12*dir}
-      else{y+=Math.sin(f.t*b.wf+b.wp)*b.wa+(f.k==='bat'?Math.sin(f.t*b.wf*2.3+b.wp*1.7)*b.wa*.5:0);if(f.k==='swift'||f.k==='bat')rot=Math.cos(f.t*b.wf+b.wp)*.18}
+      else{y+=Math.sin(f.t*b.wf+b.wp)*b.wa;if(f.k==='swift')rot=Math.cos(f.t*b.wf+b.wp)*.18;if(f.k==='bat'){rot=clamp(-f.vy/700,-.45,.45);y+=Math.sin(f.t*31+b.ph)*2.5}}
       if(f.k==='dfly')al*=f.fade}
     if(!A)continue;if(PHONE)h*=1.3; /* the phone draws the world smaller; keep the flyers readable */
     const w=h*A.r;ctx.save();ctx.globalAlpha=al;ctx.translate(x*S,GY-y*S);ctx.scale(S*dir,S);ctx.rotate(rot);ctx.drawImage(A.img,-w/2,-h/2,w,h);ctx.restore()}}}
