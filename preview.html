@@ -110,6 +110,46 @@ canvas{display:block;width:100%;height:100%;touch-action:none;cursor:grab}
 .chip.t-beans i{animation-duration:.8s}
 @keyframes chipRainbow{0%{color:#ff4d4d}17%{color:#ff9f1c}33%{color:#ffe14d}50%{color:#5be06b}67%{color:#4dc3ff}83%{color:#b86bff}100%{color:#ff4d4d}}
 @keyframes chipPump{from{transform:scale(1)}to{transform:scale(1.1)}}
+/* item name chips under Todd: each one has its own personality (v52, user: they were plain) */
+.chip i{font-style:normal;display:inline-block}
+.chip{transform-origin:50% 60%}
+.chip.t-pie{animation:cSquish 1.2s ease-in-out infinite}
+.chip.t-pie i{animation:chipWave 1.2s ease-in-out infinite}
+@keyframes cSquish{0%,100%{transform:scale(1,1)}20%{transform:scale(1.12,.86)}35%{transform:scale(.94,1.08)}50%{transform:scale(1,1)}}
+.chip.t-banana{animation:cSwing 1.3s ease-in-out infinite alternate}
+@keyframes cSwing{from{transform:rotate(-7deg) translateX(-.15em)}to{transform:rotate(7deg) translateX(.15em)}}
+.chip.t-jello i{animation:cJiggle .9s ease-in-out infinite;animation-delay:calc(var(--n)*-.07s)}
+@keyframes cJiggle{0%,100%{transform:skewX(0) scaleY(1)}25%{transform:skewX(-10deg) scaleY(.92)}75%{transform:skewX(10deg) scaleY(1.08)}}
+.chip.t-bun{filter:drop-shadow(0 0 .2em #ffb347)}
+.chip.t-bun i{animation:cDrip 1.6s ease-in infinite;animation-delay:calc(var(--n)*.11s)}
+@keyframes cDrip{0%,70%,100%{transform:translateY(0) scaleY(1)}80%{transform:translateY(.1em) scaleY(1.18)}90%{transform:translateY(-.06em) scaleY(.94)}}
+.chip.t-zooka i{animation:cStomp .5s cubic-bezier(.3,0,.4,1) infinite;animation-delay:calc(var(--n)*.07s)}
+@keyframes cStomp{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-.32em) rotate(-6deg)}}
+.chip.t-bucket{animation:cClang 2.2s ease-in-out infinite}
+@keyframes cClang{0%,82%,100%{transform:rotate(0)}85%{transform:rotate(-6deg) scale(1.08)}88%{transform:rotate(5deg)}91%{transform:rotate(-3deg)}94%{transform:rotate(2deg)}}
+.chip.t-mitt i{animation:cGrab 1.4s ease-in-out infinite}
+@keyframes cGrab{0%,100%{transform:translateX(0)}50%{transform:translateX(calc((var(--n) - 4)*-.06em)) scale(.9)}}
+.chip.t-magnet i{animation:cPull 1s ease-in-out infinite;animation-delay:calc(var(--n)*.03s)}
+@keyframes cPull{0%,100%{transform:translateX(calc((var(--n) - 5)*.05em))}50%{transform:translateX(calc((var(--n) - 5)*-.05em)) rotate(3deg)}}
+.chip.t-paddle{animation:cPong .9s ease-in-out infinite alternate}
+@keyframes cPong{from{transform:translateX(-.6em) rotate(-3deg)}to{transform:translateX(.6em) rotate(3deg)}}
+.chip.t-shoe::before,.chip.t-shoe::after{content:'\266A';color:#ffd23f;-webkit-text-stroke:1.2px var(--ink);display:inline-block;animation:cNote 1s ease-in-out infinite alternate}
+.chip.t-shoe::after{content:'\266B';animation-delay:.5s}
+.chip.t-shoe i{animation:cBlast .6s ease-out infinite;animation-delay:calc(var(--n)*.05s)}
+@keyframes cBlast{0%{transform:scale(1)}20%{transform:scale(1.22)}100%{transform:scale(1)}}
+@keyframes cNote{from{transform:translateY(.1em) rotate(-12deg)}to{transform:translateY(-.25em) rotate(12deg)}}
+.chip.t-gum{animation:cBubble 1.6s ease-in-out infinite}
+@keyframes cBubble{0%,100%{transform:scale(1)}70%{transform:scale(1.16)}74%{transform:scale(.9)}80%{transform:scale(1)}}
+.chip.t-lmu{animation:cFlame .12s steps(2) infinite;filter:drop-shadow(0 0 .3em #ff9b2f)}
+.chip.t-lmu i{animation:chipWave .5s ease-in-out infinite}
+@keyframes cFlame{0%{color:#ffb000}100%{color:#ffe14d}}
+.chip.t-waffli i{animation:chipWave 1s ease-in-out infinite,cShine 1.6s linear infinite;animation-delay:calc(var(--n)*.06s),calc(var(--n)*.08s)}
+@keyframes cShine{0%,80%,100%{filter:brightness(1)}88%{filter:brightness(1.7)}}
+.chip.t-zap{animation:cZap .18s steps(2) infinite}
+@keyframes cZap{0%{transform:translate(0,0);opacity:1}100%{transform:translate(.05em,-.03em);opacity:.75}}
+.chip.t-beam{filter:drop-shadow(0 0 .3em #fff36b)}
+.chip.t-beam i{animation:chipWave 1s ease-in-out infinite}
+
 .overlay{position:absolute;inset:0;display:flex;justify-content:center;align-items:center;padding:12px 16px;box-sizing:border-box;pointer-events:none}
 .overlay.left{justify-content:flex-start;padding-left:max(24px,5%)}
 .overlay.dim{background:rgba(22,22,22,.3);pointer-events:auto}
@@ -1337,7 +1377,7 @@ function drawStoryFX(){
 function pop(txt,x,y,color,size,life,keep){if(!keep&&superBG&&!superBG.ended&&superBG.t<superBG.life+.2)return; /* user: OUCH/OOF over the super lettering looked poor */
   pops.push({txt,x,y,color,size:size||40,life:life||.9,age:0,rot:(Math.random()-.5)*.22})}
 function porcPop(p){const n=12,dm=superDmg('omghost')/48;
-  for(let i=0;i<n;i++){const a=i/n*TAU+Math.random()*.15,v=(780+Math.random()*120)*S;shots.push({kind:'quill',x:p.x+Math.cos(a)*14*S,y:p.y+Math.sin(a)*14*S,vx:Math.cos(a)*v,vy:Math.sin(a)*v,dmg:dm,speed:900,rot:a,left:1,cool:.16})}
+  for(let i=0;i<n;i++){const a=i/n*TAU+Math.random()*.15,v=(1100+Math.random()*150)*S;shots.push({kind:'quill',x:p.x+Math.cos(a)*14*S,y:p.y+Math.sin(a)*14*S,vx:Math.cos(a)*v,vy:Math.sin(a)*v,dmg:dm,speed:1700,rot:a,left:1,cool:.1})}
   rings.push({x:p.x,age:0,air:p.y});burst(p.x,p.y,'#8a5a32',10);burst(p.x,p.y,'#f3e2c4',6);
   shake=Math.max(shake,.45);setFx('invert',.1);pop('POP!',p.x,p.y-46*S,C.white,50,.6);sfx.porcuPop()}
 function burst(x,y,col,n){return;for(let i=0;i<(n||8);i++){const a=Math.random()*TAU,v=(150+Math.random()*220)*S;sparks.push({x,y,vx:Math.cos(a)*v,vy:Math.sin(a)*v-120*S,age:0,r:(4+Math.random()*4)*S,rot:Math.random()*TAU,col:col||C.gold})}}
@@ -1399,9 +1439,7 @@ function tossGift(){
 }
 function activate(type,x,y){
   const hp=headPos(), P=PW[type];
-  if(type==='pie'||type==='banana'||type==='kit'||type==='waffli')pop(P.name.toUpperCase()+'!',clamp(bear.x,170*S,W-170*S),GY-(206*bear.gs+30)*S,P.color,34,1.6);
-  if(!SEEN[type]&&type!=='bearhand'&&type!=='snail'){SEEN[type]=1;try{localStorage.setItem('bonkd-seen',JSON.stringify(SEEN))}catch(e){}
-    pop(FIRST[type].replace('#',actWord()),W/2,H*.6+32*S,C.white,PHONE?27:18,2.6);pops[pops.length-1].tip=1}
+  /* user: no lines explaining what an item does; the item's own word (or its chip) is enough */
   sfx.power(); burst(x,y,P.color);
   if(HAND[type]){bear.jello=null;bear.weapon=null}
   /* pie and banana: Todd holds it up for a moment (he got the gift), then throws */
@@ -1421,7 +1459,7 @@ function activate(type,x,y){
   if(type==='bearhand'){bearT=BH_DUR;snd('bearHanded');for(let i=0;i<3;i++)setTimeout(()=>burst(bear.x+rnd(-40,40)*S,GY-110*S,'#e8463f',16),i*120);fxPlay('bimp',bear.x,GY-120*S,2.4,0,1);hitImpact(.18,.8);redT=.7;pop('BEAR HANDED!',W/2,H*.3,'#e8463f',64,1.6);clip('stomp',.8);clip('supS2',.6,.08);haptic([70,40,110])}
   if(type==='waffli'){waffT=10;snd('waffli');for(let i=0;i<6;i++)burst(bear.x+rnd(-80,80)*S,GY-140*S,'#f2b544',3)}
   if(type==='zooka'){const q=ANIMALS.slice().sort(()=>Math.random()-.5);bear.weapon={type:'zooka',ammo:5,next:q.shift(),q};bear.aim=-1} /* user: one of each animal, then a STAMPEDE of all four */
-  if(type==='snail'){slowT=6;sfx.snailOn();pop('SLOWMO!',W/2,H*.3,'#b48cff',64,1.6)}
+  if(type==='snail'){slowT=7.5;sfx.snailOn();pop('SLOWMO!',W/2,H*.3,'#b48cff',64,1.6)}
   if(type==='bucket')bear.helmet=2;
   if(type==='kit'){sfx.kitHeal();bear.hits=0;renderMeter();pop('YAY HEALTH!',hp.x,hp.y-70*S,C.pink,30)}
   if(type==='ivy')bear.weapon={type:'ivy',ammo:1,sup:1};
@@ -1436,7 +1474,7 @@ document.querySelectorAll('.seg[data-hand]').forEach(b=>b.addEventListener('clic
 applyHand();
 function act(){
   if(bear.zap>0){zapBack();const b=$('actBtn');b.classList.add('hit');setTimeout(()=>b.classList.remove('hit'),110);return}
-  const w=bear.weapon, lead=w&&w.type==='bun'?.6:.25;
+  const w=bear.weapon, lead=w&&w.type==='bun'?.42:.25;
   tap(clamp(ghost.x+(ghost.vx||0)*lead,30*S,W-30*S),ghost.y+ghost.yOff);
   const b=$('actBtn');b.classList.add('hit');setTimeout(()=>b.classList.remove('hit'),110);
 }
@@ -1480,17 +1518,17 @@ function tap(x,y){
   if(w&&w.type==='bun'){lobBun(x,y);if(--w.ammo<=0)bear.weapon=null;return}
   if(w&&w.type==='zooka'){fireAnimal(x,y);if(--w.ammo<=0)bear.weapon=null;return}
   if(w&&w.type==='mitt'&&w.held.length){throwHeld(w);return}
-  if(w&&(w.type==='pie'||w.type==='banana')){if(swotCool>0)return;swotCool=.25;const h=headPos(),pie=w.type==='pie',sx=h.x+30*S*bear.face,sy=h.y,dx=ghost.x-sx,dy=ghost.y+ghost.yOff-sy,d=Math.hypot(dx,dy)||1,v=(pie?950:900)*S;
-    shots.push({kind:w.type,x:sx,y:sy,vx:dx/d*v,vy:dy/d*v-180*S,dmg:pie?4:2,speed:pie?950:900,rot:0,left:pie?1:2,cool:0});bear.swing=.22;pie?sfx.pieToss():sfx.bananaThrow();
+  if(w&&(w.type==='pie'||w.type==='banana')){if(swotCool>0)return;swotCool=.25;const h=headPos(),pie=w.type==='pie',sx=h.x+30*S*bear.face,sy=h.y,dx=ghost.x-sx,dy=ghost.y+ghost.yOff-sy,d=Math.hypot(dx,dy)||1,v=1500*S;
+    shots.push({kind:w.type,x:sx,y:sy,vx:dx/d*v,vy:dy/d*v-60*S,dmg:pie?4:2,speed:1900,rot:0,left:pie?1:2,cool:0});bear.swing=.22;pie?sfx.pieToss():sfx.bananaThrow();
     if(--w.ammo<=0)bear.weapon=null;return}
-  if(w&&w.type==='magnet'&&w.held&&w.held.length){const type=w.held.shift(),m=muzzlePos()||handPos(),dx=ghost.x-m.x,dy=ghost.y+ghost.yOff-m.y,d=Math.hypot(dx,dy)||1,v=1100*S;{const mf=dx<0?-1:1;fxPlay('magnet',m.x,m.y,1,mf>0?Math.atan2(dy,dx):Math.atan2(dy,-dx),mf)}
-    shots.push({kind:'junk',type,x:m.x,y:m.y,vx:dx/d*v,vy:dy/d*v,dmg:HZ[type].heavy?3:2,speed:1100,rot:0,left:1,cool:0});bear.kick=.14;pop('KA-CHUNK!',m.x,m.y-30*S,'#e8463f',34,.7);sfx.clonk();
+  if(w&&w.type==='magnet'&&w.held&&w.held.length){const type=w.held.shift(),m=muzzlePos()||handPos(),dx=ghost.x-m.x,dy=ghost.y+ghost.yOff-m.y,d=Math.hypot(dx,dy)||1,v=1700*S;{const mf=dx<0?-1:1;fxPlay('magnet',m.x,m.y,1,mf>0?Math.atan2(dy,dx):Math.atan2(dy,-dx),mf)}
+    shots.push({kind:'junk',type,x:m.x,y:m.y,vx:dx/d*v,vy:dy/d*v,dmg:HZ[type].heavy?3:2,speed:2000,rot:0,left:1,cool:0});bear.kick=.14;pop('KA-CHUNK!',m.x,m.y-30*S,'#e8463f',34,.7);sfx.clonk();
     if(!w.held.length&&w.t<=0)bear.weapon=null;return}
   if(w&&w.type==='ivy'&&w.sup){const h=muzzlePos()||handPos();w.sup=0;bear.kick=.16;fxPlay('ivy',h.x,h.y,1,-.35*(bear.faceS||bear.face||1),bear.faceS||bear.face||1);sfx.ivyFire();startSuper('ivy',SPR.ci_ivy,'ivy');if(--w.ammo<=0)bear.weapon=null;return}
-  if(w&&w.type==='ivy'){const h=muzzlePos()||handPos();shots.push({kind:'ivy',t0:now,fl:bear.faceS||bear.face||1,x:h.x,y:h.y,vx:0,vy:-700*S,dmg:superDmg('effective')*.15,speed:650,rot:0,left:1,cool:0});bear.kick=.16;fxPlay('ivy',h.x,h.y,1,-.35*(bear.faceS||bear.face||1),bear.faceS||bear.face||1);sfx.ivyFire();pop('FWOOMP!',h.x,h.y-30*S,'#4fbf5a',30,.7);if(--w.ammo<=0)bear.weapon=null;return}
+  if(w&&w.type==='ivy'){const h=muzzlePos()||handPos();shots.push({kind:'ivy',t0:now,fl:bear.faceS||bear.face||1,x:h.x,y:h.y,vx:0,vy:-1100*S,dmg:superDmg('effective')*.15,speed:1600,rot:0,left:1,cool:0});bear.kick=.16;fxPlay('ivy',h.x,h.y,1,-.35*(bear.faceS||bear.face||1),bear.faceS||bear.face||1);sfx.ivyFire();pop('FWOOMP!',h.x,h.y-30*S,'#4fbf5a',30,.7);if(--w.ammo<=0)bear.weapon=null;return}
   if(w&&w.type==='porcu'&&w.sup){w.sup=0;bear.kick=.12;sfx.porcuFire();startSuper('porcu',SPR.ci_porcu,'porcu');if(--w.ammo<=0)bear.weapon=null;return}
   if(w&&w.type==='porcu'){const h=muzzlePos()||handPos(),f=bear.faceS||bear.face||1;bear.kick=.12;
-    shots.push({kind:'porc',x:h.x+8*S*f,y:h.y,vx:f*480*S,vy:-380*S,t:0,f,rot:0,left:1,cool:0});
+    shots.push({kind:'porc',x:h.x+8*S*f,y:h.y,vx:f*800*S,vy:-500*S,t:0,f,rot:0,left:1,cool:0});
     sfx.porcuFire();if(--w.ammo<=0)bear.weapon=null;return}
   if(w&&w.type==='beans'){if(superBG&&!superBG.ended)return;if(swotCool<=0){swotCool=.45;bear.swing=.3;
     if(Math.abs(ghost.x-bear.x)<(150+60*bear.gs)*S&&ghost.yOff>-60*S&&!ghost.ko){faceTo(ghost.x);ghost.kdT=0;hitGhost({kind:'smash',dmg:superDmg('unbearable')/4,x:ghost.x,y:ghost.y+ghost.yOff});shake=1;flashT=.12;rings.push({x:ghost.x,age:0,air:ghost.y+ghost.yOff})}
@@ -1501,7 +1539,7 @@ function tap(x,y){
 function mouthPos(){const f=bear.faceS||bear.face||1,P=T2A.blow?todd2Place('blow'):null,k=S*(bear.gs||1);
   return P?{x:bear.x+(P.x0+300*P.k)*k*f,y:GY+4*S+(P.y0+140*P.k)*k}:{x:bear.x+28*S*f,y:GY-128*S}}
 function releaseBubble(w){const m=mouthPos(),f=bear.faceS||bear.face||1;
-  shots.push({kind:'bubble',x:m.x+f*30*S,y:m.y-10*S,vx:f*60*S,vy:-140*S,dmg:3.5,speed:300,rot:0,left:1,cool:0,t0:now});
+  shots.push({kind:'bubble',x:m.x+f*30*S,y:m.y-10*S,vx:f*60*S,vy:-220*S,dmg:3.5,speed:520,rot:0,left:1,cool:0,t0:now});
   pop('BLOOP!',m.x,m.y-50*S,'#ff7fb8',26,.6);if(--w.ammo<=0)bear.weapon=null}
 function paddleHit(){
   const hp=headPos(), px=bear.x+40*S*bear.face;
@@ -1525,7 +1563,7 @@ function swot(pad){
       const heavy=HZ[it.type].heavy;
       if(heavy&&!pad){if(!it.noped){it.noped=true;pop('NOPE!',it.x,it.y-34*S,C.white,30,.7);sfx.clonk()}continue}
       it.dead=true;
-      shots.push({kind:'junk',type:it.type,x:it.x,y:it.y,vx:(it.x-bear.x)*4,vy:-900*S,dmg:pad?(heavy?4:2):1,speed:780,rot:it.rot,left:1,cool:0});
+      shots.push({kind:'junk',type:it.type,x:it.x,y:it.y,vx:(it.x-bear.x)*4,vy:-1200*S,dmg:pad?(heavy?4:2):1,speed:1900,rot:it.rot,left:1,cool:0});
       pop(pad?nextPong():'SWOT!',it.x,it.y-24*S,C.gold,pad&&heavy?42:38,.8); impact(it.x,it.y); pad?sfx.paddlePok():sfx.swot();
     }
   }
@@ -1533,15 +1571,15 @@ function swot(pad){
   return true;
 }
 function throwHeld(w){
-  const type=w.held.pop(), h=handPos();
-  shots.push({kind:'junk',type,x:h.x,y:h.y,vx:0,vy:-900*S,dmg:HZ[type].heavy?3:2,speed:820,rot:0,left:1,cool:.15});
+  const type=w.held.pop(), h=handPos(),dx=ghost.x-h.x,dy=ghost.y+ghost.yOff-h.y,d=Math.hypot(dx,dy)||1;
+  shots.push({kind:'junk',type,x:h.x,y:h.y,vx:dx/d*1600*S,vy:dy/d*1600*S,dmg:HZ[type].heavy?3:2,speed:2000,rot:0,left:1,cool:0});
   bear.swing=.28; pop('YEET!',h.x,h.y-30*S,C.gold,34,.7); sfx.mittThrow();
   if(!w.held.length&&w.catches<=0)bear.weapon=null;
 }
 function handPos(){return{x:bear.x+56*S*bear.face,y:GY-150*S}}
 function faceTo(x){if(Math.abs(x-bear.x)>8)bear.face=Math.sign(x-bear.x)}
 function lobBun(x,y){
-  faceTo(x); const h=handPos(), T=.62, g=1000*S;
+  faceTo(x); const h=handPos(), T=.42, g=1400*S;
   y=Math.min(y,GY-60*S);
   buns.push({x:h.x,y:h.y,vx:(x-h.x)/T,vy:(y-h.y-.5*g*T*T)/T,g,t:0,T,rot:0});
   bear.swing=.28; bear.aim=Math.atan2(y-h.y,x-h.x); sfx.bunLob();
@@ -1838,7 +1876,7 @@ function startBoss(){$('clear').hidden=true;bossMode=true;bossPhase=1;rageT=-1;d
 /* the GRUMBLEMAX intro (user script): Grumble glides in to his cauldron, "I'M GOING TO STOP YOU FOR GOOD!", "GET READY FOR...",
    tosses three waffles in, the cauldron spits out the magic waffle, he gobbles it, swells smoothly into GRUMBLEMAX and roars "GRUMBLEMAX!!".
    One timeline drives everything (no chasing, no jitter); the normal Grumble movement is paused while it plays. */
-const BI={glide:1.8,say1:2.0,say2:6.2,toss:8.0,spit:10.1,chomp:11.8,grow:12.4,growD:1.7,roar:14.3,end:17.0}; /* user: the lines went by too fast */
+const BI={glide:1.8,say1:2.0,say2:6.2,toss:8.0,spit:10.1,chomp:11.8,grow:12.4,growD:1.7,roar:14.3,name:14.9,end:18.6}; /* user: the lines went by too fast */
 function bossIntroUpdate(dt){const b=bossI;b.t+=dt;const T=b.t,cm=bgPt(.75,.642),gx=cm.x-150*S,gy=cm.y-210*S;
   if(b.x0===undefined){b.x0=ghost.x;b.y0=ghost.y}
   const say=(txt,sz,life)=>pop(txt,clamp(ghost.x-40*S,190*S,W-190*S),Math.max(hudBottom()+40*S,ghost.y+ghost.yOff-(ghost.mega?250:150)*S),'#b9f27a',sz,life);
@@ -1854,7 +1892,11 @@ function bossIntroUpdate(dt){const b=bossI;b.t+=dt;const T=b.t,cm=bgPt(.75,.642)
   if(T>BI.chomp&&!b.ate){b.ate=1;snd('oatEat');pop('CHOMP!',ghost.x-40*S,ghost.y-60*S,C.white,40,.8)}
   if(T>BI.grow&&!ghost.mega){ghost.mega=true;ghost.pose=null;megaK=.42;b.mx0=ghost.x;snd('megaGrow')||clip('grow');flashT=.3;shake=.6}
   if(ghost.mega){const k=Math.min(1,(T-BI.grow)/BI.growD),e=k<1?1-Math.pow(1-k,3)*(1-2.2*k*(1-k)):1;megaK=.42+.58*e;ghost.x=b.mx0+(W*.6-b.mx0)*(1-Math.pow(1-k,3));ghost.y=ghostBaseY();ghost.yOff=0}
-  if(T>=BI.roar&&!b.roared){b.roared=1;megaK=1;ghost.roarT=1.4;snd('megaRoar');shake=1;$('bossName').textContent='GRUMBLEMAX';say('GRUMBLEMAX!!',60,2.6)}
+  if(T>=BI.roar&&!b.roared){b.roared=1;megaK=1;ghost.roarT=1.4;snd('megaRoar');shake=1;$('bossName').textContent='GRUMBLEMAX'}
+  /* the name lands big in the clear space to his left (user: over his body it stepped on the transformation), holds, then the fight starts */
+  if(T>=BI.name&&!b.named){b.named=1;const half=MEGAW*S*GK*.5,right=ghost.x-half-24*S,left=24*S,avail=Math.max(160*S,right-left);
+    ctx.font=`100px 'Lilita One', 'Arial Black', Impact, sans-serif`;const per=ctx.measureText('GRUMBLEMAX!!').width*1.25/100;
+    const sz=Math.min(PHONE?62:84,avail/(per*TS*1.12));pop('GRUMBLEMAX!!',left+avail/2,Math.max(hudBottom()+60*S,H*.42),'#b9f27a',sz,3.4,1);pops[pops.length-1].rot=-.05;shake=Math.max(shake,.5);flashT=Math.max(flashT,.1)}
   if(T>=BI.end)finishBossIntro()}
 /* after Grumble's Doorstep (user: we reached the lair too fast): Grumble flees across the moonlit field into the glowing cave,
    shrinking and fading as he goes in; Todd runs after him; the iris closes and Grumble's Hideout begins */
@@ -1866,7 +1908,10 @@ const CAVE={hold:3.6,fly:3.0,hey:4.4,iris:8.2}; /* user: the story lines went by
 function caveUpdate(dt){const c=cave;c.t+=dt;const m=bgPt(.731,.548),k=Math.max(0,Math.min(1,(c.t-CAVE.hold)/CAVE.fly)),e=k*k*(3-2*k);
   if(c.x0===undefined){c.x0=ghost.x;c.y0=ghost.y;const lx=clamp(ghost.x,230*S,W-230*S);ghost.pose='laugh';
     pop("YOU'LL NEVER GET YOUR WAFFLES BACK -",lx,Math.max(hudBottom()+40*S,ghost.y-120*S),'#b9f27a',PHONE?30:28,2.1)}
-  if(c.t>1.9&&!c.ever){c.ever=1;pop('EVER! HA HA HA!',clamp(ghost.x,230*S,W-230*S),Math.max(hudBottom()+40*S,ghost.y-120*S),'#b9f27a',PHONE?40:38,2.0)}
+  if(c.t>2.0&&!c.ever){c.ever=1;pop('EVER!',clamp(ghost.x,230*S,W-230*S),Math.max(hudBottom()+40*S,ghost.y-120*S),'#b9f27a',PHONE?46:44,1.4)}
+  /* then he laughs his way to the cave: HA!s pop out of him and wave as they rise, shrinking with him as he flies off */
+  if(c.t>3.1&&c.t<CAVE.hold+CAVE.fly*.85){c.haT=(c.haT||0)-dt;if(c.haT<=0){c.haT=rnd(.24,.34);const sc=Math.max(.28,ghost.sc||1);
+    pop('HA!',ghost.x+rnd(-26,26)*S*sc,ghost.y-(60+rnd(0,25))*S*sc,'#b9f27a',(PHONE?40:36)*sc,.95);const q=pops[pops.length-1];q.wave=1;q.vx=rnd(-50,50)*S*sc;q.vy=(70+rnd(0,40))*S*sc;q.ph=rnd(0,6)}}
   if(c.t>CAVE.hold&&!c.go){c.go=1;ghost.pose='flee';sfx.whoosh()}
   ghost.x=c.x0+(m.x-c.x0)*e;ghost.y=c.y0+(m.y-c.y0)*e-Math.sin(k*Math.PI)*60*S;ghost.sc=1-.86*e;ghost.fade=k<.75?1:Math.max(0,1-(k-.75)/.25);ghost.face=ghost.faceS=1;
   if(c.t>CAVE.hey+.9){bear.pose='run';bear.tx=W+260*S;bear.face=bear.faceS=1}
@@ -1945,7 +1990,7 @@ function updateWaf(){$('waf').hidden=false;$('wafN').textContent=runWaffles}
 /* ---------- update ---------- */
 function update(dt){
   for(const c of clouds){c.x+=c.v*dt;if(c.x>1.25)c.x=-.25}
-  const sdt=slowT>0?dt*.45:dt;
+  const sdt=slowT>0?dt*.3:dt;
   slowT=Math.max(0,slowT-dt); swotCool=Math.max(0,swotCool-dt); if(bearT>0&&state==='play')bearT=Math.max(0,bearT-dt);
   /* menu: the menu sits centred in front; behind it Todd strolls the whole width left to right (off one side, back in on the other) under falling waffles */
   if(state==='menu'){const off=90*S;if(bear.x>W+off||bear.x<-off*1.5){bear.x=-off}bear.tx=bear.x+Math.max(150*S,W/11)/12;bear.hits=3;
@@ -1982,7 +2027,7 @@ function update(dt){
   shake=Math.max(0,shake-dt*1.6);
 
   // ghost
-  ghost.t+=dt*(ghostStunned()?.12:1); ghost.throwA=Math.max(0,(ghost.throwA||0)-dt); ghost.fxT=Math.max(0,(ghost.fxT||0)-dt); ghost.offT=Math.max(0,(ghost.offT||0)-dt); ghost.squash=Math.max(0,ghost.squash-dt); ghost.hitT=Math.max(0,ghost.hitT-dt); ghost.splat=Math.max(0,ghost.splat-dt); ghost.notes=Math.max(0,(ghost.notes||0)-dt);
+  ghost.t+=dt*(ghostStunned()?.12:slowT>0?.4:1); ghost.throwA=Math.max(0,(ghost.throwA||0)-dt); ghost.fxT=Math.max(0,(ghost.fxT||0)-dt); ghost.offT=Math.max(0,(ghost.offT||0)-dt); ghost.squash=Math.max(0,ghost.squash-dt); ghost.hitT=Math.max(0,ghost.hitT-dt); ghost.splat=Math.max(0,ghost.splat-dt); ghost.notes=Math.max(0,(ghost.notes||0)-dt);
   if(ghost.gumT>0){ghost.gumT-=dt;if(ghost.gumT<=0&&!ghost.ko){pop('SCHLORP!',ghost.x,ghost.y+ghost.yOff-80*GK*S,'#ff7fb8',34,.8);burst(ghost.x,ghost.y+ghost.yOff,'#ff7fb8',10);snd('gumPeel')}}
   if(ghost.hold>0){ghost.hold-=dt;ghost.yOff=-280*S;if(ghost.hold<=0)$('hud').classList.remove('intro')}
   else if(state!=='bossintro'&&state!=='cave')ghost.yOff+=(0-ghost.yOff)*Math.min(1,dt*2.5);
@@ -2016,10 +2061,10 @@ function update(dt){
 
   if(state==='play'){
     t+=dt; lvlTime+=dt; score+=dt*10;
-    if(ghost.yOff>-30*S&&!(ghost.kd>.15)){ghost.throwT-=dt*(bossMode?(bossPhase===3?1.7:1.25):1)*(ghost.roarT>0?0:1)*(ghostStunned()?0:1)*(ghost.gumT>0?.4:1)*(ghost.notes>0?.6:1)*(slowT>0?.6:1)*(ghost.blanket>0?0:ghost.itch>0?.5:1);if(ghost.throwT<=0)ghostThrow()}
+    if(ghost.yOff>-30*S&&!(ghost.kd>.15)){ghost.throwT-=dt*(bossMode?(bossPhase===3?1.7:1.25):1)*(ghost.roarT>0?0:1)*(ghostStunned()?0:1)*(ghost.gumT>0?.4:1)*(ghost.notes>0?.6:1)*(slowT>0?.4:1)*(ghost.blanket>0?0:ghost.itch>0?.5:1);if(ghost.throwT<=0)ghostThrow()}
     if(bossMode&&ghost.mega)bossUpdate(dt);
-    if(level>=3&&(!bossMode||bossPhase===3)&&ghost.yOff>-30*S&&!ghost.ko&&!(ghost.blanket>0)&&!strike&&!ghostStunned()){zapT-=dt*(slowT>0?.6:1);if(zapT<=0){strike={t:0,warn:bossMode?1.7:Math.max(1.6,2.3-(level-3)*.025),tx:clamp(bear.x,40*S,W-40*S)};sfx.charge(strike.warn);
-      if(!SEEN.light){SEEN.light=1;try{localStorage.setItem('bonkd-seen',JSON.stringify(SEEN))}catch(e){};pop('LIGHTNING!',W/2,H*.55,'#fff7a8',34,2.4);pop('DODGE IT, OR CATCH IT IN THE NOGGIN BUCKET',W/2,H*.55+32*S,C.white,18,2.6)}}}
+    if(level>=3&&(!bossMode||bossPhase===3)&&ghost.yOff>-30*S&&!ghost.ko&&!(ghost.blanket>0)&&!strike&&!ghostStunned()){zapT-=dt*(slowT>0?.4:1);if(zapT<=0){strike={t:0,warn:bossMode?1.7:Math.max(1.6,2.3-(level-3)*.025),tx:clamp(bear.x,40*S,W-40*S)};sfx.charge(strike.warn);
+      if(!SEEN.light){SEEN.light=1;try{localStorage.setItem('bonkd-seen',JSON.stringify(SEEN))}catch(e){};pop('LIGHTNING!',W/2,H*.55,'#fff7a8',34,2.4)}}}
     /* the target follows Todd while Grumble charges, then locks for the last 40% so a quick step dodges it */
     if(strike&&strike.t<strike.warn*.6)strike.tx+=(clamp(bear.x,40*S,W-40*S)-strike.tx)*Math.min(1,dt*4);
     if(strike&&!strike.locked&&strike.t>=strike.warn*.6){strike.locked=1;sfx.crackle()}
@@ -2093,11 +2138,11 @@ function update(dt){
   // bear projectiles that home on Grumble
   const gx=ghost.x, gy=ghost.y+ghost.yOff;
   for(const s of shots){
-    if(s.kind==='porc'){s.t+=dt;const dx=gx-s.x,dy=gy-s.y,d=Math.hypot(dx,dy)||1;s.vx+=(dx/d*620*S-s.vx)*Math.min(1,dt*3);s.vy+=(dy/d*620*S-s.vy)*Math.min(1,dt*3);s.x+=s.vx*dt;s.y+=s.vy*dt;
+    if(s.kind==='porc'){s.t+=dt;const dx=gx-s.x,dy=gy-s.y,d=Math.hypot(dx,dy)||1;s.vx+=(dx/d*1300*S-s.vx)*Math.min(1,dt*8);s.vy+=(dy/d*1300*S-s.vy)*Math.min(1,dt*8);s.x+=s.vx*dt;s.y+=s.vy*dt;
       if(s.t>=.62||(state==='play'&&s.t>=.4&&d<200*S)||state!=='play'){s.gone=true;porcPop(s)}continue}
     if(s.kind==='quill')s.rot=Math.atan2(s.vy,s.vx);else if(s.kind==='honk'||s.kind==='bubble')s.rot=0;else s.rot+=(s.kind==='banana'?16:s.kind==='junk'?10:s.kind==='ivy'?6:4)*dt;
     if(s.cool>0){s.cool-=dt;s.vy+=900*S*dt}
-    else{const dx=gx-s.x,dy=gy-s.y,d=Math.hypot(dx,dy)||1,sp=s.speed*S,k=Math.min(1,dt*(s.kind==='honk'?16:6));s.vx+=(dx/d*sp-s.vx)*k;s.vy+=(dy/d*sp-s.vy)*k}
+    else{const dx=gx-s.x,dy=gy-s.y,d=Math.hypot(dx,dy)||1,sp=s.speed*S,k=Math.min(1,dt*(s.kind==='honk'?16:s.kind==='bubble'?5:14));s.vx+=(dx/d*sp-s.vx)*k;s.vy+=(dy/d*sp-s.vy)*k}
     s.x+=s.vx*dt; s.y+=s.vy*dt;
     if(state==='play'&&s.cool<=0&&Math.hypot(gx-s.x,gy-s.y)<46*GK*S*HB()){
       hitGhost(s); s.left--;
@@ -2166,7 +2211,7 @@ function update(dt){
   }
   items=items.filter(it=>!it.dead&&it.y<H+80*S&&it.x>-120&&it.x<W+120);
   if(W8&&W8.type==='mitt'&&W8.catches<=0&&!W8.held.length)bear.weapon=null;
-  for(const p of pops){p.age+=dt;if(p.follow){p.x=p.follow.x;p.y=p.follow.y-58*S-p.age*20*S}else p.y-=28*S*dt}
+  for(const p of pops){p.age+=dt;if(p.wave){p.x+=p.vx*dt;p.y-=p.vy*dt;p.rot=Math.sin(p.age*9+p.ph)*.28;continue}if(p.follow){p.x=p.follow.x;p.y=p.follow.y-58*S-p.age*20*S}else p.y-=28*S*dt}
   pops=pops.filter(p=>p.age<p.life);
   for(const s of sparks){s.age+=dt;s.vy+=900*S*dt;s.x+=s.vx*dt;s.y+=s.vy*dt;s.rot+=6*dt}
   sparks=sparks.filter(s=>s.age<.8);
@@ -2178,15 +2223,17 @@ function update(dt){
   /* nothing labels the ground during a super (user: it takes away from the effect) */
   if((state==='play'||state==='levelup'||state==='clear')&&!(superBG&&!superBG.ended)){
     const w=bear.weapon;
-    if(w&&PW[w.type])ch.push([PW[w.type].name,PW[w.type].color,SUPER[w.type]?w.type:'']);
-    if(bear.jello)ch.push([PW.jello.name,PW.jello.color]);
-    if(bear.helmet>0)ch.push([PW.bucket.name,'#d4dae2']);
-    if(bear.zap>0)ch.push(['Lightning','#fff7a8']);
-    if(beamer)ch.push([PW.beam.name,PW.beam.color]);
-    if(waffT>0)ch.push([PW.waffli.name+' · '+Math.ceil(waffT)+'s',PW.waffli.color]);
+    if(w&&PW[w.type])ch.push([PW[w.type].name,PW[w.type].color,w.type,SUPER[w.type]]);
+    if(bear.jello)ch.push([PW.jello.name,PW.jello.color,'jello']);
+    if(bear.helmet>0)ch.push([PW.bucket.name,'#d4dae2','bucket']);
+    if(bear.zap>0)ch.push(['Lightning','#fff7a8','zap']);
+    if(beamer)ch.push([PW.beam.name,PW.beam.color,'beam']);
+    if(waffT>0)ch.push([PW.waffli.name+' · '+Math.ceil(waffT)+'s',PW.waffli.color,'waffli']);
   }
   updateAct();
-  const key=ch.map(c=>c[0]).join('|')+'|'+W+'x'+H; if(key!==chipKey){chipKey=key;const el=$('chips');el.textContent='';for(const [t,c,k] of ch){const sp=document.createElement('span');sp.className='chip'+(k?' sup t-'+k:'');sp.style.color=c;if(k){[...t].forEach((L,n)=>{const e=document.createElement('i');e.textContent=L===' '?'\u00a0':L;e.style.animationDelay=(n*.06)+'s';sp.append(e)})}else sp.textContent=t;el.append(sp)}
+  const key=ch.map(c=>c[0]).join('|')+'|'+W+'x'+H; if(key!==chipKey){chipKey=key;const el=$('chips');el.textContent='';for(const [t,c,k,sup] of ch){const sp=document.createElement('span');sp.className='chip'+(sup?' sup':'')+(k?' t-'+k:'');sp.style.color=c;
+      /* every item's name has its own little act (CSS t-<item>): one span per letter so each can move */
+      [...t].forEach((L,n)=>{const e=document.createElement('i');e.textContent=L===' '?'\u00a0':L;e.style.animationDelay=(n*.06)+'s';e.style.setProperty('--n',n);sp.append(e)});el.append(sp)}
     if(FINE&&ch.length){let fs=Math.min(64,(H-GY)*.72/UIZ);el.style.fontSize=fs+'px';for(const sp of el.children)sp.style.fontSize=sp.classList.contains('t-beans')?'1.3em':'1em';const avail=W-2*(22+76+20)*UIZ;if(el.offsetWidth*UIZ>avail){fs*=avail/(el.offsetWidth*UIZ);el.style.fontSize=fs+'px'}}}
   if(ch.length){const el=$('chips'),hw=el.offsetWidth*UIZ/2+8,bz=$('actBtn').hidden?0:(22+76+14)*UIZ,lo=HANDED==='right'?0:bz,hi=HANDED==='right'?W-bz:W,cx=clamp(bear.x,lo+hw,Math.max(lo+hw,hi-hw)),cy=GY+(H-GY)*.56;const tf='translate('+Math.round(cx/UIZ)+'px,'+Math.round(cy/UIZ)+'px) translate(-50%,-50%)';if(el.style.transform!==tf)el.style.transform=tf}
 }
@@ -3971,11 +4018,16 @@ function drawLost(){const L=lostItem,c=CHAPTERS[level];if(!c||!SPR[chapArt(c)])r
 function drawChapterFront(){const it=chap.item;if(!it)return;const y=it.y+Math.sin(chap.t*2.4)*7*S;lostGlow(it.x,y,chap.t);ctx.save();ctx.translate(it.x,y);ctx.scale(S*2,S*2);ctx.rotate(it.land?0:Math.sin(chap.t*2.2)*.12);
   if(SPR.x_canopy&&SPR[chapArt(chap.c)])drawGiftArt({type:chap.c.gift,chute:it.chute,land:it.land});ctx.restore()}
 /* Bear Handed: a hot red-orange glow behind Todd while his hits count double */
-function drawAura(){const on=bearT>0||(chap&&chap.c.k==='bearhand'&&chap.ph!=='fly'&&chap.ph!=='run');if(!on||bear.ko)return;
-  if(bearT>0&&bearT<3&&Math.floor(now*(bearT<1.5?12:5))%2)return; /* wearing off: blinks, then quickly, then gone */const cx=bear.x,cy=GY-100*S*(bear.gs||1),pu=1+Math.sin(now*10)*.06,r=135*S*(bear.gs||1)*pu;
-  const g=ctx.createRadialGradient(cx,cy,r*.25,cx,cy,r);g.addColorStop(0,'rgba(255,120,60,.55)');g.addColorStop(.6,'rgba(232,70,63,.28)');g.addColorStop(1,'rgba(232,70,63,0)');
+/* power-up glows on Todd: red for Bear Handed, purple for SLOWMO; each blinks for its last 3 s (fast for the last 1.5) and goes */
+function drawAura(){if(bear.ko)return;
+  if(slowT>0)auraGlow(slowT,['rgba(205,150,255,.8)','rgba(150,90,240,.45)','rgba(150,90,240,0)'],['#d9b8ff','#9b6bff'],1.05);
+  const bh=chap&&chap.c.k==='bearhand'&&chap.ph!=='fly'&&chap.ph!=='run';
+  if(bearT>0||bh)auraGlow(bearT>0?bearT:9,['rgba(255,120,60,.8)','rgba(232,70,63,.45)','rgba(232,70,63,0)'],['#ffb02e','#e8463f'],1)}
+function auraGlow(left,cols,sp,sz){if(left<3&&Math.floor(now*(left<1.5?12:5))%2)return;
+  const cx=bear.x,cy=GY-100*S*(bear.gs||1),pu=1+Math.sin(now*10)*.06,r=140*S*(bear.gs||1)*pu*sz;
+  const g=ctx.createRadialGradient(cx,cy,r*.2,cx,cy,r);g.addColorStop(0,cols[0]);g.addColorStop(.6,cols[1]);g.addColorStop(1,cols[2]);
   ctx.save();ctx.fillStyle=g;ctx.beginPath();ctx.arc(cx,cy,r,0,TAU);ctx.fill();ctx.restore();
-  if(Math.random()<.35)sparks.push({x:cx+rnd(-60,60)*S,y:cy+rnd(-40,90)*S,vx:0,vy:-120*S,age:.3,r:(3+Math.random()*3)*S,rot:0,col:Math.random()<.5?'#ffb02e':'#e8463f'})}
+  if(Math.random()<.35)sparks.push({x:cx+rnd(-60,60)*S,y:cy+rnd(-40,90)*S,vx:0,vy:-120*S,age:.3,r:(3+Math.random()*3)*S,rot:0,col:Math.random()<.5?sp[0]:sp[1]})}
 /* Gargantu-Gum: the bubble swelling at Todd's lips while he blows */
 function drawToddFX(){const w=bear.weapon;if(w&&w.type==='gum'&&w.blowT>0&&!bear.ko&&!SPR.c_todd_blow_0){const m=mouthPos(),k=1-w.blowT/.7,r=8+k*30,f=bear.faceS||bear.face||1;
   ctx.save();ctx.translate(m.x+f*(r*.8)*S,m.y-2*S);ctx.scale(S,S);drawBubble(r,now);ctx.restore()}}
