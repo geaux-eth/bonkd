@@ -284,3 +284,8 @@
 - Cave run: "EVER!" is its own beat (2.0 s), then Grumble laughs his way to the cave: green HA!s pop out of him every .24-.34 s, rise and wave (pop wave/vx/vy/ph), sized to his shrinking scale.
 - GRUMBLEMAX intro: no name over his body at the roar; at BI.name (14.9 s) GRUMBLEMAX!! lands big in the clear space to his left (sized to fit between the left edge and his body), holds 3.4 s, then the fight starts (BI.end 18.6).
 - The Light-M-Upper reception plays after level 30 (Orchard's Edge); a Level Jump straight to 31 counts the level 30 chapter as already done, so it doesn't play there.
+
+## Batch v54 notes
+- Grumble gets ONE reaction word at a time (pop(): words near him carry p.g; a new one knocks the last out in .12 s, one within .3 s of the last is skipped; keep=true words like TOASTED! always show). The Barn-zooka's STAMPEDE! sits above Grumble (keep 'big') and holds the spot, so the animal hit words no longer stack under it.
+- Map areas (user's names): AREAS in the source, by level: Maple Meadow (1-5), Conifer Corner (6-10), Biscuit Bluff (11-15), Echo Canyon (16-20), Dusty Dunes (21-25), Hayride Hill (26-30), Grumble's Doorstep (31). The level card shows the area in small red caps above "Level" (#lvArea), hidden when it matches the level's own name; the pause card adds it after the level name. The lair (the user calls it Batfoot Cave privately) gets no area label in the game.
+- The opening story's waffles are all beamed up between 4.1 and 5.4 s, before Grumble flees at 6.3 s (checked); a lone late waffle in trailer v2 came from the trailer restarting the story mid-way.

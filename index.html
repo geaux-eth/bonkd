@@ -325,6 +325,8 @@ body.keys .act::after{content:'SPACE';position:absolute;bottom:-18px;left:50%;tr
 #lvlCard .lv-pre{line-height:1;margin:0}
 #lvlCard #lvNum{line-height:.78;margin:0;font-size:clamp(48px,11vmin,80px)!important}
 #lvlCard #lvName{line-height:1.05;margin:0}
+/* the map area this level belongs to (user's map names) */
+#lvArea{font-family:var(--display);font-size:clamp(14px,3vmin,18px);letter-spacing:.14em;text-transform:uppercase;color:var(--red);margin:0 0 4px;line-height:1;white-space:nowrap}
 #profPage{z-index:14}#profile{z-index:15}
 .pf-pre{font-size:22px;-webkit-text-stroke:2px var(--ink);text-shadow:2px 2px 0 var(--ink)}
 .pf-logo{font-size:clamp(40px,11vmin,62px)}
@@ -457,7 +459,7 @@ body.ready #boot{opacity:0;pointer-events:none}
       <div class="btns"><button class="btn red" id="chGo" type="button">Let's go!</button></div></div>
   </div>
   <div class="overlay" id="lvlCard" hidden>
-    <div class="card lvc"><p class="pre outline lv-pre">Level</p><h2 class="logo" id="lvNum"></h2><p class="label" id="lvName"></p></div>
+    <div class="card lvc"><p class="label" id="lvArea" hidden></p><p class="pre outline lv-pre">Level</p><h2 class="logo" id="lvNum"></h2><p class="label" id="lvName"></p></div>
   </div>
 
   <div class="overlay" id="outLives" hidden>
@@ -1183,7 +1185,7 @@ $('olClose').onclick=hideOut;$('olBuy').onclick=buyLifeOut;$('olPlay').onclick=(
 $('contBtn').onclick=useLife;$('contEnd').onclick=()=>{if(state==='cont'){track('cont_end',{n:livesLeft()});showOver()}};$('contBuy').onclick=buyLife;
 function goMenu(){$('lvlCard').hidden=true;music('menu');state='menu';paused=false;chap=null;bossMode=false;bossI=null;drips=[];['over','cont','pause','clear','chapCard'].forEach(k=>$(k).hidden=true);$('hud').hidden=true;$('menu').hidden=false;resetBoard();Object.assign(bear,{hits:0,ko:false,koT:0,hitT:0,helmet:0,weapon:null,jello:null});level=1;bgKey='';refreshMenuBest();if(AC&&AC.state==='suspended')AC.resume()}
 $('menuBtn').onclick=goMenu;
-function setPause(v){if(v&&!(state==='play'||state==='levelup'))return;paused=v;if(v){$('pauseLvl').textContent=bossMode?'Boss':'Level '+level;$('pauseName').textContent=sceneName()}$('pause').hidden=!v;try{if(AC)v?AC.suspend():AC.resume()}catch(e){}}
+function setPause(v){if(v&&!(state==='play'||state==='levelup'))return;paused=v;if(v){$('pauseLvl').textContent=bossMode?'Boss':'Level '+level;$('pauseName').textContent=sceneName()+(areaName()?', '+areaName():'')}$('pause').hidden=!v;try{if(AC)v?AC.suspend():AC.resume()}catch(e){}}
 $('pauseBtn').onclick=()=>setPause(true);
 function syncGear(){$('gearBtn').hidden=state!=='menu'}
 $('gearBtn').onclick=()=>{track('settings_open',{lv:null});audio();$('settings').hidden=false};
@@ -1375,6 +1377,13 @@ function drawStoryFX(){
 
 /* ---------- spawning ---------- */
 function pop(txt,x,y,color,size,life,keep){if(!keep&&superBG&&!superBG.ended&&superBG.t<superBG.life+.2)return; /* user: OUCH/OOF over the super lettering looked poor */
+  /* Grumble gets ONE reaction word at a time (user: hit words stacked on fast hits): a word near him knocks the last one out,
+     a new one within .3 s of the last is skipped, and a big call (STAMPEDE!) holds the spot until it's gone */
+  const gy=ghost.y+(ghost.yOff||0),nearG=(state==='play'||state==='levelup')&&Math.abs(x-ghost.x)<170*S*(ghost.mega?2:1)&&y<gy+90*S&&y>gy-300*S*(ghost.mega?2:1);
+  if(nearG||keep==='big'){const gw=pops.filter(p=>p.g&&p.age<p.life);
+    if(!keep&&gw.some(p=>p.big||p.age<.3))return;
+    for(const p of gw)p.life=Math.min(p.life,p.age+.12);
+    pops.push({txt,x,y,color,size:size||40,life:life||.9,age:0,rot:(Math.random()-.5)*.22,g:1,big:keep==='big'?1:0});return}
   pops.push({txt,x,y,color,size:size||40,life:life||.9,age:0,rot:(Math.random()-.5)*.22})}
 function porcPop(p){const n=12,dm=superDmg('omghost')/48;
   for(let i=0;i<n;i++){const a=i/n*TAU+Math.random()*.15,v=(1100+Math.random()*150)*S;shots.push({kind:'quill',x:p.x+Math.cos(a)*14*S,y:p.y+Math.sin(a)*14*S,vx:Math.cos(a)*v,vy:Math.sin(a)*v,dmg:dm,speed:1700,rot:a,left:1,cool:.1})}
@@ -1619,7 +1628,7 @@ function fireAnimal(x,y){
   pop(MOO[kind],sx,sy-58*S,C.white,32,.8); pops[pops.length-1].follow=an; sfx.boom(); sfx[kind]();
   /* signature move: the barn's last load is a STAMPEDE: all four animals fan out together, big kick and flash (no backdrop swap) */
   if(w&&w.ammo===1){const rest=ANIMALS.filter(k=>k!==kind);for(const da of[-.3,.15,.3]){const c=Math.cos(da),s2=Math.sin(da),k2=rest.shift()||ANIMALS[0];animals.push({kind:k2,st:1,x:sx,y:sy,vx:(an.vx*c-an.vy*s2),vy:(an.vx*s2+an.vy*c),rot:0,vr:rnd(-6,6),hitG:false});an.st=1;setTimeout(()=>sfx[k2]&&sfx[k2](),90+Math.random()*120)}
-    hitImpact(.12,.8);flashT=Math.max(flashT,.1);clip('thunder',.5);pop('STAMPEDE!',W/2,H*.3,'#f2b544',58,1.1);haptic([60,30,90])}
+    hitImpact(.12,.8);flashT=Math.max(flashT,.1);clip('thunder',.5);pop('STAMPEDE!',ghost.x,Math.max(H*.2,ghost.y+(ghost.yOff||0)-150*GK*S),'#f2b544',58,1.3,'big');haptic([60,30,90])}
 }
 
 /* ---------- hits ---------- */
@@ -1875,7 +1884,7 @@ function bgPt(u,v){const a=bgArt();if(!a)return{x:u*W,y:v*H};const I=SPR[a[0]].i
 function startBoss(){$('clear').hidden=true;bossMode=true;bossPhase=1;rageT=-1;drips=[];bgKey='';setGhost();ghost.max=ghost.hp=180;updateHp();$('lvl').textContent='BOSS';
   state='bossintro';bossI={t:0,tossed:0,fl:[],magic:null,glow:0};ghost.hold=0;ghost.yOff=0;ghost.pose=null;ghost.x=W+120*S;ghost.y=H*.3;
   bear.weapon=null;bear.jello=null;items=[];gifts=[];shots=[];angel=null;beamer=null;strike=null;angelT=99;playLevel();
-  const n=$('lvNum');n.textContent='';for(const ch of 'BOSS'){const sp=document.createElement('span');sp.textContent=ch;n.append(sp)}$('lvName').textContent=BOSS_SCENE.n;
+  const n=$('lvNum');n.textContent='';for(const ch of 'BOSS'){const sp=document.createElement('span');sp.textContent=ch;n.append(sp)}$('lvName').textContent=BOSS_SCENE.n;$('lvArea').hidden=true;
   const c=$('lvlCard');c.classList.remove('out');c.hidden=false;clearTimeout(lvTimer);lvTimer=setTimeout(()=>{c.classList.add('out');lvTimer=setTimeout(()=>{c.hidden=true;c.classList.remove('out')},420)},1300);track('boss_start',{})}
 /* the GRUMBLEMAX intro (user script): Grumble glides in to his cauldron, "I'M GOING TO STOP YOU FOR GOOD!", "GET READY FOR...",
    tosses three waffles in, the cauldron spits out the magic waffle, he gobbles it, swells smoothly into GRUMBLEMAX and roars "GRUMBLEMAX!!".
@@ -1982,7 +1991,10 @@ function nextLevel0(){
   showLevelCard();
 }
 let lvTimer=0;
-function showLevelCard(){
+/* map areas (user): the six settings, then Grumble's Doorstep. The lair has no area label on purpose. */
+const AREAS=['Maple Meadow','Conifer Corner','Biscuit Bluff','Echo Canyon','Dusty Dunes','Hayride Hill',"Grumble's Doorstep"];
+function areaName(){if(bossMode)return '';const a=AREAS[Math.min(6,Math.floor((level-1)/5))];return a&&a.toUpperCase()!==String(sceneName()).toUpperCase()?a:''}
+function showLevelCard(){const ar=$('lvArea'),an=areaName();ar.textContent=an;ar.hidden=!an;
   const n=$('lvNum'); n.textContent=''; n.setAttribute('aria-label','Level '+level);
   for(const ch of String(level)){const sp=document.createElement('span');sp.textContent=ch;n.append(sp)}
   $('lvName').textContent=sceneName();
