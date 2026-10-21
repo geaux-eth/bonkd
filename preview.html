@@ -669,7 +669,7 @@ const PW={
 };
 const METAL={pan:1,anvil:1,safe:1};
 let SEEN={};try{SEEN=JSON.parse(localStorage.getItem('bonkd-seen')||'{}')||{}}catch(e){}
-const FIRST={oat:'YELLOW RINGS SOAK UP BONKS',beam:'BOOSTER BLASTS GRUMBLE FOR YOU',shoe:'# TO HONK · 5 BLASTS',bearhand:'DOUBLE DAMAGE UNTIL YOU GET BONKED',gum:'# TO BLOW A BUBBLE · 3 BUBBLES',waffli:'GRUMBLE THROWS WAFFLES FOR 10 SECONDS',pie:'2 PIES · # TO THROW · THEY FIND GRUMBLE',banana:'# TO THROW · HITS GRUMBLE TWICE',jello:'JUNK BOUNCES OFF IT',bun:'# TO LOB · 3 PER SOCK',zooka:'# TO FIRE · 6 BARNYARD BLASTS',
+const FIRST={oat:'YELLOW RINGS SOAK UP BONKS',beam:'BOOSTER BLASTS GRUMBLE FOR YOU',shoe:'# TO HONK · 5 BLASTS',bearhand:'DOUBLE DAMAGE FOR 15 SECONDS',gum:'# TO BLOW A BUBBLE · 3 BUBBLES',waffli:'GRUMBLE THROWS WAFFLES FOR 10 SECONDS',pie:'2 PIES · # TO THROW · THEY FIND GRUMBLE',banana:'# TO THROW · HITS GRUMBLE TWICE',jello:'JUNK BOUNCES OFF IT',bun:'# TO LOB · 3 PER SOCK',zooka:'# TO FIRE · 6 BARNYARD BLASTS',
   bucket:'BLOCKS 2 BONKS · CATCHES LIGHTNING',mitt:'CATCHES UP TO 3 PIECES OF JUNK · # TO THROW',magnet:'CATCHES METAL JUNK NEAR YOU · # TO FIRE IT BACK',paddle:'12 SECONDS · # TO SWOT',snail:'EVERYTHING SLOWS DOWN',kit:'HEALS ALL YOUR BONKS',ivy:'# TO LAUNCH · GRUMBLE GETS ITCHY',porcu:'# TO POP · QUILL STORM!',beans:'TODD GOES GIANT · # TO SMASH',lmu:'# TO LIGHT \'EM UP!'};
 const HAND={pie:1,banana:1,shoe:1,gum:1,jello:1,bun:1,zooka:1,mitt:1,magnet:1,paddle:1,ivy:1,porcu:1,beans:1,lmu:1};
 const SUPER={beam:{price:10000,tier:'beam',label:'Heavenly',desc:'Booster to the rescue!'},ivy:{price:2500,tier:'effective',label:'Effective',desc:'The itchiest threads in town!'},
@@ -769,7 +769,7 @@ const MOO={chicken:'BAWK!',pig:'OINK!',cow:'MOO!',sheep:'BAA!'};
 const HITQ={cow:['COWD!'],chicken:['COCKD!'],pig:['PIGD!'],sheep:['SHEEPD!']};
 const TAUNTS={2:"GRUMBLE'S STEAMED",3:"HE'S HOPPIN' MAD",4:'HE IS LIVID',5:'PURE RAGE'};
 const MAXH=4;
-let bearT=0,waffT=0,beamer=null;
+let bearT=0,waffT=0,beamer=null;const BH_DUR=15; /* Bear Handed lasts 15 s (or until a bonk); the glow blinks for its last 3 s, fast for the last 1.5 */
 const HB=()=>ghost.mega?2.1:1;
 /* RULE: a still image never performs an action. While Grumble shows a reaction pose (pie, soot, quills, zap, blanket...) he is stunned: he doesn't throw or roam, he just reacts. */
 /* during a super Grumble is just getting hit: no throwing, no lightning */
@@ -1182,7 +1182,7 @@ $('chGo').onclick=chapGo;
 document.addEventListener('visibilitychange',()=>{if(document.hidden)setPause(true)});
 
 function resetBoard(){strike=null;zaps=[];limps=[];showQ=[];showCur=null;items=[];pops=[];sparks=[];shots=[];gifts=[];buns=[];animals=[];impacts=[];splats=[];wafs=[];angel=null;slowT=0}
-function setGhost(){lvTop=null;ghost.mega=false;ghost.roarT=0;megaK=1;$('bossName').textContent='GRUMBLE';ghost.pose=null;ghost.fxT=0;ghost.offT=0;ghost.throwA=0;ghost.hold=0;$("hud").classList.remove("intro");ghost.blanket=0;ghost.itch=0;ghost.quills=0;ghost.max=grumHP(level);if(FXTEST)ghost.max*=4;ghost.hp=ghost.max;ghost.ko=false;ghost.koT=0;ghost.yOff=-280*S;ghost.splat=0;ghost.throwT=1.6;ghost.say=null;ghost.sayT=2.5;ghost.kdT=-1;ghost.kd=0;strike=null;zapT=6;lvStats={hits:0,bonks:0,waffles:0};updateHp()}
+function setGhost(){lvTop=null;ghost.mega=false;ghost.roarT=0;megaK=1;$('bossName').textContent='GRUMBLE';ghost.pose=null;ghost.fxT=0;ghost.offT=0;ghost.throwA=0;ghost.hold=0;$("hud").classList.remove("intro");ghost.blanket=0;ghost.itch=0;ghost.quills=0;ghost.max=grumHP(level);ghost.hp=ghost.max;ghost.ko=false;ghost.koT=0;ghost.yOff=-280*S;ghost.splat=0;ghost.throwT=1.6;ghost.say=null;ghost.sayT=2.5;ghost.kdT=-1;ghost.kd=0;strike=null;zapT=6;lvStats={hits:0,bonks:0,waffles:0};updateHp()}
 function updateHp(){const el=$('hp');el.style.width=Math.max(0,ghost.hp/ghost.max*100)+'%';el.style.background=ghost.hp/ghost.max<.35?'#df3a4e':'#8ee26b';$('lvl').textContent=bossMode?'BOSS':'LV '+level}
 
 function start(m){
@@ -1334,7 +1334,8 @@ function drawStoryFX(){
 }
 
 /* ---------- spawning ---------- */
-function pop(txt,x,y,color,size,life){pops.push({txt,x,y,color,size:size||40,life:life||.9,age:0,rot:(Math.random()-.5)*.22})}
+function pop(txt,x,y,color,size,life,keep){if(!keep&&superBG&&!superBG.ended&&superBG.t<superBG.life+.2)return; /* user: OUCH/OOF over the super lettering looked poor */
+  pops.push({txt,x,y,color,size:size||40,life:life||.9,age:0,rot:(Math.random()-.5)*.22})}
 function porcPop(p){const n=12,dm=superDmg('omghost')/48;
   for(let i=0;i<n;i++){const a=i/n*TAU+Math.random()*.15,v=(780+Math.random()*120)*S;shots.push({kind:'quill',x:p.x+Math.cos(a)*14*S,y:p.y+Math.sin(a)*14*S,vx:Math.cos(a)*v,vy:Math.sin(a)*v,dmg:dm,speed:900,rot:a,left:1,cool:.16})}
   rings.push({x:p.x,age:0,air:p.y});burst(p.x,p.y,'#8a5a32',10);burst(p.x,p.y,'#f3e2c4',6);
@@ -1398,8 +1399,8 @@ function tossGift(){
 }
 function activate(type,x,y){
   const hp=headPos(), P=PW[type];
-  if(type==='pie'||type==='banana'||type==='kit'||type==='bearhand'||type==='waffli')pop(P.name.toUpperCase()+'!',clamp(bear.x,170*S,W-170*S),GY-(206*bear.gs+30)*S,P.color,34,1.6);
-  if(!SEEN[type]){SEEN[type]=1;try{localStorage.setItem('bonkd-seen',JSON.stringify(SEEN))}catch(e){}
+  if(type==='pie'||type==='banana'||type==='kit'||type==='waffli')pop(P.name.toUpperCase()+'!',clamp(bear.x,170*S,W-170*S),GY-(206*bear.gs+30)*S,P.color,34,1.6);
+  if(!SEEN[type]&&type!=='bearhand'){SEEN[type]=1;try{localStorage.setItem('bonkd-seen',JSON.stringify(SEEN))}catch(e){}
     pop(FIRST[type].replace('#',actWord()),W/2,H*.6+32*S,C.white,PHONE?27:18,2.6);pops[pops.length-1].tip=1}
   sfx.power(); burst(x,y,P.color);
   if(HAND[type]){bear.jello=null;bear.weapon=null}
@@ -1417,7 +1418,7 @@ function activate(type,x,y){
   if(type==='gum'){bear.weapon={type:'gum',ammo:3,eatT:.9};pop('CHOMP!',hp.x,hp.y-60*S,'#ff7fb8',40,.9);snd('gumEat')}
   if(type==='beam'){beamer={t:0,side:ghost.x>W/2?1:-1,x:ghost.x>W/2?-140*S:W+140*S,y:Math.max(hudBottom()+70*S,ghost.y+ghost.yOff),hitT:0};snd('beamIn')||sfx.boosterIn()}
   if(type==='oat'){bear.oat=MAXH;renderMeter();snd('oatEat');pop('LUMPY OATMEAL!',hp.x,hp.y-70*S,'#ffe600',30);burst(bear.x,GY-120*S,'#ffe600',12)}
-  if(type==='bearhand'){bearT=1;snd('bearHanded');for(let i=0;i<3;i++)setTimeout(()=>burst(bear.x+rnd(-40,40)*S,GY-110*S,'#e8463f',16),i*120);fxPlay('bimp',bear.x,GY-120*S,2.4,0,1);hitImpact(.18,.8);redT=.7;pop('BEAR HANDED!',W/2,H*.3,'#e8463f',64,1.6);clip('stomp',.8);clip('supS2',.6,.08);haptic([70,40,110])}
+  if(type==='bearhand'){bearT=BH_DUR;snd('bearHanded');for(let i=0;i<3;i++)setTimeout(()=>burst(bear.x+rnd(-40,40)*S,GY-110*S,'#e8463f',16),i*120);fxPlay('bimp',bear.x,GY-120*S,2.4,0,1);hitImpact(.18,.8);redT=.7;pop('BEAR HANDED!',W/2,H*.3,'#e8463f',64,1.6);clip('stomp',.8);clip('supS2',.6,.08);haptic([70,40,110])}
   if(type==='waffli'){waffT=10;snd('waffli');for(let i=0;i<6;i++)burst(bear.x+rnd(-80,80)*S,GY-140*S,'#f2b544',3)}
   if(type==='zooka'){const q=ANIMALS.slice().sort(()=>Math.random()-.5);bear.weapon={type:'zooka',ammo:5,next:q.shift(),q};bear.aim=-1} /* user: one of each animal, then a STAMPEDE of all four */
   if(type==='snail'){slowT=6;sfx.snailOn()}
@@ -1605,7 +1606,7 @@ function bonk(x,label,col,heavy){
   if(superBG&&!superBG.ended){burst(x,hp.y,'#ffffff',4);return}
   if(bear.weapon&&bear.weapon.type==='beans'){pop(Math.random()<.5?'BOING!':'PFF!',x,hp.y-30*S,'#ffd23f',30,.7);burst(x,hp.y,'#ffd23f',6);return}
   track('bonk',{k:lastJunk||label,n:lvlTime});
-  if(bearT>0){bearT=0;pop('BEAR HANDED LOST!',clamp(bear.x,170*S,W-170*S),hp.y-120*S,C.white,24,1.1)}
+  if(bearT>0)bearT=0;
   if((bear.oat|0)>0){bear.oat--;lvStats.bonks++;bear.hitT=.4;bear.inv=1;shake=Math.max(shake,.3);pop('LUMPY!',x,hp.y-60*S,'#ffe600',40);impact(x,hp.y-40*S);sfx.clonk&&sfx.clonk();blinkArmor();haptic(30);return}
   bear.hits++; lvStats.bonks++; bear.hitT=.55; bear.inv=1; bear.lumpPop=.35; shake=Math.max(shake,.4);
   pop(label,x,hp.y-60*S,col,46); impact(x,hp.y-40*S);
@@ -1773,7 +1774,7 @@ function drawLmuSteam(){const g=ghost,mg=g.mega?megaK*2.2:1;for(const q of lmuSt
   ctx.save();ctx.translate(g.x+q.dx*GK*S*mg,g.y+g.yOff+q.dy*GK*S*mg-q.t*30*S);ctx.rotate(q.r);ctx.scale(q.fl,1);ctx.drawImage(F.img,-w/2,-h/2,w,h);ctx.restore()}}
 /* a rip that mostly landed: Grumble is toasted (the lit-up sheet), stunned for a beat, steaming, then shakes it off */
 function lmuToast(){const g=ghost,gy=g.y+g.yOff;if(superBG&&superBG.k==='lmu'){superBG.shot=0;superBG.cut=superBG.t}g.fx='lit';g.fxT=g.fxD=1.6;g.heat=1;g.heatT=1.2;snd('lmuToast');hitImpact(.05,.5);
-  pop(['TOASTED!','LIT UP!','EXTRA CRISPY!','WELL DONE!'][Math.floor(Math.random()*4)],g.x,gy-(g.mega?190:96)*GK*S,'#ffb000',g.mega?60:50,1.2);
+  pop(['TOASTED!','LIT UP!','EXTRA CRISPY!','WELL DONE!'][Math.floor(Math.random()*4)],g.x,gy-(g.mega?190:96)*GK*S,'#ffb000',g.mega?60:50,1.2,1);
   for(let i=0;i<4;i++)setTimeout(()=>lmuPuff(rnd(-60,60),-rnd(20,90),rnd(.8,1.1)),i*140)}
 function drawLmuB(){if(!lmuB.length)return;const E=SPR.fx_lember0,Sh=SPR.sh_lmu0;
   for(const b of lmuB){const a=Math.atan2(b.vy,b.vx),flip=b.vx<0;ctx.save();ctx.translate(b.x,b.y);
@@ -1796,7 +1797,7 @@ function lmuHeatGlow(){const g=ghost,hot=Math.max(g.heat||0,(g.fx==='lit'&&g.fxT
 const CHAPTERS={
   5:{k:'oat',gift:'oat',kind:'New power-up',name:'LUMPY OATMEAL',pose:'eat_oat',snd:'oatEat',desc:"Stick-to-your-ribs oatmeal! Todd can take twice the bonks now. Each bonk icon gets a yellow ring that soaks up a hit. Booster can toss you more."},
   10:{k:'shoe',gift:'shoe',kind:'New weapon',name:'SHOE HORN',pose:'h_shoe',snd:'shoeHonk',give:1,desc:"An old boot that's somehow a tuba. HONK it at Grumble for a splitting headache. Booster can toss it to you now."},
-  15:{k:'bearhand',gift:'bearhand',kind:'New power-up',name:'BEAR HANDED',pose:'cheer',snd:'bearHanded',desc:"All of Todd's weapons do DOUBLE damage until he gets bonked or the level ends. Dodge everything! Booster can toss it to you now."},
+  15:{k:'bearhand',gift:'bearhand',kind:'New power-up',name:'BEAR HANDED',pose:'cheer',snd:'bearHanded',desc:"All of Todd's weapons do DOUBLE damage for 15 seconds, or until he gets bonked. Dodge everything! Booster can toss it to you now."},
   20:{k:'gum',gift:'gum',kind:'New weapon',name:'GARGANTU-GUM',pose:'eat_gum',snd:'gumEat',give:1,desc:"Chew it, then blow a giant bubble that floats up and pops all over Grumble. Booster can toss it to you now."},
   25:{k:'waffli',gift:'waffli',kind:'New power-up',name:'WAFFLICIOUS',pose:'cheer',snd:'waffli',desc:"For 10 seconds, everything Grumble throws turns into waffles. Grab 'em all! Booster can toss it to you now."},
   30:{k:'lmu',gift:'lmu',kind:'New weapon',name:'LIGHT-M-UPPER',pose:'f_lmu',snd:'lmuRip',give:1,desc:"A spinning firefly cannon with a backpack full of bugs. Tap and Todd turns on Grumble and lets him have it: one massive blazing blast. Booster can toss it to you now."}};
@@ -1946,7 +1947,7 @@ function updateWaf(){$('waf').hidden=false;$('wafN').textContent=runWaffles}
 function update(dt){
   for(const c of clouds){c.x+=c.v*dt;if(c.x>1.25)c.x=-.25}
   const sdt=slowT>0?dt*.45:dt;
-  slowT=Math.max(0,slowT-dt); swotCool=Math.max(0,swotCool-dt);
+  slowT=Math.max(0,slowT-dt); swotCool=Math.max(0,swotCool-dt); if(bearT>0&&state==='play')bearT=Math.max(0,bearT-dt);
   /* menu: the menu sits centred in front; behind it Todd strolls the whole width left to right (off one side, back in on the other) under falling waffles */
   if(state==='menu'){const off=90*S;if(bear.x>W+off||bear.x<-off*1.5){bear.x=-off}bear.tx=bear.x+Math.max(150*S,W/11)/12;bear.hits=3;
     for(const m of menuWafs){m.y+=m.v*dt;m.rot+=m.vr*dt;m.x+=Math.sin(now*.8+m.p)*12*S*dt;if(m.y>GY-12*S){m.y=-30*S;m.x=rnd(.03,.97)*W;m.t='plain'}}}
@@ -2183,7 +2184,6 @@ function update(dt){
     if(bear.helmet>0)ch.push([PW.bucket.name,'#d4dae2']);
     if(bear.zap>0)ch.push(['Lightning','#fff7a8']);
     if(slowT>0)ch.push([PW.snail.name,PW.snail.color]);
-    if(bearT>0)ch.push([PW.bearhand.name,PW.bearhand.color]);
     if(beamer)ch.push([PW.beam.name,PW.beam.color]);
     if(waffT>0)ch.push([PW.waffli.name+' · '+Math.ceil(waffT)+'s',PW.waffli.color]);
   }
@@ -3973,7 +3973,8 @@ function drawLost(){const L=lostItem,c=CHAPTERS[level];if(!c||!SPR[chapArt(c)])r
 function drawChapterFront(){const it=chap.item;if(!it)return;const y=it.y+Math.sin(chap.t*2.4)*7*S;lostGlow(it.x,y,chap.t);ctx.save();ctx.translate(it.x,y);ctx.scale(S*2,S*2);ctx.rotate(it.land?0:Math.sin(chap.t*2.2)*.12);
   if(SPR.x_canopy&&SPR[chapArt(chap.c)])drawGiftArt({type:chap.c.gift,chute:it.chute,land:it.land});ctx.restore()}
 /* Bear Handed: a hot red-orange glow behind Todd while his hits count double */
-function drawAura(){const on=bearT>0||(chap&&chap.c.k==='bearhand'&&chap.ph!=='fly'&&chap.ph!=='run');if(!on||bear.ko)return;const cx=bear.x,cy=GY-100*S*(bear.gs||1),pu=1+Math.sin(now*10)*.06,r=135*S*(bear.gs||1)*pu;
+function drawAura(){const on=bearT>0||(chap&&chap.c.k==='bearhand'&&chap.ph!=='fly'&&chap.ph!=='run');if(!on||bear.ko)return;
+  if(bearT>0&&bearT<3&&Math.floor(now*(bearT<1.5?12:5))%2)return; /* wearing off: blinks, then quickly, then gone */const cx=bear.x,cy=GY-100*S*(bear.gs||1),pu=1+Math.sin(now*10)*.06,r=135*S*(bear.gs||1)*pu;
   const g=ctx.createRadialGradient(cx,cy,r*.25,cx,cy,r);g.addColorStop(0,'rgba(255,120,60,.55)');g.addColorStop(.6,'rgba(232,70,63,.28)');g.addColorStop(1,'rgba(232,70,63,0)');
   ctx.save();ctx.fillStyle=g;ctx.beginPath();ctx.arc(cx,cy,r,0,TAU);ctx.fill();ctx.restore();
   if(Math.random()<.35)sparks.push({x:cx+rnd(-60,60)*S,y:cy+rnd(-40,90)*S,vx:0,vy:-120*S,age:.3,r:(3+Math.random()*3)*S,rot:0,col:Math.random()<.5?'#ffb02e':'#e8463f'})}
@@ -4313,10 +4314,11 @@ function drawHits(){const B=superBG;if(!B||B.hits<2||B.t>B.life+.4)return;const 
 function drawShout(){const B=superBG;if(!B)return;const Q=SPR['ss_'+B.k];if(!Q)return;const t=B.t-.85,dur=2.3,inT=.22,outT=.28;if(t<0||t>dur+outT)return;
   const top=Math.max(hudBottom(),8*S),w=Math.min(W*.42,(H-top)*.34*Q.r,700*S*1.4),h=w/Q.r;
   /* its spot is chosen once, on the side away from Grumble at the moment it lands, and never moves after */
-  if(B.sx==null){const gs=camPt(ghost.x,ghost.y+ghost.yOff);B.sd=gs.x>W*.5?-1:1;B.sx=B.k==='lmu'?W/2:B.sd<0?w/2+14*S:W-w/2-14*S}
+  /* anchored once on the side where Todd isn't (for the LIGHT-M-UP the big hero Todd counts: he sits on the side away from Grumble) */
+  if(B.sx==null){const tx=B.k==='lmu'?(camPt(ghost.x,ghost.y+ghost.yOff).x<W*.485?W:0):camPt(bear.x,GY).x;B.sd=tx>W*.5?-1:1;B.sx=B.sd<0?w/2+14*S:W-w/2-14*S}
   const ease=u=>1-Math.pow(1-u,3);let x=B.sx,sc=1,a=1;
-  if(t<inT){const u=ease(t/inT);x=B.sx+B.sd*(1-u)*(w+W*.3);sc=1.25-.25*u}
-  else if(t>dur){const u=(t-dur)/outT;x=B.sx+B.sd*u*u*(w+W*.4);a=1-u*.3}
+  if(t<inT){const u=ease(t/inT);sc=1.35-.35*u;a=Math.min(1,t/(inT*.5))}
+  else if(t>dur){const u=(t-dur)/outT;sc=1+u*.08;a=1-u}
   ctx.save();ctx.globalAlpha=a;ctx.translate(x,top+h*.62);ctx.rotate(-.04);ctx.scale(sc,sc);ctx.drawImage(Q.img,-w/2,-h/2,w,h);ctx.restore()}
 function drawSuper(){const F=superFx;if(!F)return;const t=F.t,k=Math.min(1,t/.12)*Math.min(1,(F.d-t)/.15);
   ctx.save();ctx.fillStyle=`rgba(10,8,30,${.55*k})`;ctx.fillRect(0,0,W,H);
