@@ -325,8 +325,14 @@ body.keys .act::after{content:'SPACE';position:absolute;bottom:-18px;left:50%;tr
 #lvlCard .lv-pre{line-height:1;margin:0}
 #lvlCard #lvNum{line-height:.78;margin:0;font-size:clamp(48px,11vmin,80px)!important}
 #lvlCard #lvName{line-height:1.05;margin:0}
-/* the map area this level belongs to (user's map names) */
-#lvArea{font-family:var(--display);font-size:clamp(14px,3vmin,18px);letter-spacing:.14em;text-transform:uppercase;color:var(--red);margin:0 0 4px;line-height:1;white-space:nowrap}
+/* setting entrance (user): before the first level of each map area, a dark band slides across with the area name in the big lettering */
+#areaCard{z-index:6}
+#areaCard .arb{position:absolute;left:0;right:0;top:46%;translate:0 -50%;padding:12px 16px 14px;box-sizing:border-box;background:rgba(22,22,22,.62);display:flex;flex-direction:column;align-items:center;gap:2px;animation:arin .42s cubic-bezier(.2,1,.3,1) both}
+#areaCard.out .arb{animation:arout .38s cubic-bezier(.6,0,.8,.4) both}
+#areaCard .ar-pre{font-size:clamp(16px,3.4vmin,26px);margin:0}
+#areaCard #arName{font-size:clamp(40px,10vmin,92px);line-height:.95;margin:0;text-align:center}
+@keyframes arin{from{transform:translateX(-105%)}to{transform:none}}
+@keyframes arout{from{transform:none}to{transform:translateX(105%)}}
 #profPage{z-index:14}#profile{z-index:15}
 .pf-pre{font-size:22px;-webkit-text-stroke:2px var(--ink);text-shadow:2px 2px 0 var(--ink)}
 .pf-logo{font-size:clamp(40px,11vmin,62px)}
@@ -458,8 +464,9 @@ body.ready #boot{opacity:0;pointer-events:none}
     <div class="card chap"><p class="pre outline" id="chKind">New weapon</p><img id="chImg" alt=""><h2 class="logo" id="chName"></h2><p class="note" id="chDesc"></p>
       <div class="btns"><button class="btn red" id="chGo" type="button">Let's go!</button></div></div>
   </div>
+  <div class="overlay" id="areaCard" hidden><div class="arb"><p class="pre ar-pre" data-g="white">Now entering</p><h2 class="logo" id="arName"></h2></div></div>
   <div class="overlay" id="lvlCard" hidden>
-    <div class="card lvc"><p class="label" id="lvArea" hidden></p><p class="pre outline lv-pre">Level</p><h2 class="logo" id="lvNum"></h2><p class="label" id="lvName"></p></div>
+    <div class="card lvc"><p class="pre outline lv-pre">Level</p><h2 class="logo" id="lvNum"></h2><p class="label" id="lvName"></p></div>
   </div>
 
   <div class="overlay" id="outLives" hidden>
@@ -1183,7 +1190,7 @@ try{if(navigator.audioSession)navigator.audioSession.type='playback'}catch(e){}
 $('againBtn').onclick=()=>start(mode);
 $('olClose').onclick=hideOut;$('olBuy').onclick=buyLifeOut;$('olPlay').onclick=()=>{hideOut();start(mode||'free')};
 $('contBtn').onclick=useLife;$('contEnd').onclick=()=>{if(state==='cont'){track('cont_end',{n:livesLeft()});showOver()}};$('contBuy').onclick=buyLife;
-function goMenu(){$('lvlCard').hidden=true;music('menu');state='menu';paused=false;chap=null;bossMode=false;bossI=null;drips=[];['over','cont','pause','clear','chapCard'].forEach(k=>$(k).hidden=true);$('hud').hidden=true;$('menu').hidden=false;resetBoard();Object.assign(bear,{hits:0,ko:false,koT:0,hitT:0,helmet:0,weapon:null,jello:null});level=1;bgKey='';refreshMenuBest();if(AC&&AC.state==='suspended')AC.resume()}
+function goMenu(){$('lvlCard').hidden=true;$('areaCard').hidden=true;clearTimeout(arTimer);music('menu');state='menu';paused=false;chap=null;bossMode=false;bossI=null;drips=[];['over','cont','pause','clear','chapCard'].forEach(k=>$(k).hidden=true);$('hud').hidden=true;$('menu').hidden=false;resetBoard();Object.assign(bear,{hits:0,ko:false,koT:0,hitT:0,helmet:0,weapon:null,jello:null});level=1;bgKey='';refreshMenuBest();if(AC&&AC.state==='suspended')AC.resume()}
 $('menuBtn').onclick=goMenu;
 function setPause(v){if(v&&!(state==='play'||state==='levelup'))return;paused=v;if(v){$('pauseLvl').textContent=bossMode?'Boss':'Level '+level;$('pauseName').textContent=sceneName()+(areaName()?', '+areaName():'')}$('pause').hidden=!v;try{if(AC)v?AC.suspend():AC.resume()}catch(e){}}
 $('pauseBtn').onclick=()=>setPause(true);
@@ -1246,7 +1253,7 @@ function jumpTo(j){
   level=n;for(const k in CHAPTERS)if(+k<n)chapDone[k]=true;if(n>5){bear.oat=MAXH}
   setGhost();beginPlay();renderMeter();pops=pops.filter(p=>!p.img);clearTimeout(hintT);ghost.hold=.6;ghost.throwT=3;
   if(j==='boss'){startBoss();return}
-  showLevelCard()}
+  if(n>1)levelIntro()}
 /* ---------- the picnic: Grumble beams up Todd's waffles, Todd gives chase (tap or any key skips) ---------- */
 let story=null,picnic=null,storyWafs=[],iris=null;
 /* the picnic spot: its own little hilltop under a big shade tree, never seen again once Todd gives chase */
@@ -1286,7 +1293,8 @@ function beginPlay(chase){
   const big=Math.min(W*.55/3.7,H*.3)/S;
   {const top=hudBottom()+8,headY=GY-235*S,h=Math.min(W*.46/LOGO_R,(headY-top)/1.12);pops.push({img:LOGO_IMG,x:W/2,y:top+h*.56,size:h/S,life:1.9,age:0,rot:-.02})}
   ghost.hold=1.9; ghost.throwT=1.6+1.9; $('hud').classList.add('intro');
-  clearTimeout(hintT);hintT=setTimeout(()=>{if(state==='play')showStartHint()},1500);
+  const a1=level===1&&!bossMode;if(a1){ghost.hold+=AREA_T;ghost.throwT+=AREA_T;angelT=Math.max(angelT,2.5+AREA_T);clearTimeout(arTimer);arTimer=setTimeout(()=>{if(state==='play'&&level===1)showAreaCard()},1850)}
+  clearTimeout(hintT);hintT=setTimeout(()=>{if(state==='play')showStartHint()},a1?1850+AREA_T*1000+250:1500);
 }
 
 let hintT=0;
@@ -1884,7 +1892,7 @@ function bgPt(u,v){const a=bgArt();if(!a)return{x:u*W,y:v*H};const I=SPR[a[0]].i
 function startBoss(){$('clear').hidden=true;bossMode=true;bossPhase=1;rageT=-1;drips=[];bgKey='';setGhost();ghost.max=ghost.hp=180;updateHp();$('lvl').textContent='BOSS';
   state='bossintro';bossI={t:0,tossed:0,fl:[],magic:null,glow:0};ghost.hold=0;ghost.yOff=0;ghost.pose=null;ghost.x=W+120*S;ghost.y=H*.3;
   bear.weapon=null;bear.jello=null;items=[];gifts=[];shots=[];angel=null;beamer=null;strike=null;angelT=99;playLevel();
-  const n=$('lvNum');n.textContent='';for(const ch of 'BOSS'){const sp=document.createElement('span');sp.textContent=ch;n.append(sp)}$('lvName').textContent=BOSS_SCENE.n;$('lvArea').hidden=true;
+  const n=$('lvNum');n.textContent='';for(const ch of 'BOSS'){const sp=document.createElement('span');sp.textContent=ch;n.append(sp)}$('lvName').textContent=BOSS_SCENE.n;
   const c=$('lvlCard');c.classList.remove('out');c.hidden=false;clearTimeout(lvTimer);lvTimer=setTimeout(()=>{c.classList.add('out');lvTimer=setTimeout(()=>{c.hidden=true;c.classList.remove('out')},420)},1300);track('boss_start',{})}
 /* the GRUMBLEMAX intro (user script): Grumble glides in to his cauldron, "I'M GOING TO STOP YOU FOR GOOD!", "GET READY FOR...",
    tosses three waffles in, the cauldron spits out the magic waffle, he gobbles it, swells smoothly into GRUMBLEMAX and roars "GRUMBLEMAX!!".
@@ -1988,13 +1996,22 @@ function nextLevel0(){
   level++; lvlTime=0; setGhost(); angelT=2.5; state='play'; bgKey=''; playLevel();
   bear.hits=Math.max(0,bear.hits-1); bear.weapon=null; bear.jello=null; bear.zap=0; slowT=0; renderMeter(); updateWaf();
   ghost.throwT=3.4; angelT=4; zapT=Math.max(zapT,7);
-  showLevelCard();
+  levelIntro();
 }
 let lvTimer=0;
 /* map areas (user): the six settings, then Grumble's Doorstep. The lair has no area label on purpose. */
 const AREAS=['Maple Meadow','Conifer Corner','Biscuit Bluff','Echo Canyon','Dusty Dunes','Hayride Hill',"Grumble's Doorstep"];
 function areaName(){if(bossMode)return '';const a=AREAS[Math.min(6,Math.floor((level-1)/5))];return a&&a.toUpperCase()!==String(sceneName()).toUpperCase()?a:''}
-function showLevelCard(){const ar=$('lvArea'),an=areaName();ar.textContent=an;ar.hidden=!an;
+const AREA_T=2.3;let arTimer=0;
+function firstOfArea(){return !bossMode&&(level===LAST_LV||(level-1)%5===0)}
+function showAreaCard(){const a=AREAS[Math.min(6,Math.floor((level-1)/5))];$('arName').textContent=a.toUpperCase();
+  const c=$('areaCard');c.classList.remove('out');c.hidden=false;const k=c.firstElementChild;k.style.animation='none';void k.offsetWidth;k.style.animation='';sfx.whoosh();
+  clearTimeout(arTimer);arTimer=setTimeout(()=>{c.classList.add('out');arTimer=setTimeout(()=>{c.hidden=true;c.classList.remove('out')},400)},AREA_T*1000-400)}
+/* a new setting: its entrance first, then the level card; Grumble and Booster wait it out */
+function levelIntro(){if(!firstOfArea()){showLevelCard();return}
+  showAreaCard();ghost.throwT+=AREA_T;angelT+=AREA_T;zapT+=AREA_T;ghost.hold=Math.max(ghost.hold||0,AREA_T);
+  setTimeout(()=>{if(state==='play'||state==='levelup')showLevelCard()},AREA_T*1000)}
+function showLevelCard(){
   const n=$('lvNum'); n.textContent=''; n.setAttribute('aria-label','Level '+level);
   for(const ch of String(level)){const sp=document.createElement('span');sp.textContent=ch;n.append(sp)}
   $('lvName').textContent=sceneName();
@@ -2955,14 +2972,14 @@ const SCENES=[
  {n:'DAISY DELL',song:1,tr:0,cl:'p',bg(){BG[1]()},live(){if(bgArt())butterflies(drawSetting('meadow1',[]))}},
  {n:'SHADY GROVE',song:2,tr:-3,cl:'p',bg(){sky('#ff9a70','#ffdc96');sunDisk(P(.24),GY-40*S,74*S,'#ffcf5a','#ffb42e');mesa(P(.66),GY-40*S,90*S,70*S,'#c98a5a','#b0744a');mesa(P(.92),GY-40*S,60*S,46*S,'#c98a5a','#b0744a');hills(GY-40*S,10*S,120*S,'#d9a66a',3);ground('#dbb56c','#b98250',0);scrub(P(.1),GY,1.1*S,'#9aa85a');scrub(P(.52),GY-2*S,.8*S,'#a9b06a');cactus(P(.88),GY,.8*S)},
   live(){if(bgArt()){butterflies(drawSetting('meadow1',[]));return}tumbleweeds()}},
- {n:'PINEY WOODS',song:1,tr:-4,cl:'w',bg(){sky('#a9dff0','#e9f7f2');pineLine(GY-110*S,'#8fb8a4',30,30);pineLine(GY-70*S,'#5f9a6a',34,30);for(const [x,k] of[[.06,.8],[.2,.6],[.82,.85],[.94,.6]])pine(P(x),GY,k*S,'#3f8a4a','#2f6a3a');ground('#6fa85a','#7a5a3a',1)},
+ {n:'CONIFER CORNER',song:1,tr:-4,cl:'w',bg(){sky('#a9dff0','#e9f7f2');pineLine(GY-110*S,'#8fb8a4',30,30);pineLine(GY-70*S,'#5f9a6a',34,30);for(const [x,k] of[[.06,.8],[.2,.6],[.82,.85],[.94,.6]])pine(P(x),GY,k*S,'#3f8a4a','#2f6a3a');ground('#6fa85a','#7a5a3a',1)},
   },
  {n:'HOOT OWL HIDEOUT',song:3,tr:2,cl:null,wx:'flies',bg(){sky('#1e2340','#3d4a7a');starField(30,.5);moonDisk(P(.2),GY-230*S,30*S);pineLine(GY-70*S,'#2a3550',34,26);bareTree(P(.84),GY,.8*S,'#3a3346');bareTree(P(.08),GY,.65*S,'#3a3346');ctx.fillStyle='rgba(220,230,255,.18)';ctx.fillRect(0,GY-30*S,W,26*S);ground('#3e5a45','#2e2622',1)},
   live(){owl(P(.84)+30*S*.8*PS,GY-104*S*.8*PS,.6*S)}},
  {n:'FOXGLOVE BEND',song:0,tr:-1,cl:'w',bg(){sky('#b8e6f5','#effaf4');pineLine(GY-100*S,'#6f9e7e',30,26);water(GY-62*S,GY,'#5f9cb0','#7ab4c6');unit(P(.72),GY-30*S,()=>{cel(()=>{ctx.moveTo(-74,6);ctx.quadraticCurveTo(-60,-30,0,-34);ctx.quadraticCurveTo(60,-30,74,6);ctx.closePath()},'#7a5636','#5c3f26',-4,2);ctx.lineCap='round';const logs=[[-60,-2,-20,-14],[-40,-20,10,-28],[-6,-30,44,-22],[20,-12,64,-2],[-56,-12,-8,-24],[0,-14,40,-8],[-30,-6,10,0],[30,-26,52,-14]];for(const [a,b,c,dd] of logs){ctx.beginPath();ctx.moveTo(a,b);ctx.lineTo(c,dd);ctx.lineWidth=8;ctx.strokeStyle=INK;ctx.stroke();ctx.lineWidth=5;ctx.strokeStyle='#a8743f';ctx.stroke();ctx.beginPath();ctx.arc(c,dd,3.2,0,TAU);ctx.fillStyle='#e8c99a';ctx.fill();ctx.lineWidth=1.4;ctx.strokeStyle=INK;ctx.stroke()}ctx.beginPath();for(const [a,b] of[[-50,-18],[-20,-30],[24,-30],[50,-16]]){ctx.moveTo(a,b);ctx.lineTo(a+6,b-10);ctx.moveTo(a+3,b);ctx.lineTo(a-4,b-8)}ctx.lineWidth=1.8;ctx.strokeStyle='#5c3f26';ctx.stroke()});for(const x of[.1,.9])pine(P(x),GY,.75*S,'#3f8a4a','#2f6a3a');ground('#7fb35e','#6e5538',1)},
   live(){riverLife(GY-62*S,GY-30*S);beaver(P(.72)+6*S,GY-62*S,.5*S)}},
  {n:'MOSSY HOLLOW',song:0,tr:5,cl:'w',wx:'leaves',bg(){sky('#9fe0f7','#e8f9ff');hills(GY-90*S,20*S,150*S,'#bfe08f',3);for(const [x,y,k] of[[.08,-40,.45],[.3,-46,.4],[.55,-44,.42],[.78,-42,.45]])appleTree(P(x),GY+y*S,k*S);for(const [x,k] of[[.18,.75],[.88,.8]])appleTree(P(x),GY,k*S);ground('#8fd16a','#c99a5c',1)}},
- {n:'CONIFER CORNER',song:1,tr:1,cl:'p',wx:'leaves',bg(){sky('#f6b48a','#fde7c0');sunDisk(P(.78),GY-90*S,50*S,'#ffe27a','#ffc845');hills(GY-90*S,24*S,150*S,'#c8b468',2);hills(GY-50*S,18*S,120*S,'#a8b45a',5);scarecrow(P(.16),GY,.85*S);for(const [x,k] of[[.32,.8],[.44,.6],[.62,1],[.74,.7],[.9,.9]])pumpkin(P(x),GY+2*S,k*S);ground('#9ab95a','#8a5a35',1)},
+ {n:'PINEY WOODS',song:1,tr:1,cl:'p',wx:'leaves',bg(){sky('#f6b48a','#fde7c0');sunDisk(P(.78),GY-90*S,50*S,'#ffe27a','#ffc845');hills(GY-90*S,24*S,150*S,'#c8b468',2);hills(GY-50*S,18*S,120*S,'#a8b45a',5);scarecrow(P(.16),GY,.85*S);for(const [x,k] of[[.32,.8],[.44,.6],[.62,1],[.74,.7],[.9,.9]])pumpkin(P(x),GY+2*S,k*S);ground('#9ab95a','#8a5a35',1)},
   live(){crow(P(.16)-56*S,GY-156*S*.85,.6*S,0);crow(P(.55),GY-2*S,.6*S,2)}},
  {n:'BISCUIT BLUFF',song:1,tr:3,cl:'w',bg(){sky('#a8d4f0','#eef6fb');peaks(GY-60*S,[[.2,170,150],[.5,220,180],[.82,190,160]],'#8a95a8','#ffffff');hills(GY-60*S,26*S,160*S,'#9ab07a',3);boulder(P(.86),GY,1*S,'#9a9488','#7c766a');boulder(P(.12),GY,1*S,'#9a9488','#7c766a');ground('#9ab07a','#7d6a55',0)},
   live(){goat(P(.86)-2*S,GY-80*S,.75*S)}},
@@ -2972,29 +2989,29 @@ const SCENES=[
   live(){fallsLive(P(.8),GY-6*S,150)}},
  {n:'THUNDERHEAD PEAK',song:4,tr:0,cl:'s',wx:'rain',bg(){BG[4]()}},
  {n:'AVALANCHE ALLEY',song:4,tr:-2,cl:'w',wx:'snow',bg(){sky('#c4dcef','#f2f8ff');peaks(GY-40*S,[[.15,230,190],[.48,280,220],[.85,240,190]],'#9aa8bf','#ffffff');for(const [x,k] of[[.08,.75],[.22,.55],[.78,.7],[.92,.8]])pine(P(x),GY,k*S,'#4f8a6a','#3f6a5a',true);ground('#f4f8ff','#c9d6e6',0)}},
- {n:'MUDDY RIVER CROSSING',song:0,tr:-3,cl:'w',bg(){sky('#a8dcf0','#f2f7dc');hills(GY-120*S,26*S,170*S,'#9fcb84',3);pineLine(GY-96*S,'#7fae6a',28,16);water(GY-66*S,GY,'#6f9b8f','#86b0a3');for(const [x,k] of[[.3,.8],[.62,.6],[.72,.7]])boulder(P(x),GY-22*S,k*.5*S,'#9aa0aa','#7d838e');cattails(P(.06),GY-4*S,.6*S);ground('#8fc06a','#8a6a45',1)},
+ {n:'ECHO CANYON',song:0,tr:-3,cl:'w',bg(){sky('#a8dcf0','#f2f7dc');hills(GY-120*S,26*S,170*S,'#9fcb84',3);pineLine(GY-96*S,'#7fae6a',28,16);water(GY-66*S,GY,'#6f9b8f','#86b0a3');for(const [x,k] of[[.3,.8],[.62,.6],[.72,.7]])boulder(P(x),GY-22*S,k*.5*S,'#9aa0aa','#7d838e');cattails(P(.06),GY-4*S,.6*S);ground('#8fc06a','#8a6a45',1)},
   live(){riverLife(GY-66*S,GY-8*S)}},
- {n:'ECHO CANYON',song:3,tr:-5,cl:null,wx:'flies',bg(){sky('#3f5d6e','#d98b63');hills(GY-110*S,20*S,120*S,'#4f6a5e',3);const wy=GY-62*S;water(wy,GY+10*S,'#2f5f5a','#3d6f69');for(const [x,k] of[[.12,.9],[.88,.8],[.5,.5]])cypress(P(x),wy+14*S*k+6*S,k,0);ground('#56703a','#463626',1)},
+ {n:'MUDDY RIVER CROSSING',song:3,tr:-5,cl:null,wx:'flies',bg(){sky('#3f5d6e','#d98b63');hills(GY-110*S,20*S,120*S,'#4f6a5e',3);const wy=GY-62*S;water(wy,GY+10*S,'#2f5f5a','#3d6f69');for(const [x,k] of[[.12,.9],[.88,.8],[.5,.5]])cypress(P(x),wy+14*S*k+6*S,k,0);ground('#56703a','#463626',1)},
   live(){gator(.2,GY-40*S,S*.7,1,22);gator(.7,GY-26*S,S*.85,-1,16)}},
  {n:'COYOTE CRAG',song:3,tr:0,cl:null,bg(){sky('#6a58a8','#f3a46c');starField(14,.25);moonDisk(P(.5),GY-250*S,26*S);hills(GY-70*S,22*S,170*S,'#d9a07c',2);hills(GY-46*S,14*S,120*S,'#cf8d68',5);canyonWalls(GY,'#c4623e','#a64f30');ground('#c97b4b','#9a5634',0)},
   live(){coyote(P(.165),GY-206*S,.9*S)}},
  {n:'RED ROCK RAPIDS',song:2,tr:0,cl:null,wx:'flies',bg(){BG[2]()}},
  {n:'CATTAIL CREEK',song:2,tr:2,cl:'w',bg(){sky('#b5e3d6','#f0f7d0');hills(GY-110*S,22*S,150*S,'#8fc18a',4);for(const x of[.14,.86])tree(P(x),GY-70*S,1.1);water(GY-62*S,GY,'#5f9c8a','#79b3a0');for(const [x,y,k,f] of[[.3,22,1,1],[.5,40,.8,0],[.7,24,1,0]])lily(P(x),GY-62*S+y*S,k*S,f);cattails(P(.2),GY-2*S,.65*S);cattails(P(.8),GY-2*S,.7*S);ground('#7fb35e','#6e5538',1)},
   live(){frog(P(.3),GY-44*S,.9*S,0);frog(P(.7),GY-40*S,.9*S,1.4);dragonfly()}},
- {n:'TUMBLEWEED TRAIL',song:0,tr:1,cl:'w',bg(){sky('#9fe0f7','#f3fbff');hills(GY-100*S,26*S,170*S,'#bfe48f',3);hills(GY-54*S,20*S,130*S,'#a6d97a',6);flowers(GY-60*S,26,['#ff8fb1','#ffd23f','#b48cff','#ffffff','#ff7a45']);flowers(GY-8*S,18,['#ff8fb1','#ffd23f','#b48cff','#8fd3ff']);ground('#9bd36f','#c99a5c',1)},
+ {n:'DUSTY DUNES',song:0,tr:1,cl:'w',bg(){sky('#9fe0f7','#f3fbff');hills(GY-100*S,26*S,170*S,'#bfe48f',3);hills(GY-54*S,20*S,130*S,'#a6d97a',6);flowers(GY-60*S,26,['#ff8fb1','#ffd23f','#b48cff','#ffffff','#ff7a45']);flowers(GY-8*S,18,['#ff8fb1','#ffd23f','#b48cff','#8fd3ff']);ground('#9bd36f','#c99a5c',1)},
   live(){butterflies(4)}},
  {n:'RATTLESNAKE RIDGE',song:3,tr:-2,cl:'p',wx:'dust',bg(){sky('#e2876a','#f7c98c');hills(GY-110*S,34*S,190*S,'#b8754e',2);hills(GY-60*S,24*S,140*S,'#c98a5a',6);ground('#d4a065','#a86f45',0);boulder(P(.12),GY,1.1*S,'#a58468','#86664c');boulder(P(.84),GY,1.2*S,'#a58468','#86664c');boulder(P(.92),GY+2*S,.7*S,'#a58468','#86664c');cactus(P(.36),GY,.6*S)},
   live(){rattler(P(.84)+4*S,GY-94*S,1.05*S)}},
  {n:'CACTUS FLATS',song:3,tr:0,cl:null,bg(){BG[3]()}},
- {n:'DUSTY DUNES',song:3,tr:-3,cl:null,wx:'snow',bg(){sky('#0e1838','#24406a');starField(40,.55);hills(GY-70*S,24*S,170*S,'#c9d6ea',3);cabin(P(.82),GY,.8*S);for(const x of[.1,.24])pine(P(x),GY,.7*S,'#2f5a5a','#244a4a',true);ground('#e6eef8','#b8c6da',0)},
+ {n:'TUMBLEWEED TRAIL',song:3,tr:-3,cl:null,wx:'snow',bg(){sky('#0e1838','#24406a');starField(40,.55);hills(GY-70*S,24*S,170*S,'#c9d6ea',3);cabin(P(.82),GY,.8*S);for(const x of[.1,.24])pine(P(x),GY,.7*S,'#2f5a5a','#244a4a',true);ground('#e6eef8','#b8c6da',0)},
   live(){aurora();smoke(P(.82)+32*S,GY-136*S)}},
  {n:'SIDEWINDER SANDS',song:1,tr:2,cl:'w',bg(){sky('#a4e0f5','#f4fbe8');hills(GY-110*S,30*S,170*S,'#c4e08a',2);unit(P(.8),GY,()=>{cel(()=>rr(-70,-24,140,8,2),'#a8743f','#8a5a2e',0,2,1.8);for(const lx of[-60,56])cel(()=>rr(lx,-18,6,18,1),'#a8743f','#8a5a2e',1,0,1.6)});skep(P(.8)-36*S,GY-24*S,.6*S);skep(P(.8)+30*S,GY-24*S,.55*S);flowers(GY-8*S,16,['#ffffff','#b48cff','#ffd23f']);ground('#9bd36f','#c99a5c',1)},
   live(){bees(P(.8),GY-70*S,6)}},
- {n:'PICKLEBERRY PASTURE',song:0,tr:-2,cl:'w',bg(){sky('#8fd6f5','#fff2b8');sunDisk(P(.18),GY-230*S,40*S,'#ffe27a','#ffc845');hills(GY-80*S,20*S,160*S,'#a8cf6a',3);ground('#9ac85f','#b98250',1)},
+ {n:'HAYRIDE HILL',song:0,tr:-2,cl:'w',bg(){sky('#8fd6f5','#fff2b8');sunDisk(P(.18),GY-230*S,40*S,'#ffe27a','#ffc845');hills(GY-80*S,20*S,160*S,'#a8cf6a',3);ground('#9ac85f','#b98250',1)},
   live(){for(const [x,h,ph] of[[.06,120,0],[.16,100,1],[.27,128,2],[.72,110,3],[.83,130,4],[.94,104,5]])sunflower(P(x),GY,h,ph)}},
  {n:'CORNY MAZE',song:2,tr:-1,cl:'w',bg(){sky('#9fd6f0','#fff0c4');cornRow(GY-14*S);hills(GY-10*S,6*S,90*S,'#b8a050',3);ground('#c9a85a','#9a7040',0)},
 },
- {n:'HAYRIDE HILL',song:1,tr:-1,cl:'p',bg(){sky('#ff9f7a','#ffdca0');sunDisk(P(.5),GY-80*S,60*S,'#ffd36a','#ffb83a');hills(GY-80*S,34*S,200*S,'#d4b45a',2);for(const [x,k,r] of[[.1,.7,1],[.22,.55,0],[.36,.5,1]])hayBale(P(x),GY,k*S,r);tractor(P(.78),GY,.65*S);ground('#c9b05a','#a87a45',1)},
+ {n:'PICKLEBERRY PASTURE',song:1,tr:-1,cl:'p',bg(){sky('#ff9f7a','#ffdca0');sunDisk(P(.5),GY-80*S,60*S,'#ffd36a','#ffb83a');hills(GY-80*S,34*S,200*S,'#d4b45a',2);for(const [x,k,r] of[[.1,.7,1],[.22,.55,0],[.36,.5,1]])hayBale(P(x),GY,k*S,r);tractor(P(.78),GY,.65*S);ground('#c9b05a','#a87a45',1)},
   live(){smoke(P(.78)+8*S,GY-76*S)}},
  {n:'PUMPKIN PATCH',song:3,tr:1,cl:null,bg(){sky('#1d2a52','#4d5a8c');starField(34,.55);moonDisk(P(.62),GY-180*S,70*S);hills(GY-70*S,24*S,180*S,'#2f3d5a',2);for(const [x,k] of[[.12,.8],[.3,.6],[.86,.7]])hayBale(P(x),GY,k*S,true);ground('#3f5a3a','#2e2a26',1)}},
  {n:"ORCHARD'S EDGE",song:0,tr:0,cl:null,bg(){sky('#16224a','#3d4f8c');starField(30,.5);hills(GY-118*S,46*S,150*S,'#3f5a4a',1);hills(GY-58*S,34*S,110*S,'#4a6a50',4);tree(P(.12),GY-46*S,1);tree(P(.88),GY-40*S,.85);ctx.fillStyle='#d8dce8';ctx.fillRect(0,GY-24*S,W,5*S);ctx.fillRect(0,GY-12*S,W,5*S);for(let x=6*S;x<W;x+=24*S)unit(x,GY-2*S,()=>cel(()=>{ctx.moveTo(-5,0);ctx.lineTo(-5,-26);ctx.lineTo(0,-32);ctx.lineTo(5,-26);ctx.lineTo(5,0);ctx.closePath()},'#d8dce8','#b8bfd0',2,0,1.8));ground('#4f7a45','#7a5a3a',1)},
@@ -4295,7 +4312,7 @@ const FLY={meadow:{n:[2,3],k:'bf'},woods:{n:[1,2],k:'owl'},mountain:{n:[1,2],k:'
 const FLYBG={bd_meadow:'meadow',bd_mountain:'mountain',bd_canyon:'canyon',bd_desert:'desert',bd_harvest:'harvest',bd_doorstep:'doorstep'};
 let flyers=[],flyKind=null;
 function flyKindNow(){const a=bgArt();if(!a||!(state==='play'||state==='levelup'||state==='clear'||state==='chapter'))return null;
-  if(scene().n==='PINEY WOODS')return SPR.owl_0?'woods':null;const k=FLYBG[a[0]];return k&&(k==='meadow'||SPR[FLY[k].k+'_0'])?k:null}
+  if(scene().n==='CONIFER CORNER')return SPR.owl_0?'woods':null; /* owls stay on the forest's first level (names swapped v54) */const k=FLYBG[a[0]];return k&&(k==='meadow'||SPR[FLY[k].k+'_0'])?k:null}
 /* one bird of a group: its own size, wingbeat speed and phase, place in the group and little weave, so no two flap alike */
 const flyM=(dx,dy,h)=>({dx,dy,h:h*rnd(.86,1.12),fps:rnd(.85,1.18),ph:rnd(0,6),wf:rnd(1.6,3.2),wa:rnd(4,12),wp:rnd(0,9),a:rnd(.88,1)});
 /* where the open sky is in each painting (fractions of the backdrop's height): sky flyers spawn inside it, under the HUD (user: river and desert flyers were too low, the geese got lost) */
