@@ -1467,7 +1467,7 @@ function updateAct(){
 function tap(x,y){
   const w=bear.weapon;
   if(w&&w.type==='shoe'){if(swotCool>0)return;swotCool=.32;const h=muzzlePos()||headPos(),f=bear.faceS||bear.face||1;
-    shots.push({kind:'honk',x:h.x,y:h.y,vx:f*520*S,vy:-160*S,dmg:2.5,speed:760,rot:0,left:1,cool:0,t0:now});bear.kick=.14;
+    {const dx=ghost.x-h.x,dy=ghost.y+ghost.yOff-h.y,d=Math.hypot(dx,dy)||1;shots.push({kind:'honk',x:h.x,y:h.y,vx:dx/d*1500*S,vy:dy/d*1500*S,dmg:2.5,speed:1900,rot:0,left:1,cool:0,t0:now})}bear.kick=.14;
     if(w.ammo===1){/* signature move: the last honk is a big one, more damage, notes everywhere, the screen wobbles */
       shots[shots.length-1].dmg=6;fxPlay('shoe',h.x,h.y,1.8,f>0?-.15:.15,f);snd('shoeHonk');clip('shoeHonk',.7,.12);clip('boom',.5,.05);
       pop('BWAAAAMP!!',W/2,H*.3,'#f2b544',58,1.1);for(let i=0;i<3;i++)setTimeout(()=>rings.push({x:h.x,age:0,air:h.y}),i*110);hitImpact(.1,.7);haptic([50,40,50,40,90])}
@@ -1568,7 +1568,7 @@ function fireAnimal(x,y){
   bear.aim=Math.atan2(y-py,x-px);
   let a=zAim(), dx=f*Math.cos(a), dy=Math.sin(a), L=(NZ()?(ZMUZ-ZU)*ZW:(116-30)*1.12)*S, sx=px+dx*L, sy=py+dy*L;
   if(TODD2()&&SPR.c_todd_full){const m=todd2Muzzle();if(m){sx=m.x;sy=m.y;a=-.28;dx=f*Math.cos(a);dy=Math.sin(a)}}
-  const tdx=x-sx, tdy=y-sy, td=Math.hypot(tdx,tdy)||1, vx=dx*.5+tdx/td*.5, vy=dy*.5+tdy/td*.5, vn=Math.hypot(vx,vy)||1, sp=900*S;
+  const tdx=x-sx, tdy=y-sy, td=Math.hypot(tdx,tdy)||1, vx=dx*.5+tdx/td*.5, vy=dy*.5+tdy/td*.5, vn=Math.hypot(vx,vy)||1, sp=1800*S;
   const kind=(w&&w.next)||ANIMALS[Math.floor(Math.random()*ANIMALS.length)];
   const an={kind,x:sx,y:sy,vx:vx/vn*sp,vy:vy/vn*sp,rot:0,vr:rnd(-6,6),hitG:false};animals.push(an);
   if(w)w.next=w.q&&w.q.length?w.q.shift():ANIMALS[Math.floor(Math.random()*ANIMALS.length)];
@@ -1634,8 +1634,8 @@ function hitGhost(s){
     if(!(s.kind==='fly'&&ghost.fxT>0&&ghost.fx!=='burn'&&ghost.fx!=='hit')){ghost.fx=fk[0];ghost.fxT=fk[1];ghost.fxD=fk[1]}}
   const gy=ghost.y+ghost.yOff;
   {const sx0=s.x!=null?s.x:ghost.x,sy0=s.y!=null?s.y:gy,dx=sx0-ghost.x,dy=sy0-gy,d=Math.hypot(dx,dy)||1,R=60*GK*(ghost.mega?2:1)*S,hx=ghost.x+dx/d*Math.min(d,R),hy=gy+dy/d*Math.min(d,R);
-    const pw={fly:[0,.16,.5],quill:[s.sup?.06:0,s.sup?.3:.08,.7],animal:[.11,.5,1.3],beam:[.025,.12,0],zap:[.09,.4,1.1],smash:[.1,.45,1.2],honk:[.06,.25,1],bubble:[.04,.15,.8]}[s.kind]||[Math.min(.08,.03+dm*.015),Math.min(.35,.12+dm*.05),.85+Math.min(.4,dm*.12)];
-    const HFX={pie:'pie',banana:'banana',bun:'bun',quill:'quill',bubble:'gum'};if(HFX[s.kind])fxPlay(HFX[s.kind],hx,hy,ghost.mega?1.6:1,Math.random()*.4-.2,Math.random()<.5?-1:1);else if(s.kind==='fly'){fxPlay('lember',hx,hy,(ghost.mega?1.5:1.05)*rnd(.85,1.2),rnd(0,TAU),1);if(Math.random()<.35)fxPlay('lspark',hx,hy,(ghost.mega?.9:.6)*rnd(.8,1.1),rnd(0,TAU),1)}else if(s.kind==='smash')fxPlay('smash',ghost.x,GY+4*S,1,0,1);else if(s.kind==='animal')fxPlay('zhit',hx,hy,1.15,0,1);else if(s.kind==='beam')fxPlay('bimp',hx,hy,1.25,Math.random()*TAU,1);else fxPlay('spark',hx,hy,pw[2],Math.random()*.6-.3,Math.random()<.5?-1:1);
+    const pw={fly:[0,.16,.5],quill:[s.sup?.06:0,s.sup?.3:.08,.7],animal:[.13,.6,1.3],beam:[.025,.12,0],zap:[.09,.4,1.1],smash:[.1,.45,1.2],honk:[.08,.38,1.8],bubble:[.04,.15,.8]}[s.kind]||[Math.min(.08,.03+dm*.015),Math.min(.35,.12+dm*.05),.85+Math.min(.4,dm*.12)];
+    const HFX={pie:'pie',banana:'banana',bun:'bun',quill:'quill',bubble:'gum'};if(HFX[s.kind])fxPlay(HFX[s.kind],hx,hy,ghost.mega?1.6:1,Math.random()*.4-.2,Math.random()<.5?-1:1);else if(s.kind==='fly'){fxPlay('lember',hx,hy,(ghost.mega?1.5:1.05)*rnd(.85,1.2),rnd(0,TAU),1);if(Math.random()<.35)fxPlay('lspark',hx,hy,(ghost.mega?.9:.6)*rnd(.8,1.1),rnd(0,TAU),1)}else if(s.kind==='smash')fxPlay('smash',ghost.x,GY+4*S,1,0,1);else if(s.kind==='animal')fxPlay('zhit',hx,hy,1.8,0,1);else if(s.kind==='beam')fxPlay('bimp',hx,hy,1.25,Math.random()*TAU,1);else fxPlay('spark',hx,hy,pw[2],Math.random()*.6-.3,Math.random()<.5?-1:1);
     hitImpact(pw[0],pw[1])}
   if(s.kind==='quill'){ghost.quills=Math.min(24,(ghost.quills||0)+(s.sup?12:1));sfx.quillHit()}
   else if(s.kind==='ivy'){ghost.blanket=1.3;ghost.itch=8;ghost.itchRate=superDmg('effective')*.35/8;pop('BLANKETED!',ghost.x,gy-74*GK*S,'#4fbf5a',40);if(!(superBG&&superBG.k==='ivy'))setFx('ivy',2.4);sfx.ivyHit()}
@@ -1691,7 +1691,7 @@ function showClear(){
    backpack's glow dims as the bugs run out. GRUMBLEMAX gets the same. */
 /* user: it fires on its own like a special (LIGHT-M-UP!!): catching it freezes the screen, the super plays, and Todd rips one huge
    4-second blast (18 fireflies a second, ~35 damage in all), then it's gone */
-const LMU={dur:4.2,spin:.1,rate:18,dmg:.63,rips:1,toast:22,v0:1500,acc:16000,vmax:4800}; /* ~45 damage: more than the Booster Beam's 30 (user) */
+const LMU={dur:4.2,spin:.1,rate:18,dmg:.63,rips:1,toast:22,v0:3400,acc:30000,vmax:7200}; /* ~45 damage: more than the Booster Beam's 30 (user) */
 let lmuB=[],lmuSrc=null,lmuSndT=0;
 function segDist(px,py,ax,ay,bx,by){const dx=bx-ax,dy=by-ay,l=dx*dx+dy*dy||1,t=clamp(((px-ax)*dx+(py-ay)*dy)/l,0,1);return Math.hypot(px-ax-dx*t,py-ay-dy*t)}
 function lmuNew(){return{type:'lmu',ammo:LMU.rips,rip:0,t:0,acc:0,hits:0}}
@@ -1704,11 +1704,13 @@ function lmuRip(w){if(w.rip>0||w.ammo<=0)return;w.ammo--;w.rip=LMU.dur;w.t=0;w.a
   if(!SPR.ss_lmu){const hp=headPos();pop('LIGHT-M-UP!!',clamp(bear.x,170*S,W-170*S),hp.y-70*S,'#ffb000',48,1.4)}haptic([30,20,30])}
 /* one firefly out of the barrels, aimed dead at Grumble; in the chapter scene it just flies off */
 function lmuShot(w,key){const f=bear.faceS||bear.face||1;let m=null;
-  if(key){const mk=T2MZK[key];if(!mk)return;const P=todd2Place(key),k=S*(bear.gs||1);m={x:bear.x+(P.x0+mk[0]*P.k)*k*f,y:GY+4*S+(P.y0+mk[1]*P.k)*k}}else m=muzzlePos();if(!m)return;
+  /* in play the bullets leave the big hero Todd's barrels (user: one stream, not two), converted from the screen into the world */
+  if(key){const mk=T2MZK[key];if(!mk)return;const P=todd2Place(key),k=S*(bear.gs||1);m={x:bear.x+(P.x0+mk[0]*P.k)*k*f,y:GY+4*S+(P.y0+mk[1]*P.k)*k}}
+  else{if(!lmuBig||lmuBig.mx==null)return;m=camInv(lmuBig.mx,lmuBig.my)}
   const gx=ghost.x,gy=ghost.y+ghost.yOff,home=!key&&state==='play'&&!ghost.ko;
-  let a=home?Math.atan2(gy+rnd(-14,14)*S-m.y,gx-m.x):(f>0?-.12:Math.PI+.12);a+=rnd(-.025,.025);
+  let a=home?Math.atan2(gy-m.y,gx-m.x):(f>0?-.12:Math.PI+.12);
   const v=LMU.v0*S*rnd(.95,1.05);if(!key)lmuFlash=1;lmuB.push({x:m.x,y:m.y,vx:Math.cos(a)*v,vy:Math.sin(a)*v,t:0,ph:Math.random()*6,home,sc:rnd(.88,1.08)});
-  bear.kick=.07;if(Math.random()<.6)fxPlay('lspark',m.x+f*6*S,m.y,rnd(.55,.85)*(PHONE?1.2:1),a+(f<0?Math.PI:0),f)}
+  if(key){bear.kick=.07;if(Math.random()<.6)fxPlay('lspark',m.x+f*6*S,m.y,rnd(.55,.85)*(PHONE?1.2:1),a+(f<0?Math.PI:0),f)}}
 function updLmu(dt){lmuSndT=Math.max(0,lmuSndT-dt);const w=bear.weapon;
   lmuFlash=Math.max(0,lmuFlash-dt*12);
   if(w&&w.type==='lmu'&&w.go&&state==='play'&&!bear.ko){w.go=0;faceTo(ghost.x);bear.faceS=bear.face;lmuRip(w)}
@@ -1719,7 +1721,7 @@ function updLmu(dt){lmuSndT=Math.max(0,lmuSndT-dt);const w=bear.weapon;
       if(w.rip>0){w.acc+=dt;while(w.acc>1/LMU.rate){w.acc-=1/LMU.rate;lmuShot(w)}}
       if(w.rip<=0){w.rip=0;if(w.hits>=LMU.toast&&!ghost.ko)lmuToast();if(w.ammo<=0)w.done=1}}}
   else if(!(state==='chapter'&&chap&&chap.c.k==='lmu'))lmuStop();
-  const gx=ghost.x,gy=ghost.y+ghost.yOff,R=46*GK*S*HB();
+  const gx=ghost.x,gy=ghost.y+ghost.yOff,R=60*GK*S*HB();
   for(const b of lmuB){b.t+=dt;
     /* bullets: dead straight, kicking up to full speed in a blink (user: they don't bend) */
     {const sp=Math.hypot(b.vx,b.vy)||1,ns=Math.min(LMU.vmax*S,sp+LMU.acc*S*dt);b.vx*=ns/sp;b.vy*=ns/sp}
@@ -1760,6 +1762,7 @@ function drawBigTodd(){const B=superBG,w=bear.weapon;
    gg.addColorStop(0,'rgba(255,220,120,'+(.5*fl)+')');gg.addColorStop(.5,'rgba(255,150,30,'+(.18*fl)+')');gg.addColorStop(1,'rgba(255,120,0,0)');ctx.fillStyle=gg;ctx.fillRect(mx-rr,my-rr,rr*2,rr*2);ctx.restore()}
   ctx.drawImage(lmuOC,x0,y0,nw*ps,nh*ps);
   ctx.globalCompositeOperation='lighter';ctx.globalAlpha=Math.min(1,fl);ctx.drawImage(lmuLC,x0,y0,nw*ps,nh*ps);ctx.globalAlpha=1;ctx.globalCompositeOperation='source-over';
+  {const fx=side>0?-1:1;lmuBig.mx=X+fx*(x0+mk[0]*ps);lmuBig.my=footY+y0+mk[1]*ps}
   /* muzzle sparks out of the big barrels */
   if(w.rip>0&&lmuFlash>.35){const E=SPR['fx_lspark'+(Math.floor(now*30)%6)];if(E){const ew=iw0*.42*(.85+.3*Math.random()),eh=ew*E.img.naturalHeight/E.img.naturalWidth;ctx.save();ctx.translate(x0+mk[0]*ps,y0+mk[1]*ps);ctx.drawImage(E.img,-ew*.15,-eh/2,ew,eh);ctx.restore()}}
   ctx.restore()}
@@ -1775,8 +1778,8 @@ function lmuToast(){const g=ghost,gy=g.y+g.yOff;if(superBG&&superBG.k==='lmu'){s
 function drawLmuB(){if(!lmuB.length)return;const E=SPR.fx_lember0,Sh=SPR.sh_lmu0;
   for(const b of lmuB){const a=Math.atan2(b.vy,b.vx),flip=b.vx<0;ctx.save();ctx.translate(b.x,b.y);
     /* flickering embers around the bug */
-    const ef=SPR['fx_lember'+(Math.floor(now*14+b.ph)%6)];if(ef){const ew=40*S*b.sc;ctx.save();ctx.globalAlpha=.8;ctx.rotate(now*3+b.ph);ctx.drawImage(ef.img,-ew/2,-ew/2,ew,ew*ef.img.naturalHeight/ef.img.naturalWidth);ctx.restore()}
-    const F=SPR['sh_lmu'+(Math.floor(now*18+b.ph)%6)];if(F){const w=56*S*b.sc,h=w*F.img.naturalHeight/F.img.naturalWidth;ctx.rotate(a);if(flip)ctx.scale(1,-1);ctx.drawImage(F.img,-w*.75,-h/2,w,h)}
+    const ef=SPR['fx_lember'+(Math.floor(now*14+b.ph)%6)];if(ef){const ew=80*S*b.sc;ctx.save();ctx.globalAlpha=.8;ctx.rotate(now*3+b.ph);ctx.drawImage(ef.img,-ew/2,-ew/2,ew,ew*ef.img.naturalHeight/ef.img.naturalWidth);ctx.restore()}
+    const F=SPR['sh_lmu'+(Math.floor(now*18+b.ph)%6)];if(F){const w=112*S*b.sc,h=w*F.img.naturalHeight/F.img.naturalWidth;ctx.rotate(a);if(flip)ctx.scale(1,-1);ctx.drawImage(F.img,-w*.75,-h/2,w,h)}
     ctx.restore()}}
 /* the backpack's fireflies glow: full while there are rips left, dimming as they're used up, pulsing while firing */
 function lmuTankGlow(key,P,b){const w=b.weapon,T=LMU_TANK[key];let k=1;
@@ -2094,7 +2097,7 @@ function update(dt){
       if(s.t>=.62||(state==='play'&&s.t>=.4&&d<200*S)||state!=='play'){s.gone=true;porcPop(s)}continue}
     if(s.kind==='quill')s.rot=Math.atan2(s.vy,s.vx);else if(s.kind==='honk'||s.kind==='bubble')s.rot=0;else s.rot+=(s.kind==='banana'?16:s.kind==='junk'?10:s.kind==='ivy'?6:4)*dt;
     if(s.cool>0){s.cool-=dt;s.vy+=900*S*dt}
-    else{const dx=gx-s.x,dy=gy-s.y,d=Math.hypot(dx,dy)||1,sp=s.speed*S;s.vx+=(dx/d*sp-s.vx)*Math.min(1,dt*6);s.vy+=(dy/d*sp-s.vy)*Math.min(1,dt*6)}
+    else{const dx=gx-s.x,dy=gy-s.y,d=Math.hypot(dx,dy)||1,sp=s.speed*S,k=Math.min(1,dt*(s.kind==='honk'?16:6));s.vx+=(dx/d*sp-s.vx)*k;s.vy+=(dy/d*sp-s.vy)*k}
     s.x+=s.vx*dt; s.y+=s.vy*dt;
     if(state==='play'&&s.cool<=0&&Math.hypot(gx-s.x,gy-s.y)<46*GK*S*HB()){
       hitGhost(s); s.left--;
@@ -2108,7 +2111,7 @@ function update(dt){
   buns=buns.filter(b=>!b.gone);
   // barnyard
   for(const a of animals){
-    if(state==='play'&&!a.hitG&&!ghost.ko&&(a.st||a.y>gy-10*S)){const dx=gx-a.x,dy=gy-a.y,d=Math.hypot(dx,dy)||1,sp=Math.hypot(a.vx,a.vy),k=Math.min(1,dt*(a.st?4:1.7));a.vx+=(dx/d*sp-a.vx)*k;a.vy+=(dy/d*sp-a.vy)*k}
+    if(state==='play'&&!a.hitG&&!ghost.ko){const dx=gx-a.x,dy=gy-a.y,d=Math.hypot(dx,dy)||1,sp=Math.hypot(a.vx,a.vy),k=Math.min(1,dt*(a.st?9:8));a.vx+=(dx/d*sp-a.vx)*k;a.vy+=(dy/d*sp-a.vy)*k}
     a.x+=a.vx*dt; a.y+=a.vy*dt; a.rot+=a.vr*dt;
     for(const it of items){if(it.dead||it.loose)continue;if(Math.hypot(it.x-a.x,it.y-a.y)<HZ[it.type].r*S+44*S){it.loose=true;it.g=1500*S;it.vy=-320*S;it.vx=a.vx*.35;pop('POW!',it.x,it.y-20*S,C.gold,30,.6);impact(it.x,it.y);sfx.swot()}}
     if(state==='play'&&!a.hitG&&(Math.hypot(gx-a.x,gy-a.y)<80*GK*S*HB()||ghostBodyHit(a.x,a.y,30*S))){a.hitG=true;for(const p of pops)if(p.follow===a)p.age=Math.max(p.age,p.life-.08);hitGhost({kind:'animal',animal:a.kind,dmg:2,x:a.x,y:a.y})}
@@ -3174,8 +3177,7 @@ function todd2Key0(b,mv){const w=b.weapon,walk=mv>.15&&Math.floor(b.walk/Math.PI
   if(w&&w.type==='beans'&&b.smF>=0&&SPR.c_todd_smash_0)return 'smash_'+b.smF;
   if(w&&w.type==='beans'&&w.t>11.1)return SPR.c_todd_eat_beans_0?'eat_beans_'+Math.min(5,Math.floor((12-w.t)/.9*6)):'eat_beans';
   /* ripping: the firing sheet, braced with the barrels spinning up (frame 0), then yelling through the recoil */
-  if(w&&w.type==='lmu'&&w.rip>0&&SPR.c_todd_f_lmu_0)return 'f_lmu_'+(w.t<LMU.spin?0:1+Math.floor(w.t*14)%5);
-  if(w&&w.type==='lmu'&&(w.go||w.done)&&SPR.c_todd_f_lmu_0)return 'f_lmu_0';
+  if(w&&w.type==='lmu'&&(w.go||w.done||w.rip>0)&&SPR.c_todd_f_lmu_0)return 'f_lmu_0'; /* the big hero Todd does the firing */
   if(w&&w.type==='gum'){if(w.eatT>0)return SPR.c_todd_eat_gum_0?'eat_gum_'+Math.min(5,Math.floor((1-w.eatT/.9)*6)):'eat_gum';if(w.blowT>0)return SPR.c_todd_blow_0?'blow_'+Math.min(4,Math.floor((1-w.blowT/.7)*5)):'blow'}
   if(b.swing>0&&!(w&&(w.type==='shoe'||w.type==='gum'||w.type==='zooka'||w.type==='ivy'||w.type==='porcu'||w.type==='beans'))){if(b.swing>b._sw0||!b._sw0)b._sw0=b.swing;return SPR.c_todd_th_0?'th_'+(2+Math.min(3,Math.floor((1-b.swing/b._sw0)*4))):'h_throw'}else if(!(b.swing>0))b._sw0=0;
   if(b.helmet>0&&!w)return mov?(walkKey('bucket',b)||(walk?'w_bucket':'h_bucket')):'h_bucket';
@@ -4105,7 +4107,7 @@ function drawBubble(r,t){const q=Math.sin(t*9)*.04;ctx.save();ctx.scale(1+q,1-q)
   ctx.beginPath();ctx.ellipse(-r*.38,-r*.42,r*.22,r*.13,-.7,0,TAU);ctx.fillStyle='#ffffff';ctx.fill();ctx.restore()}
 function drawShot(s){
   ctx.save();ctx.translate(s.x,s.y);ctx.scale(S,S);ctx.rotate(s.rot);
-  if(s.kind==='honk'){ctx.rotate(-s.rot);drawNotes(now-s.t0)}
+  if(s.kind==='honk'){ctx.rotate(-s.rot);ctx.scale(2,2);drawNotes(now-s.t0)}
   else if(s.kind==='bubble'){ctx.rotate(-s.rot);drawBubble(26+Math.min(1,(now-s.t0)/.3)*10,now-s.t0)}
   else if(s.kind==='junk')drawJunk(s.type);
   else if(s.kind==='pie'&&SPR.x_pie)artDraw('x_pie',50,0,0,0);
@@ -4151,7 +4153,7 @@ const SLOW=.5; /* pieces fly at half speed */
    low and close on the hero, then a wide shot for the last hit. f = what the shot frames. */
 const SHOTS=[{f:'c',z:1,r:0},{f:'ghost',z:1.6,r:-.075},{f:'mid',z:1.32,r:.05,fl:1},{f:'todd',z:1.55,r:.08},{f:'ghost',z:1.85,r:.045,fl:1},{f:'mid',z:1.4,r:-.06}];
 SUPERS.porcu.shots=SHOTS.filter(q=>q.f!=='todd'); /* user: no close-up of Todd just standing there grinning with the gun */
-SUPERS.lmu.shots=SHOTS.filter(q=>!q.fl); /* no mirrored angles: the big Todd stays on the side away from Grumble */
+SUPERS.lmu.shots=SHOTS.filter(q=>!q.fl&&q.f!=='todd'); /* no mirrored angles: the big Todd stays on the side away from Grumble */
 let superBG=null,GPIN=70; /* how far above the ground line Grumble's anchor sits when he's smashed flat */
 const SMT=[0,.22,.5,.68,.86,1.25,1.75],SMREACH=46; /* smash frame start times (s, frame 4 = the slam); how far in front of Todd his fists land (game units at normal size) */
 function startSuper(k,img,fly){const D=SUPERS[k];if(!D||!SPR['sb_'+k])return superFlash(img,D&&D.col,0,fly);
@@ -4296,6 +4298,7 @@ function drawSuperBG(){const B=superBG;if(!B)return;const k=superK(),P=SPR['sb_'
       a=Math.min(1,p.t/.15)*Math.min(1,(p.life-p.t)/.3)*Math.max(k,.0001);
     ctx.save();ctx.globalAlpha=Math.min(1,a);ctx.translate(p.x,p.y+(p.wob!=null?Math.sin(p.t*5+p.wob)*18*S:0));ctx.rotate(p.rot);
     const ww=Q.r>=1?sz:sz*Q.r,hh=Q.r>=1?sz/Q.r:sz;ctx.drawImage(Q.img,-ww/2,-hh/2,ww,hh);ctx.restore()}}
+function camInv(sx,sy){const c=superBG&&superBG.cam;if(!c)return{x:sx,y:sy};const dx=sx-W/2,dy=sy-H/2,co=Math.cos(c.r),si=Math.sin(c.r),ux=dx*co+dy*si,uy=-dx*si+dy*co;return{x:c.fx+ux/(c.z*c.fl),y:c.fy+uy/c.z}}
 function camPt(x,y){const c=superBG&&superBG.cam;if(!c)return{x,y};const dx=(x-c.fx)*c.z*c.fl,dy=(y-c.fy)*c.z,co=Math.cos(c.r),si=Math.sin(c.r);return{x:W/2+dx*co-dy*si,y:H/2+dx*si+dy*co}}
 function applyCam(){const c=superBG&&superBG.cam;if(!c||(Math.abs(c.z-1)<.002&&Math.abs(c.r)<.001&&c.fl===1&&Math.abs(c.fx-W/2)<1&&Math.abs(c.fy-H/2)<1))return false;
   ctx.save();ctx.translate(W/2,H/2);ctx.rotate(c.r);ctx.scale(c.z*c.fl,c.z);ctx.translate(-c.fx,-c.fy);return true}
