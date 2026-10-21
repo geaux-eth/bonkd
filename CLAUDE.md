@@ -135,7 +135,7 @@
 - After levels 5, 10, 15, 20 and 25 the new ability is something Grumble LOSES, never a gift: when he poofs, it falls out of the poof cloud (lostItem, "UH OH!"), bounces and lies on the ground through the level-up. After Next level a skippable scene plays (CHAPTERS in the source): Todd walks over, grabs it and uses it, an info card explains it, Todd celebrates (c_todd_cheer), then runs off after Grumble.
   - 5: LUMPY OATMEAL: plain, gloppy, grayish oatmeal, no spoon, no toppings. Doubles how many bonks Todd can take; each meter icon gets a rainbow outline that the first bonk removes, then the icon fills.
   - 10: SHOE HORN (weapon): an old boot that's also a tuba, 2 hands, 5 honks of gold music notes; Grumble gets a headache (c_grum_headache, notes circling).
-  - 15: BEAR HANDED (power-up, v49): double damage for 15 s (BH_DUR), or until Todd gets bonked (an oatmeal ring soaking the bonk still counts) or the level ends; it never carries into the next level. Only the big BEAR HANDED! word on pickup (no small word by Todd, no first-time tip, no chip, no LOST word). A red glow on Todd that blinks for its last 3 s, quickly for the last 1.5, then goes.
+  - 15: BEAR HANDED (power-up, v49): double damage for 15 s (BH_DUR); a bonk does NOT end it (user, v50), clearing the level does; it never carries into the next level. Only the big BEAR HANDED! word on pickup (no small word by Todd, no first-time tip, no chip, no LOST word). A red glow on Todd that blinks for its last 3 s, quickly for the last 1.5, then goes.
   - 20: GARGANTU-GUM (weapon): Todd eats it (c_todd_eat_gum), blows bubbles (c_todd_blow, 3 per gumball) that float up and pop on Grumble (c_grum_gum), who peels it off.
   - 25: WAFFLICIOUS (power-up): for 10 s Grumble throws waffles (mostly plain) instead of junk.
   - 30: LIGHT-M-UPPER (weapon): the firefly cannon; see its own section below.
@@ -270,3 +270,7 @@
 ## Batch v49 notes
 - The &fx test link no longer gives Grumble 4x health (it made the specials look far too weak in testing); test runs use the real health.
 - While a super runs, no small pop words show (pop() drops them unless passed keep; TOASTED! keeps): the super's shout and the hit counter are the only lettering (user: OUCH/OOF over the red lettering looked poor).
+
+## Batch v50 notes
+- Bear Handed is a flat 15 s; bonks don't end it, a level clear does.
+- SLOWMO Snail (slowT 6 s; a bonk doesn't end it, a level clear does): it can now drop any time (it was missing from HELP, so Booster only tossed it while Todd already held a weapon, and the &fx test order never includes it). Pickup shows only a big purple SLOWMO! word: no chip under Todd and no small first-time tip.
