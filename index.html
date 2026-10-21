@@ -1415,12 +1415,16 @@ function ghostThrow(){
   const fast=Math.max(.5,1.45-level*.06-lvlTime*.006)*(level<=2?1.15:1);
   ghost.throwT=fast*(.75+rng()*.5);
 }
-let TEST=false;try{TEST=/[?&]test\b/.test(location.search)}catch(e){}
+/* test switches (?test, ?lv=, &fx) only work for testers: add &k=<tester key> once and this device remembers it.
+   Only the key's hash is in the page, so the switches can't be found or turned on from the source. */
+const TKH=8995677862600545,cyrb53=(s,seed=7)=>{let h1=0xdeadbeef^seed,h2=0x41c6ce57^seed;for(let i=0;i<s.length;i++){const c=s.charCodeAt(i);h1=Math.imul(h1^c,2654435761);h2=Math.imul(h2^c,1597334677)}h1=Math.imul(h1^(h1>>>16),2246822507)^Math.imul(h2^(h2>>>13),3266489909);h2=Math.imul(h2^(h2>>>16),2246822507)^Math.imul(h1^(h1>>>13),3266489909);return 4294967296*(2097151&h2)+(h1>>>0)};
+let TESTER=false;try{const m=location.search.match(/[?&]k=([\w-]+)/);if(m&&cyrb53(m[1])===TKH){TESTER=true;localStorage.setItem('bonkd-tk',m[1])}else{const k=localStorage.getItem('bonkd-tk');TESTER=!!k&&cyrb53(k)===TKH}}catch(e){}
+let TEST=false;try{TEST=TESTER&&/[?&]test\b/.test(location.search)}catch(e){}
 /* level jump for playtesting (?lv=7, ?lv=boss, ?lv=end): Play drops you straight into that level with the unlocks you'd have by then.
    It's a test run: nothing is saved, no lives are used, and the normal Booster drops are kept. */
-let JUMP=null;try{const m=location.search.match(/[?&]lv=(\w+)/);if(m)JUMP=m[1].toLowerCase()}catch(e){}if(JUMP)TEST=true;
+let JUMP=null;try{const m=location.search.match(/[?&]lv=(\w+)/);if(m&&TESTER)JUMP=m[1].toLowerCase()}catch(e){}if(JUMP)TEST=true;
 /* ?fx: a test run where Booster brings every super and signature move in turn, every few seconds */
-let FXTEST=false;try{FXTEST=/[?&]fx\b/.test(location.search)}catch(e){}if(FXTEST)TEST=true;
+let FXTEST=false;try{FXTEST=TESTER&&/[?&]fx\b/.test(location.search)}catch(e){}if(FXTEST)TEST=true;
 /* ---------- anonymous play stats: queued here, sent in batches by the web build (no names, no personal info) ---------- */
 const EVQ=[],SESS=(window.crypto&&crypto.randomUUID)?crypto.randomUUID():'00000000-0000-4000-8000-'+String(Date.now()).padStart(12,'0').slice(-12);
 const DEV=matchMedia('(pointer:coarse)').matches?'phone':'computer';

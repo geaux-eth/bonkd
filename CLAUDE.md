@@ -242,6 +242,7 @@
 - Touch: a second finger only takes over steering once it actually drags (16 px), so a quick tap with another finger fires without breaking the steering thumb. Paddle: the swing turns to the nearest incoming junk and its hit window is wider and longer. Waffles are grabbed by any part of Todd, in the air or bouncing at his feet.
 
 ## Playtest links
+- Test switches are for testers only (v53, user: they must not be findable): ?test, ?lv= and &fx do nothing unless the URL also carries &k=<tester key> once on that device (it's remembered in localStorage bonkd-tk). Only the key's cyrb53 hash (TKH) is in the page; the key itself lives in the scratchpad (tester_key.txt) and the user's Level Jump artifact, never in this repo. Audit scripts load ?test&k=<key>.
 - ?lv=N (1-31), ?lv=boss, ?lv=end jump straight into a level, the GRUMBLEMAX fight or the ending (JUMP / jumpTo in the source). It's a test run: nothing saved, no lives used (shows 9), normal Booster drops, the chapter unlocks before that level are given. Add &fx for the special-weapon drop order (ivy, bear handed, zooka, shoe, porcu, beam, beans, Light-M-Upper). The user's link page is the "Bonkd Level Jump" artifact.
 
 ## The Light-M-Upper (chapter weapon after level 30, v34)
