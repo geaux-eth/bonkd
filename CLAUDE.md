@@ -255,5 +255,9 @@
 
 ## Batch v46 notes
 - No skip UI anywhere: the #chSkip button, its CSS and handlers are deleted (story and ending still end early on a silent tap, chapters on Esc no more).
-- Porcu-Popper super: no cut-in still (user: the grinning hold still read like a pasted sticker) and no close-up shot on Todd standing there (SUPERS.porcu.shots drops the 'todd' framing). Ivy, beans and beam still use cut-in stills.
+- Porcu-Popper super: no close-up shot on Todd standing there (SUPERS.porcu.shots drops the 'todd' framing).
+
+## Batch v47 notes
+- Object cut-ins (user): the Ivy and Porcu-Popper supers no longer slide a still of Todd across the band; their object flies across it left to right (fast in, a beat in the middle, fast out; startSuper(k,img,fly)). Ivy: ci_ivy, the flying blanket cut from Grumble's toss-off art (art/src_c_grum_blanket_off.png by scratchpad cutin/blanket.py), fluttering. Porcu: ci_porcu, the user's rolled-up porcupine with the shouting porcupine's mouth pasted on (cutin/porc.py, sources cutin/src/porc_ball.jpg and porc_shout.jpg; sticker edge by cutin/sticker.py), tumbling. Beans and beam keep their cut-ins.
+- Sounds (scratchpad lmu/sfx_user2.py): lifeUp = the user's universfield "Level Up 06" (sfxlib/user/levelup.mp3), played on every extra-life purchase (store, continue card, out-of-lives card). lmuWhoosh = the fiery whoosh from the front of dragon-studio "Elemental Spell Impact Light" (0-1.8 s, cut before its ding at ~1.9 s), played on the LIGHT-M-UP tap.
 - Booster Beam: the beam frames (c_boost_bf*) face right in the art; they are drawn facing Grumble paws-first (no extra mirror) and the beam leaves his palms (BOOST_PAW 425,215 on bf3). He faces the way he flies when leaving.
