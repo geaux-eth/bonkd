@@ -651,14 +651,16 @@ function resize(){
   /* one scale for every screen, touch or not: wide screens show the same amount of scene around the characters as a phone held sideways (about 2.2:1) */
   S=Math.max(.28,Math.min(2.4,Math.min(H/640,W/1384)));
   /* phones: the characters draw smaller (WZ) so there's more room between Todd and Grumble; words keep a readable size (TS) */
-  PHONE=TOUCHY&&Math.min(W,H)<520; WZ=PHONE?PHONE_Z:1; TS=S*(PHONE?.85:1); S=Math.max(.2,S*WZ);
+  PHONE=TOUCHY&&Math.min(W,H)<520; WZ=PHONE_Z; /* user v56: computers use the phone's perspective too (smaller characters, more room) */ TS=S*(PHONE?.85:1); S=Math.max(.2,S*WZ);
   BSC=Math.max(.45,Math.min(2.4,Math.min(H/640,W/1384)));
   document.body.classList.toggle('short',H<460);
   UIZ=ROT?1:clamp(Math.min(H/430,W/900),1,1.75); document.documentElement.style.setProperty('--uiz',UIZ);
-  GY=H-(PHONE?Math.max(30,H*.085):Math.max(42,H*.12));
+  GY=H-Math.max(30,H*.085);
   bgKey='';
 }
 const PHONE_Z=.58;
+/* backdrop fit (user, v56): every screen shows the painting's full width like a sideways phone; only a wider-than-2:1 window crops, and the ground line always lands on GY */
+function bgFit(iw,ih,dy,gy){return Math.max(W/iw,gy/dy*.92,(H-gy)/(ih-dy))} /* .92: a squarer window crops a sliver of the sides rather than show a tall sky cap */
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 function toStage(e){return ROT?{x:e.clientY,y:innerWidth-e.clientX}:{x:e.clientX,y:e.clientY}}
 addEventListener('resize',resize); resize();
@@ -1888,7 +1890,7 @@ function finishChapter(){const h=chap;if(!h)return;if(h.c.k==='oat'&&!bear.oat){
   if(h.c.give){bear.weapon=h.c.k==='shoe'?{type:'shoe',ammo:5}:h.c.k==='lmu'?lmuNew():{type:'gum',ammo:3}}}
 function skipChapter(){if(!chap)return;track('chapter_skip',{k:chap.c.k,n:chap.t*10});finishChapter()}
 /* ---------- the boss: Grumble's Hideout. Grumble tosses waffles into his cauldron, gobbles the magic waffle it spits out, and swells into GRUMBLEMAX ---------- */
-function bgPt(u,v){const a=bgArt();if(!a)return{x:u*W,y:v*H};const I=SPR[a[0]].img,iw=I.naturalWidth,ih=I.naturalHeight,dy=a[1]*ih,gy=GY+8*BSC,k=Math.max(W/iw,gy/dy,(H-gy)/(ih-dy)),w=iw*k,h=ih*k;let x=(W-w)/2+u*w;if(a[2])x=W-x;return{x,y:gy-dy*k+v*h}}
+function bgPt(u,v){const a=bgArt();if(!a)return{x:u*W,y:v*H};const I=SPR[a[0]].img,iw=I.naturalWidth,ih=I.naturalHeight,dy=a[1]*ih,gy=GY+8*BSC,k=bgFit(iw,ih,dy,gy),w=iw*k,h=ih*k;let x=(W-w)/2+u*w;if(a[2])x=W-x;return{x,y:gy-dy*k+v*h}}
 function startBoss(){$('clear').hidden=true;bossMode=true;bossPhase=1;rageT=-1;drips=[];bgKey='';setGhost();ghost.max=ghost.hp=180;updateHp();$('lvl').textContent='BOSS';
   state='bossintro';bossI={t:0,tossed:0,fl:[],magic:null,glow:0};ghost.hold=0;ghost.yOff=0;ghost.pose=null;ghost.x=W+120*S;ghost.y=H*.3;
   bear.weapon=null;bear.jello=null;items=[];gifts=[];shots=[];angel=null;beamer=null;strike=null;angelT=99;playLevel();
@@ -3148,8 +3150,13 @@ function drawSetting(name,fixed,props){const P=planSetting(name,fixed);if(!P)ret
   /* a setting's fixed props are drawn in their own tier's slot, so size decides layering everywhere */
   for(const t of TORDER){for(const p of P.a)if(p.t===t)drawPlanned(p);if(props&&props[t])props[t]()}for(const p of P.drift||[])drawDrift(p);if(SPR.bf_pink_o){drawBflies(P);return 0}return P.flutter}
 function bgArt(){const a=BGART[scene().n];return a&&SPR[a[0]]?a:null}
+/* a window taller than the painting: the painting's own sky colour (its top rows averaged into 8 soft bands) carries up to the top and
+   fades down over the painting's top edge, so light rays and clouds never get stretched into streaks */
+const skyC=new Map();
+function skyCap(I,x,w,top){let c=skyC.get(I);if(!c){c=document.createElement('canvas');c.width=8;c.height=1;const g=c.getContext('2d');g.imageSmoothingQuality='high';g.drawImage(I,0,0,I.naturalWidth,Math.max(4,I.naturalHeight*.03),0,0,8,1);skyC.set(I,c)}
+  ctx.save();ctx.imageSmoothingEnabled=true;ctx.drawImage(c,0,0,8,1,x,0,w,top+1);const f=Math.min(top*.6,70*BSC),n=14;for(let i=0;i<n;i++){ctx.globalAlpha=1-(i+1)/(n+1);ctx.drawImage(c,0,0,8,1,x,top+i*f/n,w,f/n+1)}ctx.restore()}
 function paintBGArt(a){const I=SPR[a[0]].img,iw=I.naturalWidth,ih=I.naturalHeight,dy=a[1]*ih,gy=GY+8*BSC;if(a[2]){ctx.save();ctx.translate(W,0);ctx.scale(-1,1)}
-  const k=Math.max(W/iw,gy/dy,(H-gy)/(ih-dy)),w=iw*k,h=ih*k;ctx.drawImage(I,(W-w)/2,gy-dy*k,w,h);if(a[2])ctx.restore()}
+  const k=bgFit(iw,ih,dy,gy),w=iw*k,h=ih*k,top=gy-dy*k;ctx.drawImage(I,(W-w)/2,top,w,h);if(top>0)skyCap(I,(W-w)/2,w,top);if(a[2])ctx.restore()}
 function ensureBG(){
   const k=W+'x'+H+':'+(state==='story'||state==='ending'||(state==='over'&&bossDone)?'picnic':level)+':'+BSC+':'+!!bgArt(); if(k===bgKey)return;
   bgCan.width=Math.round(W*DPR);bgCan.height=Math.round(H*DPR);
@@ -4262,7 +4269,7 @@ function drawTarget(front){if(!strike||!SPR.fx_tgt_y||strike.t<strike.warn*.2)re
   ctx.save();ctx.globalAlpha=Math.min(1,(k-.2)*6);ctx.beginPath();if(front)ctx.rect(0,cy,W,H);else ctx.rect(0,0,W,cy);ctx.clip();
   ctx.drawImage(F.img,cx-w/2,cy-h/2,w,h);ctx.restore()}
 function drawWoodsFront(){const a=bgArt(),A=a&&SPR[a[0]+'_front'];if(!A||!a)return;const I=A.img,iw=I.naturalWidth,ih=I.naturalHeight,dy=a[1]*ih,gy=GY+8*BSC;if(a[2]){ctx.save();ctx.translate(W,0);ctx.scale(-1,1)}
-  const k=Math.max(W/iw,gy/dy,(H-gy)/(ih-dy)),w=iw*k,h=ih*k;ctx.drawImage(I,(W-w)/2,gy-dy*k,w,h);if(a[2])ctx.restore()}
+  const k=bgFit(iw,ih,dy,gy),w=iw*k,h=ih*k;ctx.drawImage(I,(W-w)/2,gy-dy*k,w,h);if(a[2])ctx.restore()}
 function superUpdate(dt){const B=superBG;if(!B)return;B.t+=dt;
   if(!B.ended&&(ghost.ko||(state!=='play'&&state!=='story'))){B.ended=1;B.bar=0;B.bolts=[];B.life=Math.min(B.life,B.t);if(cueSrc)try{cueSrc.stop(AC.currentTime+.3)}catch(e){}}
   if(!B.slam&&B.t>=.85){B.slam=1;shake=Math.max(shake,.55);clip(B.D.sl,.9)||clip('boom',.75);SUPER_SND[B.k]&&SUPER_SND[B.k]();haptic([80,30,120])}
@@ -4573,7 +4580,7 @@ document.querySelectorAll('img.wicon').forEach(i=>{i.src=wafIcon()});
    on the backdrop (gap above Leaderboard = gap between the two = gap above the grass) */
 const GRASS_FRAC=.833;let mlKey='';
 function grassLineY(){const a=bgArt();if(!a)return GY-.03*H;const I=SPR[a[0]].img,iw=I.naturalWidth,ih=I.naturalHeight,dy=a[1]*ih,gy=GY+8*BSC;
-  const k=Math.max(W/iw,gy/dy,(H-gy)/(ih-dy));return gy-(dy-GRASS_FRAC*ih)*k}
+  const k=bgFit(iw,ih,dy,gy);return gy-(dy-GRASS_FRAC*ih)*k}
 function inkBox(el){const r=el.getBoundingClientRect(),cs=getComputedStyle(el),x=document.createElement('canvas').getContext('2d');
   x.font=`${cs.fontSize} ${cs.fontFamily}`;const m=x.measureText(el.textContent.toUpperCase()),fs=parseFloat(cs.fontSize);
   const base=r.top+parseFloat(cs.paddingTop)+(r.height-parseFloat(cs.paddingTop)-parseFloat(cs.paddingBottom))/2+(m.actualBoundingBoxAscent-m.actualBoundingBoxDescent)/2;

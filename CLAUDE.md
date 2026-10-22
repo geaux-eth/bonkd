@@ -84,6 +84,7 @@
 - Review every group in the art review page before anything ships. Never deploy unapproved art.
 
 ## Screen scale
+- v56 (user, watching a computer stream: everything too big and close): computers use the phone's perspective. WZ=PHONE_Z (.58) on every screen and the dirt strip is 8.5% everywhere. Backdrops fit by bgFit: the painting's full width shows (like a sideways phone), cropping only a sliver of the sides on squarer windows (gy/dy*.92); any sky left above the painting is filled by skyCap (the painting's own top colour, averaged and faded down over its top edge, so no stretched streaks). Super plates keep the old cover fit.
 - Base scale S = min(H/640, W/1384). Wide computer windows show the same amount of scene around the characters as a phone held sideways. Grumble's size is GK (0.82 of the original); everything placed around him scales with it.
 - Phones (touch, short side under 520 px) draw the world at PHONE_Z (0.58) of that so Todd and Grumble have room between them; words use TS (0.85 of the base) so they stay readable. The phone dirt strip is 8.5% of the height (computer 12%).
 - Check "phone" views with real touch emulation (audit/bg_shots_t.py with TOUCH=1), not just a phone-sized window.
