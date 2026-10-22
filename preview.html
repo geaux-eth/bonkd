@@ -801,19 +801,21 @@ let wallet={
 const PONG=['PING!','PONG!'];
 const WT=[
   {k:'plain',name:'WAFFLE',v:5,w:44},
-  {k:'chicken',name:'CHICKEN & WAFFLES',v:25,w:16},
-  {k:'report',name:'STRAIGHT-A WAFFLE',v:100,w:14},
-  {k:'unicorn',name:'BIRTHDAY UNICORN WAFFLE',v:250,w:9},
-  {k:'ring',name:'ENGAGEMENT WAFFLE',v:1000,w:6},
-  {k:'refund',name:'TAX REFUND WAFFLE',v:500,w:9},
-  {k:'tree',name:'WAFFLE TREE',v:5000,w:4.5},
-  {k:'barrow',name:'WHEELBARROW OF WAFFLES',v:2000,w:6},
-  {k:'truck',name:'DUMP TRUCK OF WAFFLES',v:10000,w:1.5},
-  {k:'lotto',name:'WAFFLE LOTTO TICKET',v:25000,w:.3}];
+  {k:'chicken',name:'CHICKEN & WAFFLES',v:25,w:16,lv:1},
+  {k:'report',name:'STRAIGHT-A WAFFLE',v:100,w:14,lv:3},
+  {k:'unicorn',name:'BIRTHDAY UNICORN WAFFLE',v:250,w:9,lv:6},
+  {k:'ring',name:'ENGAGEMENT WAFFLE',v:1000,w:6,lv:12},
+  {k:'refund',name:'TAX REFUND WAFFLE',v:500,w:9,lv:9},
+  {k:'tree',name:'WAFFLE TREE',v:5000,w:4.5,lv:20},
+  {k:'barrow',name:'WHEELBARROW OF WAFFLES',v:2000,w:6,lv:16},
+  {k:'truck',name:'DUMP TRUCK OF WAFFLES',v:10000,w:1.5,lv:24},
+  {k:'lotto',name:'WAFFLE LOTTO TICKET',v:25000,w:.3,lv:27}];
 const QUIP={chicken:'Winner winner, chicken dinner!',report:'Look, Ma! Straight A\'s!',unicorn:'Is it my birthday?!',ring:'I said YES!',refund:'Uncle Sam paid ME back!',tree:'Waffles DO grow on trees!',barrow:'Load \'er up!',truck:'Back it up! Beep beep!',lotto:'I\'m a WAFFLE-AIRE!'};
 let quip=null;
 const WTK={};WT.forEach(t=>WTK[t.k]=t);
-function pickWaffle(){const sp=WT.filter(t=>t.k!=='plain');const tot=sp.reduce((a,t)=>a+t.w,0);let r=rng()*tot;for(const t of sp){r-=t.w;if(r<=0)return t.k}return sp[0].k}
+/* waffle economy (user v57: a level-9 run paid 5,700; that should take about 2/3 of the game, or ~15 runs of the first 10 levels):
+   each special waffle only drops from its own level on (lv), so early levels pay small change and the jackpots wait for the late game */
+function pickWaffle(){const L=bossMode?LAST_LV:level,sp=WT.filter(t=>t.k!=='plain'&&(t.lv||1)<=L);const tot=sp.reduce((a,t)=>a+t.w,0);let r=rng()*tot;for(const t of sp){r-=t.w;if(r<=0)return t.k}return sp[0].k}
 let pongI=0; const nextPong=()=>PONG[pongI++%PONG.length];
 const ANIMALS=['chicken','pig','cow','sheep'];
 const MOO={chicken:'BAWK!',pig:'OINK!',cow:'MOO!',sheep:'BAA!'};
@@ -1410,7 +1412,7 @@ function helpAim0(){return 0}
 function ghostThrow(){
   if(waffT>0){const side=bear.x>=ghost.x?1:-1;ghost.throwSide=side;ghost.throwA=.35;const sx=ghost.x+side*86*GK*S,sy=ghost.y+ghost.yOff+44*GK*S;
     const n=1+(rng()<.4?1:0);for(let i=0;i<n;i++){const tx=clamp(bear.x+rnd(-160,160)*S,40*S,W-40*S),T=1.1;
-      const sm=WT.filter(q=>q.k!=='plain'&&q.v<=250);wafs.push({t:rng()<.8?'plain':sm[Math.floor(rng()*sm.length)].k,x:sx,y:sy,vx:(tx-sx)/T,vy:-260*S,g:2*((GY-60*S-sy)+260*S*T)/(T*T),rot:rnd(0,TAU),vr:rnd(-5,5),age:0})}
+      const sm=WT.filter(q=>q.k!=='plain'&&q.v<=250&&(q.lv||1)<=level);wafs.push({t:rng()<.8||!sm.length?'plain':sm[Math.floor(rng()*sm.length)].k,x:sx,y:sy,vx:(tx-sx)/T,vy:-260*S,g:2*((GY-60*S-sy)+260*S*T)/(T*T),rot:rnd(0,TAU),vr:rnd(-5,5),age:0})}
     sfx.whoosh();ghost.throwT=.55+rng()*.35;return}
   let pool=Object.keys(HZ).filter(k=>HZ[k].lv<=level);
   if(bear.weapon&&bear.weapon.type==='magnet'){pool=['pan'];if(level>=3)pool.push('anvil');if(level>=5)pool.push('safe')}
@@ -1728,8 +1730,8 @@ function ghostDown(){
     poofs.push({x:gx0,y:gy0,age:0}); sfx.poof(); pop('POOF!',gx0,gy0-50*S,C.white,40,.9);
     if(!bossMode&&CHAPTERS[level]&&!chapDone[level]){lostItem={x:gx0,y:gy0,vx:(gx0>W/2?-1:1)*rnd(90,170)*S,vy:-420*S,rot:0,vr:rnd(5,8)*(Math.random()<.5?-1:1),land:false,b:0};setTimeout(()=>pop('UH OH!',gx0,gy0-90*S,'#9cffb0',30,.9),250)}
     const gy=gy0, kinds=[];
-    const reg=1+Math.floor(rng()*5); for(let i=0;i<reg;i++)kinds.push('plain');
-    if(rng()<Math.min(.9,.55+level*.05))kinds.push(pickWaffle());
+    const reg=1+Math.floor(rng()*3); for(let i=0;i<reg;i++)kinds.push('plain');
+    if(rng()<Math.min(.9,.3+(level-1)*.022))kinds.push(pickWaffle());
     for(const k of kinds)wafs.push({t:k,x:gx0+rnd(-20,20)*S,y:gy,vx:rnd(-300,300)*S,vy:rnd(-460,-220)*S,g:820*S,rot:rnd(0,TAU),vr:rnd(-5,5),age:0});
   },650);
 }
