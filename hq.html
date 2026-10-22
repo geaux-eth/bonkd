@@ -1,0 +1,326 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<title>Bonkd HQ</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Lilita+One&family=Nunito:wght@500;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#fbf5e6;--card:#ffffff;--ink:#161616;--ink2:#4d4a42;--muted:#857f72;--line:#e7dfcb;
+  --red:#df3a4e;--gold:#f2b544;--goldDeep:#c98500;--good:#1a8a3a;--bad:#c2362b;
+  --s1:#2a78d6;--s2:#eb6834;--grid:#ece6d6;--bar:#2a78d6;--barHi:#df3a4e;
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#17150f;--card:#221f17;--ink:#f3eee2;--ink2:#cdc6b4;--muted:#9a937f;--line:#3a3527;
+  --good:#4cc46f;--bad:#ef6f62;--s1:#3987e5;--s2:#d95926;--grid:#332e22;--bar:#3987e5;--barHi:#e66767;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#17150f;--card:#221f17;--ink:#f3eee2;--ink2:#cdc6b4;--muted:#9a937f;--line:#3a3527;
+  --good:#4cc46f;--bad:#ef6f62;--s1:#3987e5;--s2:#d95926;--grid:#332e22;--bar:#3987e5;--barHi:#e66767;color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:500 15px/1.5 Nunito,system-ui,sans-serif;
+  padding:max(14px,env(safe-area-inset-top)) max(16px,env(safe-area-inset-right)) 40px max(16px,env(safe-area-inset-left))}
+h1,h2,h3,.disp{font-family:'Lilita One',Impact,system-ui,sans-serif;font-weight:400;letter-spacing:.01em;margin:0;text-wrap:balance}
+h1{font-size:30px;line-height:1}
+h2{font-size:22px;margin:0 0 4px}
+h3{font-size:17px;margin:0 0 8px}
+.wrap{max-width:1180px;margin:0 auto}
+header{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between;margin-bottom:14px}
+.brand{display:flex;align-items:center;gap:10px}
+.brand .tag{font-family:'Lilita One';background:var(--red);color:#fff;border:2px solid var(--ink);border-radius:10px;padding:2px 8px 0;font-size:15px;box-shadow:2px 2px 0 var(--ink)}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+button,select,input{font:inherit;color:var(--ink);background:var(--card);border:2px solid var(--ink);border-radius:10px;padding:6px 12px;font-weight:800}
+button{cursor:pointer;box-shadow:2px 2px 0 var(--ink)}
+button:active{transform:translate(2px,2px);box-shadow:none}
+button.on{background:var(--gold);color:#161616}
+button.primary{background:var(--red);color:#fff}
+.tabs button{border-radius:999px}
+.grid{display:grid;gap:14px}
+.kpis{grid-template-columns:repeat(auto-fit,minmax(160px,1fr))}
+.two{grid-template-columns:repeat(auto-fit,minmax(min(100%,460px),1fr))}
+.card{background:var(--card);border:2px solid var(--ink);border-radius:16px;padding:14px 16px;box-shadow:3px 3px 0 var(--ink);min-width:0}
+.card .sub{color:var(--muted);font-size:13px;margin:-2px 0 10px}
+.kpi .lab{font-size:12px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--ink2)}
+.kpi .val{font-family:'Lilita One';font-size:32px;line-height:1.1}
+.kpi .chg{font-size:13px;font-weight:800}
+.up{color:var(--good)}.down{color:var(--bad)}.flat{color:var(--muted)}
+.chart{width:100%;overflow-x:auto}
+.chart svg{display:block;width:100%;height:auto}
+.tip{position:fixed;pointer-events:none;background:var(--ink);color:var(--bg);padding:6px 9px;border-radius:8px;font-size:13px;font-weight:700;z-index:50;display:none;max-width:260px}
+table{border-collapse:collapse;width:100%;font-size:13.5px}
+th,td{text-align:right;padding:5px 8px;border-bottom:1px solid var(--line);white-space:nowrap}
+th:first-child,td:first-child{text-align:left}
+th{font-size:11.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink2)}
+.tablewrap{overflow-x:auto}
+.hl{background:color-mix(in srgb,var(--red) 14%,transparent)}
+.ins{display:grid;gap:10px}
+.insight{border-left:6px solid var(--gold);padding:8px 12px;background:color-mix(in srgb,var(--gold) 12%,var(--card));border-radius:0 10px 10px 0}
+.insight.warn{border-color:var(--red);background:color-mix(in srgb,var(--red) 9%,var(--card))}
+.insight.good{border-color:var(--good);background:color-mix(in srgb,var(--good) 9%,var(--card))}
+.insight b{font-weight:800}
+.insight .act{display:block;color:var(--ink2);font-size:13.5px;margin-top:2px}
+.muted{color:var(--muted)}
+#gate{max-width:420px;margin:12vh auto 0;text-align:center}
+#gate input{width:100%;margin:12px 0}
+.section{margin-top:22px}
+.reports{grid-template-columns:repeat(auto-fit,minmax(220px,1fr))}
+.rep{cursor:pointer;text-align:left}
+.rep:hover{background:color-mix(in srgb,var(--gold) 18%,var(--card))}
+/* report view: a pitch page */
+#report{max-width:880px;margin:0 auto}
+.cover{background:var(--red);color:#fff;border:2px solid var(--ink);border-radius:18px;padding:22px 24px;box-shadow:4px 4px 0 var(--ink);display:flex;gap:18px;align-items:center;flex-wrap:wrap}
+.cover img{width:150px;max-width:40%}
+.cover h1{font-size:34px}
+.cover .meta{opacity:.92;font-weight:700}
+.big{font-family:'Lilita One';font-size:44px;line-height:1}
+.story p{margin:0 0 10px;max-width:68ch}
+.note{font-size:12.5px;color:var(--muted)}
+#report .two{grid-template-columns:repeat(auto-fit,minmax(min(100%,380px),1fr))}
+@media print{
+  body{background:#fff;color:#161616;padding:0}
+  .noprint{display:none!important}
+  .card,.cover{box-shadow:none;break-inside:avoid}
+  #report{max-width:none}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div id="gate" class="card">
+    <h1>Bonkd HQ</h1>
+    <p class="muted">Private analytics. Enter the HQ key.</p>
+    <form id="gateForm"><input id="key" type="password" autocomplete="off" placeholder="HQ key"><button class="primary" type="submit">Open</button></form>
+    <p id="gateErr" class="down" hidden>That key didn't work.</p>
+  </div>
+
+  <div id="app" hidden>
+    <header class="noprint">
+      <div class="brand"><h1>Bonkd HQ</h1><span class="tag">ANALYTICS</span></div>
+      <div class="row tabs">
+        <button data-tab="dash" class="on">Dashboard</button>
+        <button data-tab="reports">Reports</button>
+        <button id="lock" title="Forget the key on this device">Lock</button>
+      </div>
+    </header>
+
+    <section id="dash">
+      <div class="row noprint" style="margin-bottom:12px">
+        <span class="muted" style="font-weight:800">Range</span>
+        <button data-range="1">Today</button><button data-range="7" class="on">7 days</button><button data-range="30">30 days</button><button data-range="all">Since launch</button>
+        <span id="asof" class="muted" style="margin-left:auto;font-size:13px"></span>
+      </div>
+      <div id="kpis" class="grid kpis"></div>
+
+      <div class="section card"><h2>Act on this</h2><div class="sub">Generated from the numbers in this range. Each one names what to change or watch.</div><div id="insights" class="ins"></div></div>
+
+      <div class="section grid two">
+        <div class="card"><h3>Active players per day</h3><div class="sub">Distinct players who did anything that day (Central time)</div><div id="c_daily" class="chart"></div></div>
+        <div class="card"><h3>Runs and minutes played per day</h3><div class="sub">Runs started (bars). Minutes: see the table under Levels.</div><div id="c_runs" class="chart"></div></div>
+      </div>
+
+      <div class="section grid two">
+        <div class="card"><h3>How far players get</h3><div class="sub">Players who cleared at least this level in the range</div><div id="c_funnel" class="chart"></div></div>
+        <div class="card"><h3>Where runs stop</h3><div class="sub">Players whose best level in the range was this one (the highlighted bar is the biggest wall)</div><div id="c_reach" class="chart"></div></div>
+      </div>
+
+      <div class="section card"><h3>Levels</h3><div class="sub">Clears, bonks per clear (difficulty), KOs, players who left mid-level, average clear time and waffles paid out</div><div class="tablewrap"><table id="t_levels"></table></div></div>
+
+      <div class="section grid two">
+        <div class="card"><h3>Power-ups caught from Booster</h3><div class="sub">Catches, with the catch rate where drops were missed</div><div id="c_gifts" class="chart"></div></div>
+        <div class="card"><h3>What actually hits Grumble</h3><div class="sub">Hits on Grumble by source (Light-M-Upper fireflies are sampled 1 in 10)</div><div id="c_hits" class="chart"></div></div>
+      </div>
+
+      <div class="section grid two">
+        <div class="card"><h3>Waffle Store</h3><div class="sub">Visits, purchases and lives</div><div class="tablewrap"><table id="t_store"></table></div></div>
+        <div class="card"><h3>Special waffles caught</h3><div class="sub">Count and waffles paid out by type</div><div id="c_specials" class="chart"></div></div>
+      </div>
+
+      <div class="section grid two">
+        <div class="card"><h3>Devices</h3><div class="sub">Sessions and average session length</div><div class="tablewrap"><table id="t_dev"></table></div></div>
+        <div class="card"><h3>Retention and economy</h3><div class="sub">Return rates use each player's first day ever; the wallet totals are all-time</div><div class="tablewrap"><table id="t_ret"></table></div></div>
+      </div>
+
+      <div class="section card"><h3>Top players (all time)</h3><div class="sub">By waffles banked</div><div class="tablewrap"><table id="t_top"></table></div></div>
+    </section>
+
+    <section id="reports" hidden>
+      <div id="replist">
+        <h2>Reports</h2>
+        <p class="muted" style="margin-top:0">One report per week since launch, numbered in order, plus a since-launch summary. Each is built live from the data, compares itself with the week before, and prints cleanly to PDF for pitches.</p>
+        <div id="repgrid" class="grid reports"></div>
+      </div>
+      <div id="report" hidden></div>
+    </section>
+  </div>
+</div>
+<div class="tip" id="tip"></div>
+<script>
+const URL0='https://jmiesqhrpcmrthrquqpq.supabase.co/rest/v1/rpc/admin_stats',AKEY='sb_publishable_e7oqQbX2PJ5qV5ge2vUSbg_H9t0A9-d';
+const LAUNCH=new Date('2026-10-13T05:00:00Z'); /* Monday Oct 13, 00:00 Central */
+const NAMES={pie:'Pie of Justice',banana:'Boomer-nana',bun:'Honey Buns',zooka:'Barn-zooka',mitt:'Yoink Mitt',magnet:'Junk Magnet',paddle:'Ping Pong Paddle',jello:'Peach Wobbler',bucket:'Noggin Bucket',kit:'Health Kit',oat:'Lumpy Oatmeal',snail:'SLOWMO Snail',shoe:'Shoe Horn',gum:'Gargantu-Gum',bearhand:'Bear Handed',waffli:'Wafflicious',lmu:'Light-M-Upper',ivy:'Poison Ivy Launcher',porcu:'Porcu-Popper',beam:'Booster Beam',beans:'Mega Beans',
+  junk:'Thrown junk (Mitt/Magnet)',ric:'Bounced junk (Paddle/Wobbler)',zap:'Lightning sent back (Bucket)',honk:'Shoe Horn',fly:'Light-M-Upper',quill:'Porcu-Popper quills',smash:'Mega Beans',bubble:'Gargantu-Gum',blanket:'Ivy Launcher',animal:'Barn-zooka',
+  chicken:'Chicken & Waffles',report:'Straight-A',unicorn:'Birthday Unicorn',ring:'Engagement',refund:'Tax Refund',tree:'Waffle Tree',barrow:'Wheelbarrow',truck:'Dump Truck',lotto:'Lotto Ticket'};
+const nm=k=>NAMES[k]||k;
+const $=id=>document.getElementById(id);
+const fmt=n=>n==null?'–':Number(n).toLocaleString('en-US',{maximumFractionDigits:1});
+const pct=(a,b)=>b?Math.round(a/b*100)+'%':'–';
+let KEY='';try{KEY=localStorage.getItem('bonkd-hq')||''}catch(e){}
+async function stats(from,to){
+  const r=await fetch(URL0,{method:'POST',headers:{'apikey':AKEY,'Authorization':'Bearer '+AKEY,'Content-Type':'application/json'},body:JSON.stringify({p_key:KEY,p_from:from.toISOString(),p_to:to.toISOString()})});
+  if(!r.ok)throw new Error(await r.text());return r.json()}
+/* ---------- gate ---------- */
+$('gateForm').onsubmit=async e=>{e.preventDefault();KEY=$('key').value.trim();try{await stats(new Date(Date.now()-864e5),new Date());try{localStorage.setItem('bonkd-hq',KEY)}catch(e){}open_()}catch(err){$('gateErr').hidden=false}};
+$('lock').onclick=()=>{try{localStorage.removeItem('bonkd-hq')}catch(e){}location.reload()};
+function open_(){$('gate').hidden=true;$('app').hidden=false;load()}
+if(KEY)stats(new Date(Date.now()-864e5),new Date()).then(open_).catch(()=>{});
+/* ---------- tabs and range ---------- */
+document.querySelectorAll('[data-tab]').forEach(b=>b.onclick=()=>{document.querySelectorAll('[data-tab]').forEach(x=>x.classList.toggle('on',x===b));$('dash').hidden=b.dataset.tab!=='dash';$('reports').hidden=b.dataset.tab!=='reports';if(b.dataset.tab==='reports')listReports()});
+let RANGE='7';document.querySelectorAll('[data-range]').forEach(b=>b.onclick=()=>{RANGE=b.dataset.range;document.querySelectorAll('[data-range]').forEach(x=>x.classList.toggle('on',x===b));load()});
+function rangeDates(){const to=new Date();if(RANGE==='all')return[LAUNCH,to];if(RANGE==='1'){const d=new Date(to.toLocaleString('en-US',{timeZone:'America/Chicago'}));const off=to-d;d.setHours(0,0,0,0);return[new Date(d.getTime()+off),to]}return[new Date(to-RANGE*864e5),to]}
+/* ---------- tooltip ---------- */
+const tip=$('tip');function tipOn(e,html){tip.innerHTML=html;tip.style.display='block';const x=Math.min(innerWidth-tip.offsetWidth-8,e.clientX+12);tip.style.left=x+'px';tip.style.top=(e.clientY-tip.offsetHeight-12)+'px'}function tipOff(){tip.style.display='none'}
+document.addEventListener('scroll',tipOff,{passive:true});
+/* ---------- charts (plain SVG: thin bars, rounded data ends, hover tooltips) ---------- */
+function vbars(el,items,o={}){/* items:[{label,value,tip,hi}] vertical columns */
+  const W=640,H=230,L=36,B=34,T=12,n=Math.max(1,items.length),max=Math.max(1,...items.map(i=>i.value)),bw=Math.min(46,(W-L-8)/n*.62),step=(W-L-8)/n;
+  const nice=niceMax(max),ticks=[0,nice/2,nice];
+  let s=`<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${o.aria||''}">`;
+  for(const tk of ticks){const y=H-B-(tk/nice)*(H-B-T);s+=`<line x1="${L}" x2="${W}" y1="${y}" y2="${y}" stroke="var(--grid)"/><text x="${L-6}" y="${y+4}" text-anchor="end" font-size="11" fill="var(--muted)">${fmt(tk)}</text>`}
+  items.forEach((it,i)=>{const h=(it.value/nice)*(H-B-T),x=L+i*step+(step-bw)/2,y=H-B-h;
+    s+=`<g class="hov" data-tip="${esc(it.tip||(it.label+': '+fmt(it.value)))}"><rect x="${L+i*step}" y="${T}" width="${step}" height="${H-B-T}" fill="transparent"/>`+(h>0?`<path d="${barPath(x,y,bw,h)}" fill="${it.hi?'var(--barHi)':'var(--bar)'}"/>`:'')+`</g>`;
+    if(n<=16||i%Math.ceil(n/12)===0)s+=`<text x="${x+bw/2}" y="${H-B+15}" text-anchor="middle" font-size="11" fill="var(--ink2)">${esc(it.label)}</text>`});
+  s+='</svg>';el.innerHTML=items.length?s:'<p class="muted">No data in this range yet.</p>';bindTips(el)}
+function hbars(el,items,o={}){/* horizontal bars with direct value labels */
+  if(!items.length){el.innerHTML='<p class="muted">No data in this range yet.</p>';return}
+  const W=640,rh=26,L=200,R=Math.min(220,14+6.6*Math.max(4,...items.map(i=>String(i.lab!=null?i.lab:fmt(i.value)).length))),H=items.length*rh+8,max=Math.max(1,...items.map(i=>i.value));
+  let s=`<svg viewBox="0 0 ${W} ${H}" role="img">`;
+  items.forEach((it,i)=>{const y=4+i*rh,w=Math.max(0,(it.value/max)*(W-L-R));
+    s+=`<g class="hov" data-tip="${esc(it.tip||(it.label+': '+fmt(it.value)))}"><rect x="0" y="${y}" width="${W}" height="${rh}" fill="transparent"/><text x="${L-8}" y="${y+17}" text-anchor="end" font-size="12.5" fill="var(--ink)">${esc(it.label)}</text>`+(w>0?`<path d="${hbarPath(L,y+6,w,14)}" fill="${it.hi?'var(--barHi)':'var(--bar)'}"/>`:'')+`<text x="${L+w+6}" y="${y+17}" font-size="12" fill="var(--ink2)">${esc(it.lab!=null?it.lab:fmt(it.value))}</text></g>`});
+  el.innerHTML=s+'</svg>';bindTips(el)}
+const barPath=(x,y,w,h)=>{const r=Math.min(4,w/2,h);return`M${x},${y+h}V${y+r}Q${x},${y} ${x+r},${y}H${x+w-r}Q${x+w},${y} ${x+w},${y+r}V${y+h}Z`};
+const hbarPath=(x,y,w,h)=>{const r=Math.min(4,h/2,w);return`M${x},${y}H${x+w-r}Q${x+w},${y} ${x+w},${y+r}V${y+h-r}Q${x+w},${y+h} ${x+w-r},${y+h}H${x}Z`};
+function niceMax(m){const p=Math.pow(10,Math.floor(Math.log10(m))),f=m/p;return(f<=1?1:f<=2?2:f<=5?5:10)*p}
+function bindTips(el){el.querySelectorAll('.hov').forEach(g=>{g.addEventListener('mousemove',e=>tipOn(e,g.dataset.tip));g.addEventListener('mouseleave',tipOff);g.addEventListener('touchstart',e=>{const t0=e.touches[0];tipOn(t0,g.dataset.tip)},{passive:true})})}
+function esc(s){return String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]))}
+function chg(cur,prev,inv){if(prev==null)return'';if(!prev&&!cur)return'<span class="chg flat">no change</span>';if(!prev)return'<span class="chg up">new this period</span>';const d=(cur-prev)/prev*100;const good=inv?d<0:d>0;const c=Math.abs(d)<1?'flat':good?'up':'down';return`<span class="chg ${c}">${d>0?'▲':d<0?'▼':''} ${Math.abs(d).toFixed(0)}% vs previous</span>`}
+function days(from,to){const out=[],d=new Date(from.toLocaleString('en-US',{timeZone:'America/Chicago'}));d.setHours(0,0,0,0);const end=new Date(to.toLocaleString('en-US',{timeZone:'America/Chicago'}));while(d<=end){out.push(d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'));d.setDate(d.getDate()+1)}return out}
+const short=s=>{const[y,m,d]=s.split('-');return+m+'/'+ +d};
+/* ---------- dashboard ---------- */
+async function load(){
+  const [from,to]=rangeDates(),span=to-from,pf=new Date(from-span);
+  $('asof').textContent='Loading…';
+  let cur,prev;try{[cur,prev]=await Promise.all([stats(from,to),RANGE==='all'?null:stats(pf,from)])}catch(e){$('asof').textContent='Could not load: '+e.message;return}
+  $('asof').textContent='Updated '+new Date().toLocaleTimeString([], {hour:'numeric',minute:'2-digit'});
+  render(cur,prev,from,to)}
+function kpiTiles(K,P){const p=P?P.kpi:null;const T=[
+  ['Active players',K.active_players,p&&p.active_players],['New players',K.new_players,p&&p.new_players],['Sessions',K.sessions,p&&p.sessions],
+  ['Minutes played',K.play_minutes,p&&p.play_minutes],['Avg session (min)',K.avg_session_min,p&&p.avg_session_min],['Runs started',K.runs,p&&p.runs],
+  ['Levels cleared',K.level_clears,p&&p.level_clears],['Waffles rewarded',K.waffles_rewarded,p&&p.waffles_rewarded],['Store visits',K.store_opens,p&&p.store_opens],
+  ['Supers bought',K.supers_bought,p&&p.supers_bought],['Lives bought',K.lives_bought,p&&p.lives_bought],['Waffles spent',K.waffles_spent_store,p&&p.waffles_spent_store]];
+  return T.map(([l,v,pv])=>`<div class="card kpi"><div class="lab">${l}</div><div class="val">${fmt(v||0)}</div>${P?chg(+v||0,+pv||0):''}</div>`).join('')}
+function render(S,P,from,to){
+  const K=S.kpi;$('kpis').innerHTML=kpiTiles(K,P);
+  const dmap={};(S.daily||[]).forEach(d=>dmap[d.dd]=d);const ds=days(from,to);
+  vbars($('c_daily'),ds.map(d=>({label:short(d),value:(dmap[d]||{}).players||0,tip:`${short(d)}: ${(dmap[d]||{}).players||0} players, ${(dmap[d]||{}).sessions||0} sessions`})));
+  vbars($('c_runs'),ds.map(d=>({label:short(d),value:(dmap[d]||{}).runs||0,tip:`${short(d)}: ${(dmap[d]||{}).runs||0} runs, ${(dmap[d]||{}).clears||0} level clears, ${fmt((dmap[d]||{}).waffles||0)} waffles`})));
+  const F=S.funnel,fl=[['Opened',F.session],['Started a run',F.run],['Level 1',F.l1],['Level 5',F.l5],['Level 10',F.l10],['Level 15',F.l15],['Level 20',F.l20],['Level 25',F.l25],['Level 30',F.l30],['Boss',F.boss],['Beat GRUMBLEMAX',F.win]];
+  hbars($('c_funnel'),fl.map(([l,v],i)=>({label:l,value:v||0,lab:`${fmt(v||0)}${i&&fl[0][1]?' · '+pct(v||0,fl[0][1]):''}`})));
+  const reach=S.reach||[],rmax=Math.max(0,...reach.map(r=>r.players));const rm={};reach.forEach(r=>rm[r.best]=r.players);const maxLv=Math.max(5,...reach.map(r=>r.best));
+  vbars($('c_reach'),Array.from({length:maxLv},(_,i)=>({label:String(i+1),value:rm[i+1]||0,hi:rmax&&rm[i+1]===rmax,tip:`Best level ${i+1}: ${rm[i+1]||0} players`})));
+  /* levels table */
+  const lv=S.levels||[];const hard=lv.filter(l=>l.clears>=2).reduce((a,l)=>!a||(l.bonks/l.clears)>(a.bonks/a.clears)?l:a,null);
+  $('t_levels').innerHTML='<tr><th>Level</th><th>Clears</th><th>Players</th><th>Bonks / clear</th><th>KOs</th><th>Left mid-level</th><th>Avg clear (s)</th><th>Waffles</th></tr>'+
+    (lv.length?lv.map(l=>`<tr class="${hard&&l.lv===hard.lv?'hl':''}"><td>${l.lv}</td><td>${fmt(l.clears)}</td><td>${fmt(l.players)}</td><td>${l.clears?(l.bonks/l.clears).toFixed(2):'–'}</td><td>${fmt(l.kos)}</td><td>${fmt(l.quits)}</td><td>${fmt(l.avg_secs)}</td><td>${fmt(l.waffles)}</td></tr>`).join(''):'<tr><td colspan="8" class="muted">No level data in this range yet.</td></tr>');
+  /* gifts */
+  const G=S.gifts||{},GM=S.gift_miss||{};const gk=[...new Set([...Object.keys(G),...Object.keys(GM)])].sort((a,b)=>(G[b]||0)-(G[a]||0));
+  hbars($('c_gifts'),gk.map(k=>({label:nm(k),value:G[k]||0,lab:fmt(G[k]||0)+(GM[k]?` · ${pct(G[k]||0,(G[k]||0)+GM[k])} caught`:''),tip:`${nm(k)}: ${G[k]||0} caught, ${GM[k]||0} missed`})));
+  const Hh=S.hits||{};hbars($('c_hits'),Object.keys(Hh).sort((a,b)=>Hh[b].hits-Hh[a].hits).map(k=>({label:nm(k),value:Hh[k].hits,lab:`${fmt(Hh[k].hits)} hits · ${fmt(Hh[k].dmg)} dmg`})));
+  /* store */
+  const B=S.buys||{},SU=S.supers||{};
+  $('t_store').innerHTML=`<tr><th>What</th><th>Count</th><th>Waffles</th></tr>
+    <tr><td>Store visits</td><td>${fmt(K.store_opens)}</td><td></td></tr>
+    ${Object.keys(B).map(k=>`<tr><td>Bought: ${esc(nm(k))}</td><td>${fmt(B[k].n)}</td><td>${fmt(B[k].waffles)}</td></tr>`).join('')||'<tr><td>Supers bought</td><td>0</td><td></td></tr>'}
+    <tr><td>Lives bought</td><td>${fmt(K.lives_bought)}</td><td>${fmt(K.lives_bought*1000)}</td></tr>
+    <tr><td>Continues used</td><td>${fmt(K.continues)}</td><td></td></tr>
+    <tr><td>Hit "out of lives"</td><td>${fmt(K.out_of_lives)}</td><td></td></tr>
+    <tr><td>Tapped "buy waffles"</td><td>${fmt(K.buy_waffles_taps)}</td><td></td></tr>
+    ${Object.keys(SU).map(k=>`<tr><td>Super used: ${esc(nm(k))}</td><td>${fmt(SU[k])}</td><td></td></tr>`).join('')}
+    <tr><td>Shares</td><td>${fmt(K.shares)}</td><td></td></tr>`;
+  const SP=S.specials||{};hbars($('c_specials'),Object.keys(SP).filter(k=>k!=='plain').sort((a,b)=>SP[b].waffles-SP[a].waffles).map(k=>({label:nm(k),value:SP[k].waffles,lab:`${fmt(SP[k].n)}× · ${fmt(SP[k].waffles)}`})).concat(SP.plain?[{label:'Plain waffles',value:SP.plain.waffles,lab:`${fmt(SP.plain.n)}× · ${fmt(SP.plain.waffles)}`}]:[]));
+  /* devices, retention, economy */
+  const D=S.devices||{};$('t_dev').innerHTML='<tr><th>Device</th><th>Players</th><th>Sessions</th><th>Avg min</th></tr>'+(Object.keys(D).map(k=>`<tr><td>${esc(k)}</td><td>${fmt(D[k].players)}</td><td>${fmt(D[k].sessions)}</td><td>${fmt(D[k].avg_min)}</td></tr>`).join('')||'<tr><td colspan="4" class="muted">No sessions yet.</td></tr>');
+  const R=S.retention||{},E=S.economy||{};
+  $('t_ret').innerHTML=`<tr><th>Measure</th><th>Value</th></tr>
+    <tr><td>Came back after day 1</td><td>${R.cohort_d1?pct(R.ret_d1,R.cohort_d1)+` (${R.ret_d1}/${R.cohort_d1})`:'–'}</td></tr>
+    <tr><td>Came back after day 7</td><td>${R.cohort_d7?pct(R.ret_d7,R.cohort_d7)+` (${R.ret_d7}/${R.cohort_d7})`:'not enough history'}</td></tr>
+    <tr><td>Players ever</td><td>${fmt(S.all_time.players)}</td></tr>
+    <tr><td>Profiles</td><td>${fmt(E.profiles)}</td></tr>
+    <tr><td>Waffles in wallets</td><td>${fmt(E.waffles_banked)}</td></tr>
+    <tr><td>Waffles spent (all time)</td><td>${fmt(E.waffles_spent)}</td></tr>
+    <tr><td>Lives banked</td><td>${fmt(E.lives_banked)}</td></tr>
+    <tr><td>Beat GRUMBLEMAX</td><td>${fmt(E.cleared)}</td></tr>`;
+  $('t_top').innerHTML='<tr><th>Player</th><th>Best level</th><th>Waffles</th><th>Runs</th></tr>'+(S.top||[]).filter(t=>t.waffles>0||t.best>0).map(t=>`<tr><td>${esc(t.nick)}</td><td>${fmt(t.best)}</td><td>${fmt(t.waffles)}</td><td>${fmt(t.runs)}</td></tr>`).join('');
+  $('insights').innerHTML=insights(S,P).map(i=>`<div class="insight ${i.t||''}"><b>${i.h}</b><span class="act">${i.a}</span></div>`).join('')||'<p class="muted">Not enough activity in this range to say anything yet.</p>'}
+/* ---------- the rules that turn numbers into actions ---------- */
+function insights(S,P){const K=S.kpi,out=[],F=S.funnel;
+  if(K.active_players<5)out.push({t:'warn',h:`Only ${K.active_players} active player${K.active_players===1?'':'s'} in this range.`,a:'Every other number here is too thin to trust yet. Growth first: post clips from the trailer, run a waffle tournament, and ask the Nibbles community to play a run.'});
+  if(P){const a=K.active_players,b=P.kpi.active_players;if(b&&a<b*.8)out.push({t:'warn',h:`Active players fell ${Math.round((1-a/b)*100)}% from the previous period.`,a:'Check whether a change shipped in this window (difficulty, waffle payouts). A new chapter or a tournament announcement brings people back.'});else if(b&&a>b*1.2)out.push({t:'good',h:`Active players grew ${Math.round((a/b-1)*100)}% on the previous period.`,a:'Note what drove it (a stream, a post, a new feature) and do more of it.'})}
+  const reach=S.reach||[];if(reach.length){const tot=reach.reduce((s,r)=>s+r.players,0),w=reach.reduce((a,r)=>!a||r.players>a.players?r:a,null);if(tot>=3)out.push({t:'warn',h:`Level ${w.best} is the biggest wall: ${pct(w.players,tot)} of players stop there.`,a:`Watch a run of level ${w.best} (and the one after it). Ease junk speed or Grumble's health there, or make Booster arrive sooner.`})}
+  const lv=(S.levels||[]).filter(l=>l.clears>=2);if(lv.length){const h=lv.reduce((a,l)=>l.bonks/l.clears>a.bonks/a.clears?l:a);if(h.bonks/h.clears>=1)out.push({h:`Level ${h.lv} is the hardest to clear (${(h.bonks/h.clears).toFixed(1)} bonks per clear).`,a:'If players are quitting there, soften it; if they push through, it is a good tension point. Compare with the "Left mid-level" column.'})}
+  const sd=F.story_done||0,sk=F.story_skip||0;if(sd+sk>=4)out.push({h:`${pct(sk,sd+sk)} of players skip the opening story.`,a:sk>sd?'The story is being skipped more than watched: shorten it or make the first beat (Grumble taking the waffles) land in under 3 seconds.':'Most players watch the story, so it is a good place for the hook.'});
+  if(K.avg_session_min!=null&&K.sessions>=4){if(K.avg_session_min<3)out.push({t:'warn',h:`Sessions are short: ${K.avg_session_min} minutes on average.`,a:'The first two levels need to hook faster. Give a weapon in the first 20 seconds and make the first special waffle land early.'});else out.push({t:'good',h:`Average session is ${K.avg_session_min} minutes.`,a:'Healthy. Keep an eye on it after each balance change.'})}
+  if(K.store_opens>=3){const conv=K.supers_bought/K.store_opens;out.push({t:conv<.1?'warn':'',h:`Store visits turn into a purchase ${pct(K.supers_bought,K.store_opens)} of the time (${K.supers_bought} of ${K.store_opens}).`,a:conv<.1?'People look but don\'t buy. Either they can\'t afford it yet (compare waffles rewarded per run with prices) or the items need a stronger pitch: show each super in action in the store.':'Good conversion. Try a limited-time item to lift it further.'})}
+  if(K.out_of_lives>=2)out.push({t:K.lives_bought<K.out_of_lives*.15?'warn':'',h:`${K.out_of_lives} times players ran out of lives; ${K.lives_bought} lives were bought.`,a:'This is the main moment to sell. Test a cheaper first life, or a one-tap "keep going" on the out-of-lives card.'});
+  const G=S.gifts||{},GM=S.gift_miss||{};const miss=Object.keys(GM).filter(k=>(GM[k]||0)>=2).map(k=>({k,r:(G[k]||0)/((G[k]||0)+GM[k])})).sort((a,b)=>a.r-b.r)[0];if(miss&&miss.r<.8)out.push({h:`${nm(miss.k)} drops are caught only ${Math.round(miss.r*100)}% of the time.`,a:'Booster may be tossing it somewhere hard to reach. Toss it closer to Todd.'});
+  const gk=Object.keys(G).sort((a,b)=>G[b]-G[a]);if(gk.length>=3)out.push({h:`Most caught: ${nm(gk[0])} (${G[gk[0]]}). Least: ${nm(gk[gk.length-1])} (${G[gk[gk.length-1]]}).`,a:'Use the favourites in clips and the store; check the least-seen items are dropping often enough to be discovered.'});
+  if(K.runs>=3){const per=K.waffles_rewarded/K.runs;out.push({h:`Runs pay ${fmt(Math.round(per))} waffles on average.`,a:`At that rate a player needs ${Math.ceil(2500/Math.max(1,per))} runs for the Ivy Launcher (2,500) and ${Math.ceil(25000/Math.max(1,per))} for Mega Beans (25,000). Tune payouts or prices against that.`})}
+  const R=S.retention||{};if(R.cohort_d1>=3){const r=R.ret_d1/R.cohort_d1;out.push({t:r<.25?'warn':'good',h:`${Math.round(r*100)}% of players came back after their first day.`,a:r<.25?'Give a reason to return: the daily lives already reset at midnight GMT, so say so on the out-of-lives card, and add a daily waffle bonus.':'Good stickiness. Daily events will build on it.'})}
+  const D=S.devices||{};const ph=(D.phone||{}).sessions||0,pc=(D.computer||{}).sessions||0;if(ph+pc>=5)out.push({h:`${pct(ph,ph+pc)} of sessions are on phones, ${pct(pc,ph+pc)} on computers.`,a:'Test every change on the bigger group first.'});
+  return out}
+/* ---------- reports: one per week since launch, plus since-launch ---------- */
+function weeks(){const out=[];let s=new Date(LAUNCH),i=1;while(s<new Date()){const e=new Date(s.getTime()+7*864e5);out.push({n:i++,from:new Date(s),to:e});s=e}return out}
+const dstr=d=>d.toLocaleDateString('en-US',{month:'short',day:'numeric',timeZone:'America/Chicago'});
+function listReports(){$('report').hidden=true;$('replist').hidden=false;const W=weeks();
+  $('repgrid').innerHTML=`<button class="card rep" data-r="all"><div class="kpi"><div class="lab">Summary</div><div class="val" style="font-size:24px">Since launch</div><div class="muted">${dstr(LAUNCH)} – today</div></div></button>`+
+   W.slice().reverse().map(w=>`<button class="card rep" data-r="${w.n}"><div class="kpi"><div class="lab">Report #${w.n}</div><div class="val" style="font-size:24px">Week ${w.n}</div><div class="muted">${dstr(w.from)} – ${dstr(new Date(w.to-1))}${w.to>new Date()?' · in progress':''}</div></div></button>`).join('');
+  $('repgrid').querySelectorAll('[data-r]').forEach(b=>b.onclick=()=>showReport(b.dataset.r))}
+async function showReport(r){const W=weeks();let from,to,prevFrom,title,num;
+  if(r==='all'){from=LAUNCH;to=new Date();title='Since launch';num=''}else{const w=W[+r-1];from=w.from;to=w.to>new Date()?new Date():w.to;prevFrom=new Date(w.from-7*864e5);title=`Week ${w.n}`;num=`Report #${w.n}`}
+  $('replist').hidden=true;const el=$('report');el.hidden=false;el.innerHTML='<p class="muted">Building the report…</p>';
+  const [S,P,ALL]=await Promise.all([stats(from,to),prevFrom&&+r>1?stats(prevFrom,from):null,stats(LAUNCH,to)]);
+  const K=S.kpi,A=ALL.kpi,F=S.funnel;
+  const best=Math.max(0,...(S.reach||[]).map(x=>x.best));
+  const tiles=[['Active players',K.active_players,P&&P.kpi.active_players],['New players',K.new_players,P&&P.kpi.new_players],['Minutes played',K.play_minutes,P&&P.kpi.play_minutes],['Runs',K.runs,P&&P.kpi.runs],['Levels cleared',K.level_clears,P&&P.kpi.level_clears],['Waffles rewarded',K.waffles_rewarded,P&&P.kpi.waffles_rewarded]];
+  const ins=insights(S,P);
+  const lines=[];
+  lines.push(`<p><b>Don't get BONKD!</b> is a free-to-play browser game on nibblethis.wtf: Todd the bear chases the ghost Grumble across 31 levels in seven painted areas to win his waffles back, with Booster dropping weapons and power-ups, a Waffle Store of "Super Duper Weapons" and a leaderboard. It runs on phones and computers with no install.</p>`);
+  lines.push(`<p>${r==='all'?'Since launch':'This week'}, <b>${fmt(K.active_players)}</b> players played <b>${fmt(K.sessions)}</b> sessions and <b>${fmt(K.play_minutes)}</b> minutes, started <b>${fmt(K.runs)}</b> runs and cleared <b>${fmt(K.level_clears)}</b> levels${best?`, with the furthest player reaching level <b>${best}</b>`:''}. ${P?`Against the week before, active players ${trend(K.active_players,P.kpi.active_players)} and minutes played ${trend(K.play_minutes,P.kpi.play_minutes)}.`:''}</p>`);
+  lines.push(`<p>Engagement: players caught <b>${fmt(K.gifts_caught)}</b> Booster drops and landed <b>${fmt(Object.values(S.hits||{}).reduce((s,h)=>s+h.hits,0))}</b> hits on Grumble. The economy paid out <b>${fmt(K.waffles_rewarded)}</b> waffles; <b>${fmt(K.store_opens)}</b> store visits led to <b>${fmt(K.supers_bought)}</b> Super Duper Weapon purchases and <b>${fmt(K.lives_bought)}</b> extra lives.</p>`);
+  if(r!=='all')lines.push(`<p>Since launch (${dstr(LAUNCH)}): <b>${fmt(ALL.all_time.players)}</b> players, <b>${fmt(A.play_minutes)}</b> minutes played, <b>${fmt(A.runs)}</b> runs.</p>`);
+  const G=S.gifts||{},gk=Object.keys(G).sort((a,b)=>G[b]-G[a]).slice(0,5);
+  el.innerHTML=`<div class="row noprint" style="margin-bottom:12px"><button id="back">← All reports</button><button class="primary" onclick="print()">Print / save as PDF</button></div>
+   <div class="cover"><img src="hq_logo.webp" alt="" onerror="this.remove()"><div><div class="meta">${num||'Summary'} · ${dstr(from)} – ${dstr(new Date(to-1))}</div><h1>Don't get BONKD! — ${title}</h1><div class="meta">Player and engagement report</div></div></div>
+   <div class="grid kpis section">${tiles.map(([l,v,pv])=>`<div class="card kpi"><div class="lab">${l}</div><div class="val">${fmt(v||0)}</div>${P?chg(+v||0,+pv||0):''}</div>`).join('')}</div>
+   <div class="card section story"><h2>The story so far</h2>${lines.join('')}</div>
+   <div class="grid two section"><div class="card"><h3>Daily active players</h3><div id="r_daily" class="chart"></div></div><div class="card"><h3>How far players get</h3><div id="r_funnel" class="chart"></div></div></div>
+   <div class="grid two section"><div class="card"><h3>Favourite power-ups</h3><div id="r_gifts" class="chart"></div></div><div class="card"><h3>Highlights</h3><ul>${highlights(S,ALL).map(h=>`<li>${h}</li>`).join('')}</ul></div></div>
+   <div class="card section"><h2>What we're doing next</h2><div class="ins">${ins.slice(0,5).map(i=>`<div class="insight ${i.t||''}"><b>${i.h}</b><span class="act">${i.a}</span></div>`).join('')||'<p class="muted">Collecting more data.</p>'}</div></div>
+   <p class="note section">Generated ${new Date().toLocaleString('en-US',{timeZone:'America/Chicago'})} Central from live game telemetry. Players are counted by anonymous profile; no personal information is collected.</p>`;
+  $('back').onclick=listReports;
+  const dmap={};(S.daily||[]).forEach(d=>dmap[d.dd]=d);vbars($('r_daily'),days(from,new Date(to-1)).map(d=>({label:short(d),value:(dmap[d]||{}).players||0})));
+  hbars($('r_funnel'),[['Opened',F.session],['Started a run',F.run],['Level 5',F.l5],['Level 10',F.l10],['Level 20',F.l20],['Level 30',F.l30],['Beat GRUMBLEMAX',F.win]].map(([l,v])=>({label:l,value:v||0})));
+  hbars($('r_gifts'),gk.map(k=>({label:nm(k),value:G[k]})));
+  scrollTo(0,0)}
+function trend(a,b){if(!b)return a?'went from zero to '+fmt(a):'held at zero';const d=Math.round((a-b)/b*100);return d===0?'held steady':(d>0?'rose ':'fell ')+Math.abs(d)+'%'}
+function highlights(S,ALL){const h=[],K=S.kpi;const best=Math.max(0,...(S.reach||[]).map(x=>x.best));if(best)h.push(`Furthest level reached: <b>${best}</b>`);
+  const SP=S.specials||{};const big=Object.keys(SP).filter(k=>k!=='plain').sort((a,b)=>SP[b].waffles-SP[a].waffles)[0];if(big)h.push(`Biggest jackpot type: <b>${nm(big)}</b> (${fmt(SP[big].n)} caught)`);
+  if(K.boss_wins)h.push(`<b>${K.boss_wins}</b> GRUMBLEMAX defeat${K.boss_wins>1?'s':''}`);
+  const D=S.devices||{};const tot=Object.values(D).reduce((s,d)=>s+d.sessions,0);if(tot)h.push(`Phones: <b>${pct((D.phone||{}).sessions||0,tot)}</b> of sessions`);
+  if(K.avg_session_min)h.push(`Average session: <b>${K.avg_session_min} min</b>`);
+  const top=(ALL.top||[])[0];if(top&&top.waffles)h.push(`Leaderboard leader: <b>${esc(top.nick)}</b> with ${fmt(top.waffles)} waffles`);
+  return h}
+</script>
+</body>
+</html>

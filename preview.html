@@ -1450,6 +1450,7 @@ let FXTEST=false;try{FXTEST=TESTER&&/[?&]fx\b/.test(location.search)}catch(e){}i
 const EVQ=[],SESS=(window.crypto&&crypto.randomUUID)?crypto.randomUUID():'00000000-0000-4000-8000-'+String(Date.now()).padStart(12,'0').slice(-12);
 const DEV=matchMedia('(pointer:coarse)').matches?'phone':'computer';
 let lastJunk=null;
+setInterval(()=>{if(!paused&&(state==='play'||state==='levelup'||state==='ko'))track('beat',{n:Math.round(t/60)})},60000);
 function track(ev,o){if(TEST)return;o=o||{};EVQ.push({ev,lv:o.lv!==undefined?o.lv:(state==='menu'?null:level),k:o.k==null?null:String(o.k),n:o.n==null?null:Math.round(o.n),m:o.m==null?null:Math.round(o.m),t:Math.round(performance.now()/1000)});if(EVQ.length>300)EVQ.splice(0,EVQ.length-300)}
 setTimeout(()=>{let r=0;try{r=+localStorage.getItem('bonkd-runs')||0}catch(e){}track('session',{lv:null,k:(matchMedia('(display-mode: fullscreen)').matches||navigator.standalone)?'app':'web',n:r>0?1:0})},0);
 document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden'&&(state==='play'||state==='ko'||state==='story'||state==='levelup'))track('left',{k:state,n:lvlTime})});
@@ -4249,7 +4250,7 @@ SUPERS.porcu.shots=SHOTS.filter(q=>q.f!=='todd'); /* user: no close-up of Todd j
 SUPERS.lmu.shots=SHOTS.filter(q=>!q.fl&&q.f!=='todd'); /* no mirrored angles: the big Todd stays on the side away from Grumble */
 let superBG=null,GPIN=70; /* how far above the ground line Grumble's anchor sits when he's smashed flat */
 const SMT=[0,.22,.5,.68,.86,1.25,1.75],SMREACH=46; /* smash frame start times (s, frame 4 = the slam); how far in front of Todd his fists land (game units at normal size) */
-function startSuper(k,img,fly){const D=SUPERS[k];if(!D||!SPR['sb_'+k])return superFlash(img,D&&D.col,0,fly);
+function startSuper(k,img,fly){track('super',{k});const D=SUPERS[k];if(!D||!SPR['sb_'+k])return superFlash(img,D&&D.col,0,fly);
   superFlash(img,D.col,0,fly);const n=[];for(let i=0;i<6;i++)if(SPR['sp_'+k+i])n.push('sp_'+k+i);
   pops=pops.filter(p=>!p.tip);
   /* user: junk already in the air when a super fires is wiped out (you can't see where to dodge during the move) */
