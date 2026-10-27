@@ -651,7 +651,7 @@ function resize(){
   /* one scale for every screen, touch or not: wide screens show the same amount of scene around the characters as a phone held sideways (about 2.2:1) */
   S=Math.max(.28,Math.min(2.4,Math.min(H/640,W/1384)));
   /* phones: the characters draw smaller (WZ) so there's more room between Todd and Grumble; words keep a readable size (TS) */
-  PHONE=TOUCHY&&Math.min(W,H)<520; WZ=PHONE_Z; /* user v56: computers use the phone's perspective too (smaller characters, more room) */ TS=S*(PHONE?.85:1); S=Math.max(.2,S*WZ);
+  PHONE=TOUCHY&&Math.min(W,H)<520; WZ=PHONE_Z; /* user v56: computers use the phone's perspective too (smaller characters, more room) */ TS=S*(PHONE?.85:1); S=Math.max(.2,PHONE?S*WZ:Math.min(Math.min(2.4,H/640)*WZ,W/1400)); /* v60 (user: characters too small on a squarish computer window): computers size the world by height like a sideways phone, but always show at least 1400 units across */
   BSC=Math.max(.45,Math.min(2.4,Math.min(H/640,W/1384)));
   document.body.classList.toggle('short',H<460);
   UIZ=ROT?1:clamp(Math.min(H/430,W/900),1,1.75); document.documentElement.style.setProperty('--uiz',UIZ);
@@ -1418,7 +1418,7 @@ function pop(txt,x,y,color,size,life,keep){if(!keep&&superBG&&!superBG.ended&&su
     pops.push({txt,x,y,color,size:size||40,life:life||.9,age:0,rot:(Math.random()-.5)*.22,g:1,big:keep==='big'?1:0});return}
   pops.push({txt,x,y,color,size:size||40,life:life||.9,age:0,rot:(Math.random()-.5)*.22})}
 function porcPop(p){const n=12,dm=superDmg('omghost')/48;
-  for(let i=0;i<n;i++){const a=i/n*TAU+Math.random()*.15,v=(1100+Math.random()*150)*S;shots.push({kind:'quill',x:p.x+Math.cos(a)*14*S,y:p.y+Math.sin(a)*14*S,vx:Math.cos(a)*v,vy:Math.sin(a)*v,dmg:dm,speed:1700,rot:a,left:1,cool:.1})}
+  const gA=leadAim(p.x,p.y,ghost.x,ghost.y+ghost.yOff,1700*S)[2];for(let i=0;i<n;i++){const a=gA+(i/(n-1)-.5)*.5+(Math.random()-.5)*.06,v=(1600+Math.random()*200)*S;shots.push({kind:'quill',x:p.x+Math.cos(a)*14*S,y:p.y+Math.sin(a)*14*S,vx:Math.cos(a)*v,vy:Math.sin(a)*v,dmg:dm,speed:1700,rot:a,left:1,cool:0})}
   rings.push({x:p.x,age:0,air:p.y});burst(p.x,p.y,'#8a5a32',10);burst(p.x,p.y,'#f3e2c4',6);
   shake=Math.max(shake,.45);setFx('invert',.1);pop('POP!',p.x,p.y-46*S,C.white,50,.6);sfx.porcuPop()}
 function burst(x,y,col,n){return;for(let i=0;i<(n||8);i++){const a=Math.random()*TAU,v=(150+Math.random()*220)*S;sparks.push({x,y,vx:Math.cos(a)*v,vy:Math.sin(a)*v-120*S,age:0,r:(4+Math.random()*4)*S,rot:Math.random()*TAU,col:col||C.gold})}}
@@ -1585,7 +1585,7 @@ function tap(x,y){
 function mouthPos(){const f=bear.faceS||bear.face||1,P=T2A.blow?todd2Place('blow'):null,k=S*(bear.gs||1);
   return P?{x:bear.x+(P.x0+300*P.k)*k*f,y:GY+4*S+(P.y0+140*P.k)*k}:{x:bear.x+28*S*f,y:GY-128*S}}
 function releaseBubble(w){const m=mouthPos(),f=bear.faceS||bear.face||1;
-  shots.push({kind:'bubble',x:m.x+f*30*S,y:m.y-10*S,vx:f*60*S,vy:-220*S,dmg:3.5,speed:520,rot:0,left:1,cool:0,t0:now});
+  shots.push({kind:'bubble',x:m.x+f*30*S,y:m.y-10*S,vx:f*60*S,vy:-220*S,dmg:3.5,speed:950,rot:0,left:1,cool:0,t0:now});
   pop('BLOOP!',m.x,m.y-50*S,'#ff7fb8',26,.6);if(--w.ammo<=0)bear.weapon=null}
 function paddleHit(){
   const hp=headPos(), px=bear.x+40*S*bear.face;
@@ -1653,14 +1653,14 @@ function fireAnimal(x,y){
   bear.aim=Math.atan2(y-py,x-px);
   let a=zAim(), dx=f*Math.cos(a), dy=Math.sin(a), L=(NZ()?(ZMUZ-ZU)*ZW:(116-30)*1.12)*S, sx=px+dx*L, sy=py+dy*L;
   if(TODD2()&&SPR.c_todd_full){const m=todd2Muzzle();if(m){sx=m.x;sy=m.y;a=-.28;dx=f*Math.cos(a);dy=Math.sin(a)}}
-  const tdx=x-sx, tdy=y-sy, td=Math.hypot(tdx,tdy)||1, vx=dx*.5+tdx/td*.5, vy=dy*.5+tdy/td*.5, vn=Math.hypot(vx,vy)||1, sp=1800*S;
+  const sp=1800*S, la=leadAim(sx,sy,ghost.x,ghost.y+ghost.yOff,sp), vx=la[0]/sp, vy=la[1]/sp, vn=1;
   const kind=(w&&w.next)||ANIMALS[Math.floor(Math.random()*ANIMALS.length)];
   const an={kind,x:sx,y:sy,vx:vx/vn*sp,vy:vy/vn*sp,rot:0,vr:rnd(-6,6),hitG:false};animals.push(an);
   if(w)w.next=w.q&&w.q.length?w.q.shift():ANIMALS[Math.floor(Math.random()*ANIMALS.length)];
   bear.recoil=.18; shake=Math.max(shake,.3); burst(sx,sy,'#ffffff',6);fxPlay('zmuz',sx+dx*34*S,sy+dy*34*S,1.1,f>0?Math.atan2(dy,dx):Math.atan2(dy,-dx),f);hitImpact(.05,.3);
   pop(MOO[kind],sx,sy-58*S,C.white,32,.8); pops[pops.length-1].follow=an; sfx.boom(); sfx[kind]();
   /* signature move: the barn's last load is a STAMPEDE: all four animals fan out together, big kick and flash (no backdrop swap) */
-  if(w&&w.ammo===1){const rest=ANIMALS.filter(k=>k!==kind);for(const da of[-.3,.15,.3]){const c=Math.cos(da),s2=Math.sin(da),k2=rest.shift()||ANIMALS[0];animals.push({kind:k2,st:1,x:sx,y:sy,vx:(an.vx*c-an.vy*s2),vy:(an.vx*s2+an.vy*c),rot:0,vr:rnd(-6,6),hitG:false});an.st=1;setTimeout(()=>sfx[k2]&&sfx[k2](),90+Math.random()*120)}
+  if(w&&w.ammo===1){const rest=ANIMALS.filter(k=>k!==kind);for(const da of[-.07,.035,.07]){const c=Math.cos(da),s2=Math.sin(da),k2=rest.shift()||ANIMALS[0];animals.push({kind:k2,st:1,x:sx,y:sy,vx:(an.vx*c-an.vy*s2),vy:(an.vx*s2+an.vy*c),rot:0,vr:rnd(-6,6),hitG:false});an.st=1;setTimeout(()=>sfx[k2]&&sfx[k2](),90+Math.random()*120)}
     hitImpact(.12,.8);flashT=Math.max(flashT,.1);clip('thunder',.5);pop('STAMPEDE!',ghost.x,Math.max(H*.2,ghost.y+(ghost.yOff||0)-150*GK*S),'#f2b544',58,1.3,'big');haptic([60,30,90])}
 }
 
@@ -1704,6 +1704,8 @@ function hitBear(it){
   if(bear.helmet>0){track('blocked',{k:it.type});bear.helmet--;bear.inv=.4;pop('CLONK!',it.x,hp.y-60*S,'#d4dae2',38);fxPlay('clonk',bear.x,hp.y-50*S,1,0,1);sfx.clonk();burst(it.x,hp.y-40*S,'#ffffff');return}
   bonk(it.x,'BONK!',C.gold,HZ[it.type].heavy);
 }
+/* v60: one aim at launch, led by Grumble's sideways drift (two passes), then the shot flies straight */
+function leadAim(x,y,tx,ty,sp){let px=tx;for(let i=0;i<2;i++){const t=Math.hypot(px-x,ty-y)/Math.max(1,sp);px=tx+(ghost.vx||0)*t}const dx=px-x,dy=ty-y,d=Math.hypot(dx,dy)||1;return[dx/d*sp,dy/d*sp,Math.atan2(dy,dx)]}
 function hitGhost(s){
   if(strike&&!ghost.mega){strike=null;zapT=Math.max(zapT,3.5);try{if(chargeG){const t=AC.currentTime;chargeG.gain.cancelScheduledValues(t);chargeG.gain.setValueAtTime(chargeG.gain.value,t);chargeG.gain.linearRampToValueAtTime(.0001,t+.08)}}catch(e){}pop('FIZZLE!',ghost.x,ghost.y+ghost.yOff-90*GK*S,'#fff7a8',30,.8)}
   if(superBG&&superBG.t>.85&&superBG.t<superBG.life){const B=superBG;B.hits++;
@@ -2196,15 +2198,15 @@ function update(dt){
   // bear projectiles that home on Grumble
   const gx=ghost.x, gy=ghost.y+ghost.yOff;
   for(const s of shots){
-    if(s.kind==='porc'){s.t+=dt;const dx=gx-s.x,dy=gy-s.y,d=Math.hypot(dx,dy)||1;s.vx+=(dx/d*1300*S-s.vx)*Math.min(1,dt*8);s.vy+=(dy/d*1300*S-s.vy)*Math.min(1,dt*8);s.x+=s.vx*dt;s.y+=s.vy*dt;
+    if(s.kind==='porc'){s.t+=dt;if(!s.aimed){s.aimed=1;const v=leadAim(s.x,s.y,gx,gy,1300*S);s.vx=v[0];s.vy=v[1]}const dx=gx-s.x,dy=gy-s.y,d=Math.hypot(dx,dy)||1;s.x+=s.vx*dt;s.y+=s.vy*dt;
       if(s.t>=.62||(state==='play'&&s.t>=.4&&d<200*S)||state!=='play'){s.gone=true;porcPop(s)}continue}
     if(s.kind==='quill')s.rot=Math.atan2(s.vy,s.vx);else if(s.kind==='honk'||s.kind==='bubble')s.rot=0;else s.rot+=(s.kind==='banana'?16:s.kind==='junk'?10:s.kind==='ivy'?6:4)*dt;
     if(s.cool>0){s.cool-=dt;s.vy+=900*S*dt}
-    else{const dx=gx-s.x,dy=gy-s.y,d=Math.hypot(dx,dy)||1,sp=s.speed*S,k=Math.min(1,dt*(s.kind==='honk'?16:s.kind==='bubble'?5:14));s.vx+=(dx/d*sp-s.vx)*k;s.vy+=(dy/d*sp-s.vy)*k}
+    else if(!s.aimed){s.aimed=1;if(s.kind!=='quill'){const v=leadAim(s.x,s.y,gx,gy,s.speed*S);s.vx=v[0];s.vy=v[1]}} /* v60 (user): every shot is aimed once where Grumble is when it leaves, then flies straight: no tracking */
     s.x+=s.vx*dt; s.y+=s.vy*dt;
     if(state==='play'&&s.cool<=0&&Math.hypot(gx-s.x,gy-s.y)<46*GK*S*HB()){
       hitGhost(s); s.left--;
-      if(s.left>0){s.cool=.7;s.vx=(Math.random()<.5?-1:1)*420*S;s.vy=-200*S}else s.gone=true;
+      if(s.left>0){s.cool=.7;s.aimed=0;s.vx=(Math.random()<.5?-1:1)*420*S;s.vy=-200*S} /* the Boomer-nana bounces off, then whips back in one new straight line */else s.gone=true;
     }
     if(state!=='play'||s.y>H+60)s.gone=true;
   }
@@ -2214,8 +2216,7 @@ function update(dt){
   buns=buns.filter(b=>!b.gone);
   // barnyard
   for(const a of animals){
-    if(state==='play'&&!a.hitG&&!ghost.ko){const dx=gx-a.x,dy=gy-a.y,d=Math.hypot(dx,dy)||1,sp=Math.hypot(a.vx,a.vy),k=Math.min(1,dt*(a.st?9:8));a.vx+=(dx/d*sp-a.vx)*k;a.vy+=(dy/d*sp-a.vy)*k}
-    a.x+=a.vx*dt; a.y+=a.vy*dt; a.rot+=a.vr*dt;
+        a.x+=a.vx*dt; a.y+=a.vy*dt; a.rot+=a.vr*dt;
     for(const it of items){if(it.dead||it.loose)continue;if(Math.hypot(it.x-a.x,it.y-a.y)<HZ[it.type].r*S+44*S){it.loose=true;it.g=1500*S;it.vy=-320*S;it.vx=a.vx*.35;pop('POW!',it.x,it.y-20*S,C.gold,30,.6);impact(it.x,it.y);sfx.swot()}}
     if(state==='play'&&!a.hitG&&(Math.hypot(gx-a.x,gy-a.y)<80*GK*S*HB()||ghostBodyHit(a.x,a.y,30*S))){a.hitG=true;for(const p of pops)if(p.follow===a)p.age=Math.max(p.age,p.life-.08);hitGhost({kind:'animal',animal:a.kind,dmg:2,x:a.x,y:a.y})}
     if(a.y<-100||a.x<-100||a.x>W+100||a.y>H+100)a.gone=true;
