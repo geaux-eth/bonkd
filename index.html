@@ -758,6 +758,25 @@ function setNibbles(n){n=Math.max(0,Math.min(9999,Math.floor(+n||0)));const was=
 window.bonkdSetNibbles=setNibbles;
 addEventListener('message',e=>{if(!/^https:\/\/([a-z0-9-]+\.)*nibblethis\.wtf$/.test(e.origin))return;const d=e.data;if(d&&d.type==='bonkd:wallet')setNibbles(d.nibbles)});
 try{if(window.parent!==window)window.parent.postMessage({type:'bonkd:ready'},'*')}catch(e){}
+/* Nibble This arcade bridge (www.nibblethis.wtf/developers): inside the arcade machine, a run's waffles go to the pond board,
+   each level reached goes on the player's shelf, clearing a setting earns its badge, and the first time Todd gets a weapon
+   it becomes an object in the player's Forge. Ids must match the list declared on the game's arcade row (edit_game items).
+   Only counts in the machine; one event a second at most (queued); never in test runs. */
+const NT_ORIGIN='https://www.nibblethis.wtf',NTQ=[];let ntT=0,ntScored=true;
+const NT_ITEMS=new Set(['pie','banana','bun','zooka','mitt','magnet','paddle','jello','bucket','shoe','gum','lmu','ivy','porcu','beans']);
+const NT_AREA={5:'maple-meadow',10:'conifer-corner',15:'biscuit-bluff',20:'echo-canyon',25:'dusty-dunes',30:'hayride-hill',31:'grumbles-doorstep'};
+const ntGot=new Set();
+function ntSend(ev,id){if(ev.type==='item'||ev.type==='badge'){if(ntGot.has(ev.id))return;ntGot.add(ev.id)}try{if(TEST||(typeof JUMP!=='undefined'&&JUMP))return}catch(e){}if(window.parent===window)return;NTQ.push({ev,id});if(NTQ.length>40)NTQ.shift();ntPump()}
+function ntPump(){if(ntT||!NTQ.length)return;const q=NTQ.shift();try{window.parent.postMessage({type:'nibbles-event',ev:q.ev,id:q.id||null},NT_ORIGIN)}catch(e){}ntT=setTimeout(()=>{ntT=0;ntPump()},1150)}
+const ntTitle=s=>String(s).toLowerCase().replace(/(^|[\s'-])([a-z])/g,(m,a,b)=>a+b.toUpperCase()).replace(/'S\b/g,"'s");
+function ntLevel(){ntSend({type:'level',level:(bossMode?'Boss: GRUMBLEMAX':level+' '+ntTitle(sceneName())).slice(0,32)})}
+function ntScore(){if(ntScored)return;ntScored=true;ntSend({type:'score',score:Math.max(0,Math.round(runWaffles||0))},'run')}
+addEventListener('message',e=>{if(e.origin!==NT_ORIGIN||!e.data)return;const d=e.data;
+  /* the machine's on-screen stick and buttons (phones) press our keys */
+  if(d.type==='nibbles-pad'){const ev=new KeyboardEvent(d.down?'keydown':'keyup',{key:d.key,code:d.code,bubbles:true,cancelable:true});
+    Object.defineProperty(ev,'keyCode',{get:()=>d.keyCode});Object.defineProperty(ev,'which',{get:()=>d.keyCode});
+    (document.activeElement&&document.activeElement!==document.body?document.activeElement:document).dispatchEvent(ev)}});
+try{if(window.parent!==window)window.parent.postMessage({type:'nibbles-pad-ready'},'*')}catch(e){}
 let headURL='';
 /* lives icon: Todd's head sticker (cut from the approved logo head, no lump or stars), no circle behind it */
 function toddHead(){if(headURL||!SPR.todd_head)return headURL;headURL=SPR.todd_head.img.src;
@@ -1182,7 +1201,7 @@ addEventListener('keydown',e=>{
   if(state==='ending'&&!e.repeat&&ending&&ending.t>1){e.preventDefault();finishEnding();return}
   if(state==='bossintro'&&!e.repeat&&e.key==='Escape'){e.preventDefault();finishBossIntro();return}
   if(state==='chapter'&&!e.repeat){if(e.key==='Enter'||e.key===' '){e.preventDefault();if(chap&&chap.ph==='card')chapGo();return}}
-  if(['ArrowLeft','ArrowRight','a','d','A','D',' '].includes(e.key))setInput('keys');
+  if(e.isTrusted&&['ArrowLeft','ArrowRight','a','d','A','D',' '].includes(e.key))setInput('keys');
   if(e.key==='p'||e.key==='P'||e.key==='Escape'){if(!$('cardView').hidden){$('cardView').hidden=true;return}if(!$('stNo').hidden){$('stNo').hidden=true;return}if(!$('storePage').hidden){$('storePage').hidden=true;return}if(!$('profile').hidden){$('profile').hidden=true;return}if(!$('profPage').hidden){$('profPage').hidden=true;return}if(!$('settings').hidden){$('settings').hidden=true;return}if(!$('boardPanel').hidden){$('boardPanel').hidden=true;return}setPause(!paused);return}
   if(e.key===' '||e.key==='Enter'){e.preventDefault();if(paused)return;if(state==='menu'||state==='over')start(mode);else if(state==='clear')nextLevel();else if(state==='play'&&!e.repeat)act()}
 });
@@ -1194,7 +1213,7 @@ try{if(navigator.audioSession)navigator.audioSession.type='playback'}catch(e){}
 $('againBtn').onclick=()=>start(mode);
 $('olClose').onclick=hideOut;$('olBuy').onclick=buyLifeOut;$('olPlay').onclick=()=>{hideOut();start(mode||'free')};
 $('contBtn').onclick=useLife;$('contEnd').onclick=()=>{if(state==='cont'){track('cont_end',{n:livesLeft()});showOver()}};$('contBuy').onclick=buyLife;
-function goMenu(){$('lvlCard').hidden=true;$('areaCard').hidden=true;clearTimeout(arTimer);music('menu');state='menu';paused=false;chap=null;bossMode=false;bossI=null;drips=[];['over','cont','pause','clear','chapCard'].forEach(k=>$(k).hidden=true);$('hud').hidden=true;$('menu').hidden=false;resetBoard();Object.assign(bear,{hits:0,ko:false,koT:0,hitT:0,helmet:0,weapon:null,jello:null});level=1;bgKey='';refreshMenuBest();if(AC&&AC.state==='suspended')AC.resume()}
+function goMenu(){if(state!=='menu')ntScore();$('lvlCard').hidden=true;$('areaCard').hidden=true;clearTimeout(arTimer);music('menu');state='menu';paused=false;chap=null;bossMode=false;bossI=null;drips=[];['over','cont','pause','clear','chapCard'].forEach(k=>$(k).hidden=true);$('hud').hidden=true;$('menu').hidden=false;resetBoard();Object.assign(bear,{hits:0,ko:false,koT:0,hitT:0,helmet:0,weapon:null,jello:null});level=1;bgKey='';refreshMenuBest();if(AC&&AC.state==='suspended')AC.resume()}
 $('menuBtn').onclick=goMenu;
 function setPause(v){if(v&&!(state==='play'||state==='levelup'))return;paused=v;if(v){$('pauseLvl').textContent=bossMode?'Boss':'Level '+level;$('pauseName').textContent=sceneName()+(areaName()?', '+areaName():'')}$('pause').hidden=!v;try{if(AC)v?AC.suspend():AC.resume()}catch(e){}}
 $('pauseBtn').onclick=()=>setPause(true);
@@ -1241,6 +1260,7 @@ function updateHp(){const el=$('hp');el.style.width=Math.max(0,ghost.hp/ghost.ma
 function start(m){
   audio();
   if(livesLeft()<=0){showOutOfLives();return}
+  ntScored=false;
   mode=m; rng=m==='daily'?mulberry(dayNum()*9973+7):Math.random;
   resetBoard(); chap=null; lostItem=null; bossMode=false; bossDone=false; bossPhase=1; bossI=null; drips=[]; for(const k in chapDone)delete chapDone[k]; if(isCleared())for(const k in CHAPTERS)chapDone[k]=true; bearT=0; waffT=0; beamer=null;  shownLives=-1; t=0; score=0; shownScore=-1; level=1; lvlTime=0; angelT=2.5; bgKey=''; paused=false; runWaffles=0; runCounts={}; bankedCounts={}; bankedW=0; updateWaf();
   Object.assign(bear,{oat:isCleared()?MAXH:0,pose:null,x:W/2,tx:W/2,hits:0,hitT:0,inv:0,ko:false,koT:0,helmet:0,zap:0,weapon:null,jello:null,swing:0,face:1,faceS:1,gs:1}); fx=null; runTop=null; lvTop=null;
@@ -1297,7 +1317,7 @@ function beginPlay(chase){
   const big=Math.min(W*.55/3.7,H*.3)/S;
   {const top=hudBottom()+8,headY=GY-235*S,h=Math.min(W*.46/LOGO_R,(headY-top)/1.12);pops.push({img:LOGO_IMG,x:W/2,y:top+h*.56,size:h/S,life:1.9,age:0,rot:-.02})}
   ghost.hold=1.9; ghost.throwT=1.6+1.9; $('hud').classList.add('intro');
-  const a1=level===1&&!bossMode;if(a1){ghost.hold+=AREA_T;ghost.throwT+=AREA_T;angelT=Math.max(angelT,2.5+AREA_T);clearTimeout(arTimer);arTimer=setTimeout(()=>{if(state==='play'&&level===1)showAreaCard()},1850)}
+  const a1=level===1&&!bossMode;if(a1)ntLevel();if(a1){ghost.hold+=AREA_T;ghost.throwT+=AREA_T;angelT=Math.max(angelT,2.5+AREA_T);clearTimeout(arTimer);arTimer=setTimeout(()=>{if(state==='play'&&level===1)showAreaCard()},1850)}
   clearTimeout(hintT);hintT=setTimeout(()=>{if(state==='play')showStartHint()},a1?1850+AREA_T*1000+250:1500);
 }
 
@@ -1463,7 +1483,7 @@ function tossGift(){
   gifts.push({type,x:ax,y:ay,vx:(tx-ax)*rnd(.9,1.3),vy:-rnd(380,520)*S,g:900*S,rot:0,t:0,chute:0,sw:rnd(0,6),land:false,lt:0});
   pop('CATCH!',ax,ay-62*S,C.white,26,.8); sfx.toss();
 }
-function activate(type,x,y){
+function activate(type,x,y){if(NT_ITEMS.has(type))ntSend({type:'item',id:type});
   const hp=headPos(), P=PW[type];
   /* user: no lines explaining what an item does; the item's own word (or its chip) is enough */
   sfx.power(); burst(x,y,P.color);
@@ -1718,7 +1738,7 @@ function hitGhost(s){
 }
 function grawlix(){const g='#@%&$!*?';let s='';for(let i=0;i<4;i++)s+=g[Math.floor(Math.random()*g.length)];return s+'!'}
 function ghostDown(){
-  track('level_clear',{n:lvlTime,m:lvStats.bonks});
+  track('level_clear',{n:lvlTime,m:lvStats.bonks});if(!bossMode&&NT_AREA[level])ntSend({type:'badge',id:NT_AREA[level]});
   bear.weapon=null; bear.jello=null; bear.helmet=0; bear.zap=0; slowT=0; paddleT=0; bearT=0; waffT=0; beamer=null; ghost.gumT=0; ghost.notes=0; ghost.heat=0; lmuStop();
   state='levelup'; levelT=0; clrT=0; ghost.ko=true; ghost.koT=0; shake=.6; ghost.say=null;
   for(const it of items){it.loose=true;it.g=1500*S}
@@ -1897,7 +1917,7 @@ function bgPt(u,v){const a=bgArt();if(!a)return{x:u*W,y:v*H};const I=SPR[a[0]].i
 function startBoss(){$('clear').hidden=true;bossMode=true;bossPhase=1;rageT=-1;drips=[];bgKey='';setGhost();ghost.max=ghost.hp=180;updateHp();$('lvl').textContent='BOSS';
   state='bossintro';bossI={t:0,tossed:0,fl:[],magic:null,glow:0};ghost.hold=0;ghost.yOff=0;ghost.pose=null;ghost.x=W+120*S;ghost.y=H*.3;
   bear.weapon=null;bear.jello=null;items=[];gifts=[];shots=[];angel=null;beamer=null;strike=null;angelT=99;playLevel();
-  const n=$('lvNum');n.textContent='';for(const ch of 'BOSS'){const sp=document.createElement('span');sp.textContent=ch;n.append(sp)}$('lvName').textContent=BOSS_SCENE.n;
+  const n=$('lvNum');n.textContent='';for(const ch of 'BOSS'){const sp=document.createElement('span');sp.textContent=ch;n.append(sp)}$('lvName').textContent=BOSS_SCENE.n;ntLevel();
   const c=$('lvlCard');c.classList.remove('out');c.hidden=false;clearTimeout(lvTimer);lvTimer=setTimeout(()=>{c.classList.add('out');lvTimer=setTimeout(()=>{c.hidden=true;c.classList.remove('out')},420)},1300);track('boss_start',{})}
 /* the GRUMBLEMAX intro (user script): Grumble glides in to his cauldron, "I'M GOING TO STOP YOU FOR GOOD!", "GET READY FOR...",
    tosses three waffles in, the cauldron spits out the magic waffle, he gobbles it, swells smoothly into GRUMBLEMAX and roars "GRUMBLEMAX!!".
@@ -1981,7 +2001,7 @@ function endingUpdate(dt){const e=ending;e.t+=dt;bear.pose='sit_eat';bear.x=bear
   if(e.t>7.2&&!e.end){e.end=1;pop('THE END',W/2,H*.3,C.gold,90,3);sfx.waffle()}
   if(e.t>10)finishEnding()}
 function finishEnding(){if(state!=='ending')return;ending=null;quip=null;bear.pose='sit_eat';showWin()}
-function showWin(){store('bonkd-cleared',1);if(wallet.markCleared)wallet.markCleared();showOver();$('againBtn').textContent='Play again';setOverLogo('GRUMBLEMAX is','DEFEATED!');$('overMode').textContent='Waffles saved!';track('boss_win',{n:score})}
+function showWin(){ntSend({type:'badge',id:'grumblemax'});store('bonkd-cleared',1);if(wallet.markCleared)wallet.markCleared();showOver();$('againBtn').textContent='Play again';setOverLogo('GRUMBLEMAX is','DEFEATED!');$('overMode').textContent='Waffles saved!';track('boss_win',{n:score})}
 function drawBossFX(){const b=bossI;
   if(b){const cm=bgPt(.75,.642);if(b.glow>0){const r=(90+b.glow*60)*S,g=ctx.createRadialGradient(cm.x,cm.y,r*.1,cm.x,cm.y,r);g.addColorStop(0,`rgba(140,255,150,${.7*b.glow})`);g.addColorStop(1,'rgba(140,255,150,0)');ctx.save();ctx.fillStyle=g;ctx.beginPath();ctx.arc(cm.x,cm.y,r,0,TAU);ctx.fill();ctx.restore()}
     for(const f of b.fl){ctx.save();ctx.translate(f.x,f.y);ctx.scale(S*1.1,S*1.1);ctx.rotate(f.rot);drawWaffle('plain',0);ctx.restore()}
@@ -2016,7 +2036,7 @@ function showAreaCard(){const a=AREAS[Math.min(6,Math.floor((level-1)/5))];$('ar
 function levelIntro(){if(!firstOfArea()){showLevelCard();return}
   showAreaCard();ghost.throwT+=AREA_T;angelT+=AREA_T;zapT+=AREA_T;ghost.hold=Math.max(ghost.hold||0,AREA_T);
   setTimeout(()=>{if(state==='play'||state==='levelup')showLevelCard()},AREA_T*1000)}
-function showLevelCard(){
+function showLevelCard(){ntLevel();
   const n=$('lvNum'); n.textContent=''; n.setAttribute('aria-label','Level '+level);
   for(const ch of String(level)){const sp=document.createElement('span');sp.textContent=ch;n.append(sp)}
   $('lvName').textContent=sceneName();
@@ -2165,7 +2185,7 @@ function update(dt){
     if(w.sq>0)w.sq=Math.max(0,w.sq-dt);
     /* any part of Todd grabs a waffle: in the air or bouncing low at his feet, not just near his middle (user: a bouncing waffle tree was missed) */
     const wr=(w.t==='plain'?0:14)*S,near=w.home?Math.hypot(w.x-bear.x,w.y-(GY-96*S))<30*S:w.land?Math.abs(w.x-bear.x)<60*S+wr:Math.abs(w.x-bear.x)<62*S+wr&&w.y>(bear.topY||GY-200*S)-30*S&&w.y<GY+20*S;
-    if((canMove()||w.home)&&!bear.ko&&near){w.gone=true;const T=WTK[w.t]||WT[0];runWaffles+=T.v;runCounts[T.k]=(runCounts[T.k]||0)+1;track('waffle',{k:T.k,n:T.v});lvStats.waffles+=T.v;updateWaf();
+    if((canMove()||w.home)&&!bear.ko&&near){w.gone=true;const T=WTK[w.t]||WT[0];runWaffles+=T.v;runCounts[T.k]=(runCounts[T.k]||0)+1;track('waffle',{k:T.k,n:T.v});if(T.k==='lotto')ntSend({type:'item',id:'lotto'});lvStats.waffles+=T.v;updateWaf();
       if(!runTop||T.v>runTop.v)runTop=T; if(!lvTop||T.v>lvTop.v)lvTop=T;
       if(T.k==='plain'){pop('+'+T.v+' WAFFLES',clamp(w.x,140*S,W-140*S),w.y-34*S,'#f2b544',22,.8);sfx.waffle();burst(w.x,w.y,'#f2b544',5)}
       else{showQ.push(T);sfx.waffle();burst(w.x,w.y,'#ffd23f',10)}}
@@ -2277,7 +2297,7 @@ function update(dt){
 }
 
 function setOverLogo(pre,word){$('overPre').textContent=pre;const l=$('overLogo');l.textContent='';l.setAttribute('aria-label',word);for(const ch of word){const sp=document.createElement('span');sp.textContent=ch===' '?'\u00a0':ch;l.append(sp)}l.style.fontSize='';l.style.whiteSpace='nowrap';requestAnimationFrame(()=>{const cw=l.parentElement.clientWidth-28;if(l.scrollWidth>cw)l.style.fontSize=(parseFloat(getComputedStyle(l).fontSize)*cw/l.scrollWidth)+'px'})}
-function showOver(){
+function showOver(){ntScore();
   $('lvlCard').hidden=true; $('cont').hidden=true; setOverLogo('You got','BONKD!'); $('againBtn').textContent='Replay';
   state='over'; curSong=null;
   track('run_end',{n:score,m:runWaffles,k:Math.round(t)});
