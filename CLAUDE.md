@@ -1,5 +1,9 @@
 # Bonkd project notes
 
+## Official description (user, v64)
+- The game's description everywhere is exactly: "Get waffles. Don't get BONKD!" (meta description, share cards, manifest, README, store listings, arcade row). Remind the user of it whenever a description is needed.
+- Link previews: og/twitter tags in build_web.py (title "Don't get BONKD!"), image og.jpg (1200x630) in the repo root, made by scratchpad banners/og_still7.py from the arcade label art (same logo, blue and waffles, hand-placed, user-approved). Never change that art without the user. Apps cache previews; add ?v=N to the shared link to refresh.
+
 ## Weapon checklist: every weapon, existing or new, needs ALL of these
 
 1. **Drop look**: what hangs from the burlap bandana parachute. Use the simplest recognizable piece (the barn, the rolled blanket, the porcupine), not the whole gun. The strings must touch real points on the item's top edge.
