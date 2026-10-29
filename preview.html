@@ -64,7 +64,7 @@ canvas{display:block;width:100%;height:100%;touch-action:none;cursor:grab}
 /* short screens (phones sideways): the SAME stacked card as everywhere else (v63, user: no side-by-side), with a smaller picture and tighter rows so Let's go! stays on screen */
 .short .card.chap{padding-top:10px;padding-bottom:12px}
 .short .chap>#chImg{width:auto;height:64px;max-width:130px;margin:2px auto 0}
-.short .chap .note{max-width:52ch;font-size:14px;margin:4px auto 0}
+.short .chap .note{max-width:none;font-size:14px;margin:4px auto 0}
 /* v63: the chapter card is one centred column; every row's top margin is set from MEASURED ink gaps (audit/card_gaps.py) so the rows are evenly spaced */
 #chapCard .card.chap{display:flex;flex-direction:column;align-items:center;gap:0;width:min(580px,100%)}
 #chapCard .card.chap>*{margin:0!important;position:static!important}
