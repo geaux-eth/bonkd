@@ -185,7 +185,7 @@
 - Booster's drops are caught by any part of Todd (giftTouch): from the tip of his lump to his feet, his body width plus the front where his arms and weapon are.
 - Touch: drag anywhere to move Todd, tap anywhere to use the weapon (a quick touch under 350 ms that doesn't move). The red badge only shows the weapon and ammo; it isn't a button. Two thumbs work: the newest finger steers, and the one still down takes over when it lifts.
 - Keys: arrows or A/D move, Space uses weapons, P pauses.
-- Pie (2) and Boomer-nana (1) are held and thrown with the weapon control. The Junk Magnet (12 s) only grabs metal junk that comes near Todd, holds up to 3, and fires them back with the weapon control.
+- Pie (2) and Nana-rang (1, renamed from Boomer-nana in v61) are held and thrown with the weapon control. The Junk Magnet (12 s) only grabs metal junk that comes near Todd, holds up to 3, and fires them back with the weapon control.
 
 ## Title, lettering and music
 - The title is the real logo lettering (logo_text_only: "Don't get BONKD!" cut from the approved sticker logo, finished in ChatGPT; scratchpad sprites/logo.webp, embedded as __LOGO__). The menu shows it pinned near the top; the run start pops the same image sized to stay between the HUD and Todd's head. Never retype the title in a font.
@@ -300,4 +300,8 @@
 
 ## Batch v60 notes
 - Computer scale (user: characters too small on a squarish PC window): non-phone screens size the world by height like a sideways phone (min(H/640,2.4)*PHONE_Z), capped so at least 1400 game units show across (W/1400). Phones unchanged. A 1283x1242 window draws ~1.7x bigger than v56-v59, 1920x1080 ~1.2x.
-- No tracking on any weapon (user): every shot is aimed ONCE when it leaves (leadAim: Grumble's position led by his sideways drift ghost.vx), then flies straight. Porcupine flies straight and its quills burst in a cone at Grumble (spread .5 rad) instead of a homing ring. Barn-zooka animals launch straight at Grumble; the stampede fans only slightly (+-.07 rad). Gum bubbles 950 (was 520) so a straight bubble can reach him. The Boomer-nana's second hit: after the bounce it re-aims once (one new straight line), no steering. Measured at level 12: pie 2/2, honks 5/5, animals 8/8, magnet 6/6, mitt 3/3, banana 2/2, bubbles 2/3.
+- No tracking on any weapon (user): every shot is aimed ONCE when it leaves (leadAim: Grumble's position led by his sideways drift ghost.vx), then flies straight. Porcupine flies straight and its quills burst in a cone at Grumble (spread .5 rad) instead of a homing ring. Barn-zooka animals launch straight at Grumble; the stampede fans only slightly (+-.07 rad). Gum bubbles 950 (was 520) so a straight bubble can reach him. The Nana-rang's second hit: after the bounce it re-aims once (one new straight line), no steering. Measured at level 12: pie 2/2, honks 5/5, animals 8/8, magnet 6/6, mitt 3/3, banana 2/2, bubbles 2/3.
+
+## Batch v61 notes
+- Boomer-nana renamed Nana-rang (PW.banana.name, HQ names). The arcade listing's item name still needs changing through edit_game when the Nibble This connector is signed in again.
+- &w=<keys> (testers, with &k): Booster tosses exactly those weapons in that order (WSEQ; any PW key, chapter unlocks ignored), every ~4 s when Todd is free, then stops coming; a missed one is queued again next. It wins over &fx. The Level Jump page has a "Pick Booster's drops" section that builds it (tap order = toss order, tap again to remove, remembered on that device).
