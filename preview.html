@@ -84,10 +84,12 @@ canvas{display:block;width:100%;height:100%;touch-action:none;cursor:grab}
 .boss span{font-size:12px;line-height:1;-webkit-text-stroke:1px var(--ink);text-shadow:1px 1px 0 var(--ink)}
 .bar{flex:1;height:10px;border:2px solid var(--ink);border-radius:8px;background:var(--paper);overflow:hidden;box-shadow:2px 2px 0 var(--ink)}
 .bar i{display:block;height:100%;width:100%;background:var(--green);border-right:2px solid var(--ink);box-sizing:border-box;transition:width .2s}
-.meter{display:flex;gap:2px;justify-content:flex-end;align-items:center}
-.meter svg{width:20px;height:20px;fill:var(--paper);stroke:var(--ink);stroke-width:1.8;stroke-linejoin:round;transition:transform .2s}
+.meter{display:flex;gap:6px;justify-content:flex-end;align-items:center;padding:3px 4px}
+.meter svg{overflow:visible;width:20px;height:20px;fill:var(--paper);stroke:var(--ink);stroke-width:1.8;stroke-linejoin:round;transition:transform .2s}
 .meter svg.armor{filter:drop-shadow(2px 0 0 #ffe600) drop-shadow(-2px 0 0 #ffe600) drop-shadow(0 2px 0 #ffe600) drop-shadow(0 -2px 0 #ffe600)}
 .meter svg.armor.blink{animation:armorBlink .6s steps(1) 1}
+.meter svg.armor.gain{animation:armorGain .45s ease-in-out 3}
+@keyframes armorGain{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.2;transform:scale(1.35)}}
 @keyframes armorBlink{0%,33%,66%{opacity:1}16%,50%,83%{opacity:.15}100%{opacity:1}}
 .meter svg.lump.on{fill:var(--pink);transform:scale(1.15)}
 .meter svg.star.on{fill:var(--gold);transform:scale(1.15) rotate(-12deg)}
@@ -677,6 +679,8 @@ const lumpSVG='<svg class="lump" viewBox="0 0 24 24"><path d="M7.5 21.5C6.5 13 8
 const starSVG='<svg class="star" viewBox="0 0 24 24"><path d="M12 2.2l2.9 6.5 7.1.7-5.4 4.7 1.6 7-6.2-3.8-6.2 3.8 1.6-7L2 9.4l7.1-.7z"/></svg>';
 $('meter').innerHTML=lumpSVG+starSVG+starSVG+starSVG;
 function renderMeter(){const n=$('meter').children.length;[...$('meter').children].forEach((s,i)=>{s.classList.toggle('on',i<bear.hits);if(!s.classList.contains('blink'))s.classList.toggle('armor',n-1-i<(bear.oat|0))})}
+/* v63: new juice rings pulse a few times so the player sees what the juice did */
+function flashArmor(){for(const s of $('meter').children)if(s.classList.contains('armor')){s.classList.remove('gain');void s.getBoundingClientRect();s.classList.add('gain')}setTimeout(()=>{for(const s of $('meter').children)s.classList.remove('gain')},1500)}
 /* a juice ring soaks up a bonk: that icon blinks three times, then its yellow outline goes */
 function blinkArmor(){const el=$('meter').children,n=el.length,i=n-1-(bear.oat|0);const s=el[i];if(!s){renderMeter();return}s.classList.add('armor','blink');setTimeout(()=>{s.classList.remove('blink','armor');renderMeter()},620)}
 
@@ -736,7 +740,7 @@ function superDmg(tier){return SUPER_FIX[tier]||12}
 /* lives: 3 for everyone, +1 per Nibble in the wallet connected on nibblethis.wtf (up to 25 more),
    plus lives bought with waffles (1,000 each, 10 per 24 hours), banked between runs. Free lives are spent first. */
 /* beaten the game: on this device, or on the player's profile (follows them across devices) */
-function isCleared(){return !!store('bonkd-cleared')||!!(wallet.cleared&&wallet.cleared())}
+function isCleared(){if(JUMP||FXTEST||WSEQ)return false; /* v63: tester runs always play like a first run (chapters, no free juice) */ return !!store('bonkd-cleared')||!!(wallet.cleared&&wallet.cleared())}
 const LIFE_PRICE=1000,LIFE_DAY_MAX=10,BASE_LIVES=3,NIB_MAX=25;
 let nibbles=0,shownLives=-1;
 /* daily lives: everyone gets BASE_LIVES (+1 per Nibble held) per day, shared by every run that day. The day turns over at
@@ -1263,7 +1267,7 @@ function start(m){
   ntScored=false;
   mode=m; rng=m==='daily'?mulberry(dayNum()*9973+7):Math.random;
   resetBoard(); chap=null; lostItem=null; bossMode=false; bossDone=false; bossPhase=1; bossI=null; drips=[]; for(const k in chapDone)delete chapDone[k]; if(isCleared())for(const k in CHAPTERS)chapDone[k]=true; bearT=0; waffT=0; beamer=null;  shownLives=-1; t=0; score=0; shownScore=-1; level=1; lvlTime=0; angelT=2.5; bgKey=''; paused=false; runWaffles=0; runCounts={}; bankedCounts={}; bankedW=0; updateWaf();
-  Object.assign(bear,{oat:isCleared()?MAXH:0,pose:null,x:W/2,tx:W/2,hits:0,hitT:0,inv:0,ko:false,koT:0,helmet:0,zap:0,weapon:null,jello:null,swing:0,face:1,faceS:1,gs:1}); fx=null; runTop=null; lvTop=null;
+  Object.assign(bear,{drinkT:0,aimT:0,oat:isCleared()?MAXH:0,pose:null,x:W/2,tx:W/2,hits:0,hitT:0,inv:0,ko:false,koT:0,helmet:0,zap:0,weapon:null,jello:null,swing:0,face:1,faceS:1,gs:1}); fx=null; runTop=null; lvTop=null;
   setGhost(); ghost.x=W/2;
   ['menu','over','cont','pause','clear','chapCard','boardPanel','settings'].forEach(k=>$(k).hidden=true); renderMeter();
   const run=++runId; store('bonkd-runs',store('bonkd-runs')+1);
@@ -1503,7 +1507,7 @@ function activate(type,x,y){if(NT_ITEMS.has(type))ntSend({type:'item',id:type});
   if(type==='lmu'){bear.weapon=lmuNew()}
   if(type==='gum'){bear.weapon={type:'gum',ammo:3,eatT:.9};pop('CHOMP!',hp.x,hp.y-60*S,'#ff7fb8',40,.9);snd('gumEat')}
   if(type==='beam'){beamer={t:0,side:ghost.x>W/2?1:-1,x:ghost.x>W/2?-140*S:W+140*S,y:Math.max(hudBottom()+70*S,ghost.y+ghost.yOff),hitT:0};snd('beamIn')||sfx.boosterIn()}
-  if(type==='oat'){bear.oat=MAXH;renderMeter();snd('oatEat');pop('APPLE JUICE!',hp.x,hp.y-70*S,'#ffe600',30);burst(bear.x,GY-120*S,'#ffe600',12)}
+  if(type==='oat'){bear.oat=MAXH;renderMeter();flashArmor();if(state==='play'&&SPR.c_todd_eat_oat_0){bear.drinkT=1.5;bear.tx=bear.x;bear.inv=Math.max(bear.inv,1.6)}snd('oatEat');pop('APPLE JUICE!',hp.x,hp.y-70*S,'#ffe600',30);burst(bear.x,GY-120*S,'#ffe600',12)}
   if(type==='bearhand'){bearT=BH_DUR;snd('bearHanded');for(let i=0;i<3;i++)setTimeout(()=>burst(bear.x+rnd(-40,40)*S,GY-110*S,'#e8463f',16),i*120);fxPlay('bimp',bear.x,GY-120*S,2.4,0,1);hitImpact(.18,.8);redT=.7;pop('BEAR HANDED!',W/2,H*.3,'#e8463f',64,1.6);clip('stomp',.8);clip('supS2',.6,.08);haptic([70,40,110])}
   if(type==='waffli'){waffT=10;snd('waffli');for(let i=0;i<6;i++)burst(bear.x+rnd(-80,80)*S,GY-140*S,'#f2b544',3)}
   if(type==='zooka'){const q=ANIMALS.slice().sort(()=>Math.random()-.5);bear.weapon={type:'zooka',ammo:5,next:q.shift(),q};bear.aim=-1} /* user: one of each animal, then a STAMPEDE of all four */
@@ -1553,6 +1557,7 @@ function updateAct(){
 }
 function tap(x,y){
   const w=bear.weapon;
+  if((w||bear.jello)&&state==='play'&&!bear.ko&&!ghost.ko){faceTo(ghost.x);bear.faceS=bear.face;bear.aimT=w&&w.type==='gum'?1.1:.6} /* v63 (user): no shots out of the back of his head */
   if(w&&w.type==='shoe'){if(swotCool>0)return;swotCool=.32;const h=muzzlePos()||headPos(),f=bear.faceS||bear.face||1;
     {const dx=ghost.x-h.x,dy=ghost.y+ghost.yOff-h.y,d=Math.hypot(dx,dy)||1;shots.push({kind:'honk',x:h.x,y:h.y,vx:dx/d*1500*S,vy:dy/d*1500*S,dmg:2.5,speed:1900,rot:0,left:1,cool:0,t0:now})}bear.kick=.14;
     if(w.ammo===1){/* signature move: the last honk is a big one, more damage, notes everywhere, the screen wobbles */
@@ -1627,7 +1632,7 @@ function throwHeld(w){
 function handPos(){return{x:bear.x+56*S*bear.face,y:GY-150*S}}
 function faceTo(x){if(Math.abs(x-bear.x)>8)bear.face=Math.sign(x-bear.x)}
 function lobBun(x,y){
-  faceTo(x); const h=handPos(), T=.42, g=1400*S;
+  faceTo(x); const h=handPos(), T=.42, g=1400*S; if(state==='play'&&!ghost.ko){x=clamp(x+ghostXAt(T)-ghost.x,30*S,W-30*S);y+=40*GK*S*HB()}
   y=Math.min(y,GY-60*S);
   buns.push({x:h.x,y:h.y,vx:(x-h.x)/T,vy:(y-h.y-.5*g*T*T)/T,g,t:0,T,rot:0});
   bear.swing=.28; bear.aim=Math.atan2(y-h.y,x-h.x); sfx.bunLob();
@@ -1636,7 +1641,7 @@ function explode(x,y){
   splats.push({x,y,age:0}); shake=Math.max(shake,.45);
   pop('GLAZED!',x,y-30*S,'#ffb347',40); sfx.bunBoom(); burst(x,y,'#fff2d6',12);
   for(const it of items){if(!it.dead&&!it.loose&&Math.hypot(it.x-x,it.y-y)<100*S){it.dead=true;burst(it.x,it.y,'#c98e5c',5)}}
-  if(state==='play'&&Math.hypot(ghost.x-x,ghost.y+ghost.yOff-y)<120*S)hitGhost({kind:'bun',dmg:3,x,y});
+  if(state==='play'&&(Math.hypot(ghost.x-x,ghost.y+ghost.yOff-y)<120*S||ghostBodyHit(x,y,60*S)))hitGhost({kind:'bun',dmg:3,x,y});
 }
 /* Barn-zooka rests on Todd's BACK shoulder (behind his head); ZU/ZV = where the tube touches the shoulder in the art, ZW = art width */
 /* Barn-zooka: the barn's underside (ZU,ZV) rests on Todd's right shoulder; ZGRIP[0]=trigger grip (right paw), ZGRIP[1]=front grip (left paw) */
@@ -1707,7 +1712,10 @@ function hitBear(it){
   bonk(it.x,'BONK!',C.gold,HZ[it.type].heavy);
 }
 /* v60: one aim at launch, led by Grumble's sideways drift (two passes), then the shot flies straight */
-function leadAim(x,y,tx,ty,sp){let px=tx;for(let i=0;i<2;i++){const t=Math.hypot(px-x,ty-y)/Math.max(1,sp);px=tx+(ghost.vx||0)*t}const dx=px-x,dy=ty-y,d=Math.hypot(dx,dy)||1;return[dx/d*sp,dy/d*sp,Math.atan2(dy,dx)]}
+/* v63: where Grumble will be in T seconds, by running his own drift forward (straight-line lead overshot when he turned) */
+function ghostXAt(T){if(bossMode||ghost.ko||state!=='play'||T<=0)return ghost.x+(ghost.vx||0)*Math.max(0,T);const st=ghostStunned(),r=st?.12:slowT>0?.4:1,k=st?(ghost.fxT>0&&(ghost.fx==='burn'||ghost.fx==='lit')?.04:.6):3,f=.55+Math.min(.9,(level-1)*.03),h=1/60;let t=ghost.t,x=ghost.x;
+  for(let e=0;e<T;e+=h){t+=h*r;const g=W/2+Math.sin(t*f)*W*.27+Math.sin(t*1.9+1)*W*.05+(level>=3?(bear.x-W/2)*.15:0);x+=(g-x)*Math.min(1,h*k)}return x}
+function leadAim(x,y,tx,ty,sp){ty+=40*GK*S*HB();let px=tx;for(let i=0;i<3;i++){const t=Math.hypot(px-x,ty-y)/Math.max(1,sp);px=tx+ghostXAt(t)-ghost.x}const dx=px-x,dy=ty-y,d=Math.hypot(dx,dy)||1;return[dx/d*sp,dy/d*sp,Math.atan2(dy,dx)]}
 function hitGhost(s){
   if(strike&&!ghost.mega){strike=null;zapT=Math.max(zapT,3.5);try{if(chargeG){const t=AC.currentTime;chargeG.gain.cancelScheduledValues(t);chargeG.gain.setValueAtTime(chargeG.gain.value,t);chargeG.gain.linearRampToValueAtTime(.0001,t+.08)}}catch(e){}pop('FIZZLE!',ghost.x,ghost.y+ghost.yOff-90*GK*S,'#fff7a8',30,.8)}
   if(superBG&&superBG.t>.85&&superBG.t<superBG.life){const B=superBG;B.hits++;
@@ -2064,7 +2072,10 @@ function update(dt){
     const nx=bear.x+(bear.tx-bear.x)*Math.min(1,dt*12);
     bear.vx=(nx-bear.x)/Math.max(dt,1e-3); bear.x=nx;
   } else bear.vx*=.9;
-  if(!bear.ko&&Math.abs(bear.vx)>40)bear.face=Math.sign(bear.vx);
+  bear.aimT=Math.max(0,(bear.aimT||0)-dt);
+  if(bear.drinkT>0){bear.drinkT=Math.max(0,bear.drinkT-dt);bear.tx=bear.x;bear.vx=0}
+  if(!bear.ko&&bear.aimT>0&&!ghost.ko)faceTo(ghost.x);
+  else if(!bear.ko&&Math.abs(bear.vx)>40)bear.face=Math.sign(bear.vx);
   else if(!bear.ko&&bear.weapon&&bear.weapon.type==='mitt'&&bear.weapon.catches>0){let best=null,bd=1e9;for(const it of items){if(it.loose||it.dead||it.vy<0)continue;const d=Math.abs(it.x-bear.x);if(d<260*S&&d>12*S&&it.y<GY-60*S&&d<bd){bd=d;best=it}}if(best)bear.face=Math.sign(best.x-bear.x)}
   bear.faceS=bear.face;
   bear.recoil=Math.max(0,(bear.recoil||0)-dt);bear.kick=Math.max(0,(bear.kick||0)-dt);updFlings(dt);updLmu(dt);
@@ -2206,7 +2217,7 @@ function update(dt){
     if(s.cool>0){s.cool-=dt;s.vy+=900*S*dt}
     else if(!s.aimed){s.aimed=1;if(s.kind!=='quill'){const v=leadAim(s.x,s.y,gx,gy,s.speed*S);s.vx=v[0];s.vy=v[1]}} /* v60 (user): every shot is aimed once where Grumble is when it leaves, then flies straight: no tracking */
     s.x+=s.vx*dt; s.y+=s.vy*dt;
-    if(state==='play'&&s.cool<=0&&Math.hypot(gx-s.x,gy-s.y)<46*GK*S*HB()){
+    if(state==='play'&&s.cool<=0&&(Math.hypot(gx-s.x,gy-s.y)<46*GK*S*HB()||ghostBodyHit(s.x,s.y,(s.kind==='quill'?4:10)*S))){
       hitGhost(s); s.left--;
       if(s.left>0){s.cool=.7;s.aimed=0;s.vx=(Math.random()<.5?-1:1)*420*S;s.vy=-200*S} /* the Nana-rang bounces off, then whips back in one new straight line */else s.gone=true;
     }
@@ -3282,6 +3293,7 @@ function todd2Key0(b,mv){const w=b.weapon,walk=mv>.15&&Math.floor(b.walk/Math.PI
   if(b.ko)return SPR.c_todd_ko_0?'ko_'+(b.koT<.55?Math.min(3,Math.floor(b.koT/.55*4)):4+Math.floor(now*3)%2):'ko';
   /* the opening story and the ending keep the original single drawings for sitting, startled and angry (the user preferred them to the sheets) */
   if(b.pose)return b.pose==='run'?(SPR.c_todd_rn0?'rn'+(Math.floor(now*13)%6):'run'):(state==='story'?(T2A[b.pose]?b.pose:null):todd2Pose(b));
+  if(b.drinkT>0&&SPR.c_todd_eat_oat_0)return 'eat_oat_'+Math.min(5,Math.floor((1-b.drinkT/1.5)*6)); /* v63: he drinks the juice he caught */
   if(b.hitT>0)return SPR.c_todd_bonked_0?'bonked_'+Math.max(0,Math.min(5,Math.floor((1-b.hitT/.55)*6))):'h_bonked';
   if(b.hold&&T2A['h_'+b.hold.k])return mov?(walkKey(b.hold.k,b)||(walk&&T2A['w_'+b.hold.k]?'w_'+b.hold.k:'h_'+b.hold.k)):'h_'+b.hold.k;
   if(b.jello)return mov?(walkKey('jello',b)||(walk?'w_jello':'h_jello')):'h_jello';
