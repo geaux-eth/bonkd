@@ -60,13 +60,13 @@ canvas{display:block;width:100%;height:100%;touch-action:none;cursor:grab}
 .st-card.quest .qimg b{font:44px 'Lilita One',Impact,sans-serif;color:#fff;-webkit-text-stroke:2px #161616}
 #chImg{display:block;width:auto;height:118px;max-width:220px;object-fit:contain;margin:4px auto 0} /* fixed height, width follows the art, so wide items (waffle, shoe) aren't shrunk into a square with empty space */
 .chap .logo{font-size:clamp(24px,4.6vw,38px);white-space:nowrap}
-.chap .note{max-width:30ch;margin:6px auto 0;font-size:15px;line-height:1.35}
+.chap .note{max-width:none;margin:6px auto 0;font-size:15px;line-height:1.35;white-space:pre-line} /* v63: one sentence per line (user) */
 /* short screens (phones sideways): the SAME stacked card as everywhere else (v63, user: no side-by-side), with a smaller picture and tighter rows so Let's go! stays on screen */
 .short .card.chap{padding-top:10px;padding-bottom:12px}
 .short .chap>#chImg{width:auto;height:64px;max-width:130px;margin:2px auto 0}
 .short .chap .note{max-width:52ch;font-size:14px;margin:4px auto 0}
 /* v63: the chapter card is one centred column; every row's top margin is set from MEASURED ink gaps (audit/card_gaps.py) so the rows are evenly spaced */
-#chapCard .card.chap{display:flex;flex-direction:column;align-items:center;gap:0}
+#chapCard .card.chap{display:flex;flex-direction:column;align-items:center;gap:0;width:min(580px,100%)}
 #chapCard .card.chap>*{margin:0!important;position:static!important}
 #chapCard .card.chap>#chImg{margin-top:var(--m1,0)!important}#chapCard .card.chap>#chName{margin-top:var(--m2,0)!important}#chapCard .card.chap>#chDesc{margin-top:var(--m3,0)!important}#chapCard .card.chap>.btns{margin-top:var(--m4,0)!important}
 #outLives{z-index:40}
@@ -1512,7 +1512,7 @@ function activate(type,x,y){if(NT_ITEMS.has(type))ntSend({type:'item',id:type});
   if(type==='lmu'){bear.weapon=lmuNew()}
   if(type==='gum'){bear.weapon={type:'gum',ammo:3,eatT:.9};pop('CHOMP!',hp.x,hp.y-60*S,'#ff7fb8',40,.9);snd('gumEat')}
   if(type==='beam'){beamer={t:0,side:ghost.x>W/2?1:-1,x:ghost.x>W/2?-140*S:W+140*S,y:Math.max(hudBottom()+70*S,ghost.y+ghost.yOff),hitT:0};snd('beamIn')||sfx.boosterIn()}
-  if(type==='oat'){bear.oat=MAXH;renderMeter();flashArmor();if(state==='play'&&SPR.c_todd_eat_oat_0){bear.drinkT=1.5;bear.tx=bear.x;bear.inv=Math.max(bear.inv,1.6)}snd('oatEat');pop('APPLE JUICE!',hp.x,hp.y-70*S,'#ffe600',30);burst(bear.x,GY-120*S,'#ffe600',12)}
+  if(type==='oat'){bear.oat=MAXH;bear.hits=0;renderMeter();flashArmor();if(state==='play'&&SPR.c_todd_eat_oat_0){bear.drinkT=1.5;bear.tx=bear.x;bear.inv=Math.max(bear.inv,1.6)}snd('oatEat');pop('APPLE JUICE!',hp.x,hp.y-70*S,'#ffe600',30);burst(bear.x,GY-120*S,'#ffe600',12)}
   if(type==='bearhand'){bearT=BH_DUR;snd('bearHanded');for(let i=0;i<3;i++)setTimeout(()=>burst(bear.x+rnd(-40,40)*S,GY-110*S,'#e8463f',16),i*120);fxPlay('bimp',bear.x,GY-120*S,2.4,0,1);hitImpact(.18,.8);redT=.7;pop('BEAR HANDED!',W/2,H*.3,'#e8463f',64,1.6);clip('stomp',.8);clip('supS2',.6,.08);haptic([70,40,110])}
   if(type==='waffli'){waffT=10;snd('waffli');for(let i=0;i<6;i++)burst(bear.x+rnd(-80,80)*S,GY-140*S,'#f2b544',3)}
   if(type==='zooka'){const q=ANIMALS.slice().sort(()=>Math.random()-.5);bear.weapon={type:'zooka',ammo:5,next:q.shift(),q};bear.aim=-1} /* user: one of each animal, then a STAMPEDE of all four */
@@ -1597,7 +1597,7 @@ function tap(x,y){
 function mouthPos(){const f=bear.faceS||bear.face||1,P=T2A.blow?todd2Place('blow'):null,k=S*(bear.gs||1);
   return P?{x:bear.x+(P.x0+300*P.k)*k*f,y:GY+4*S+(P.y0+140*P.k)*k}:{x:bear.x+28*S*f,y:GY-128*S}}
 function releaseBubble(w){const m=mouthPos(),f=bear.faceS||bear.face||1;
-  shots.push({kind:'bubble',x:m.x+f*30*S,y:m.y-10*S,vx:f*60*S,vy:-220*S,dmg:3.5,speed:950,rot:0,left:1,cool:0,t0:now});
+  shots.push({kind:'bubble',x:m.x+f*30*S,y:m.y-10*S,vx:f*60*S,vy:-220*S,dmg:5,speed:950,rot:0,left:1,cool:0,t0:now});
   pop('BLOOP!',m.x,m.y-50*S,'#ff7fb8',26,.6);if(--w.ammo<=0)bear.weapon=null}
 function paddleHit(){
   const hp=headPos(), px=bear.x+40*S*bear.face;
@@ -1730,13 +1730,13 @@ function hitGhost(s){
   const dm=s.dmg*(bearT>0?2:1);
   if(ghost.mega&&Math.random()<(s.kind==='fly'?.02:.3)){wafs.push({t:'plain',x:ghost.x+rnd(-20,20)*S,y:ghost.y+ghost.yOff+40*S,vx:rnd(-260,260)*S,vy:rnd(-420,-200)*S,g:820*S,rot:rnd(0,TAU),vr:rnd(-5,5),age:0});if(Math.random()<.5)pop('*BURP*',ghost.x+rnd(-40,40)*S,ghost.y+ghost.yOff-20*S,'#9cffb0',30,.7)} ghost.hp-=dm; lvStats.hits++; ghost.hitT=.35; ghost.squash=.3; score+=dm*25;
   if(bearT>0&&(s.kind!=='fly'||Math.random()<.12)){pop('×2',ghost.x+rnd(40,70)*S,ghost.y+ghost.yOff-30*S,'#e8463f',34,.8);fxPlay('bimp',s.x!=null?s.x:ghost.x,s.y!=null?s.y:ghost.y+ghost.yOff,1.3,rnd(-.5,.5),1);redT=Math.max(redT,.25);hitImpact(.08,.5);clip('stomp',.4);haptic(30)}
-  {const fk={zap:['zap',.9],smash:['flat',.9],bun:['soot',1.3],quill:['quills',1.2],honk:['headache',1.6],bubble:['gum',2.6],beam:['zap',.5],fly:['burn',.35]}[s.kind]||['hit',.7];
+  {const fk={zap:['zap',.9],smash:['flat',.9],bun:['soot',1.3],quill:['quills',1.2],honk:['headache',1.6],bubble:['gum',Math.min(8,Math.max(ghost.fx==='gum'?ghost.fxT:0,0)+3.2)],beam:['zap',.5],fly:['burn',.35]}[s.kind]||['hit',.7];
     /* a firefly only sets him burning when nothing bigger is playing (a toast, a headache...) */
     if(!(s.kind==='fly'&&ghost.fxT>0&&ghost.fx!=='burn'&&ghost.fx!=='hit')){ghost.fx=fk[0];ghost.fxT=fk[1];ghost.fxD=fk[1]}}
   const gy=ghost.y+ghost.yOff;
   {const sx0=s.x!=null?s.x:ghost.x,sy0=s.y!=null?s.y:gy,dx=sx0-ghost.x,dy=sy0-gy,d=Math.hypot(dx,dy)||1,R=60*GK*(ghost.mega?2:1)*S,hx=ghost.x+dx/d*Math.min(d,R),hy=gy+dy/d*Math.min(d,R);
-    const pw={fly:[0,.16,.5],quill:[s.sup?.06:0,s.sup?.3:.08,.7],animal:[.13,.6,1.3],beam:[.025,.12,0],zap:[.09,.4,1.1],smash:[.1,.45,1.2],honk:[.08,.38,1.8],bubble:[.04,.15,.8]}[s.kind]||[Math.min(.08,.03+dm*.015),Math.min(.35,.12+dm*.05),.85+Math.min(.4,dm*.12)];
-    const HFX={pie:'pie',banana:'banana',bun:'bun',quill:'quill',bubble:'gum'};if(HFX[s.kind])fxPlay(HFX[s.kind],hx,hy,ghost.mega?1.6:1,Math.random()*.4-.2,Math.random()<.5?-1:1);else if(s.kind==='fly'){fxPlay('lember',hx,hy,(ghost.mega?1.5:1.05)*rnd(.85,1.2),rnd(0,TAU),1);if(Math.random()<.35)fxPlay('lspark',hx,hy,(ghost.mega?.9:.6)*rnd(.8,1.1),rnd(0,TAU),1)}else if(s.kind==='smash')fxPlay('smash',ghost.x,GY+4*S,1,0,1);else if(s.kind==='animal')fxPlay('zhit',hx,hy,1.8,0,1);else if(s.kind==='beam')fxPlay('bimp',hx,hy,1.25,Math.random()*TAU,1);else fxPlay('spark',hx,hy,pw[2],Math.random()*.6-.3,Math.random()<.5?-1:1);
+    const pw={fly:[0,.16,.5],quill:[s.sup?.06:0,s.sup?.3:.08,.7],animal:[.13,.6,1.3],beam:[.025,.12,0],zap:[.09,.4,1.1],smash:[.1,.45,1.2],honk:[.08,.38,1.8],bubble:[.09,.5,1.4]}[s.kind]||[Math.min(.08,.03+dm*.015),Math.min(.35,.12+dm*.05),.85+Math.min(.4,dm*.12)];
+    const HFX={pie:'pie',banana:'banana',bun:'bun',quill:'quill',bubble:'gum'};if(HFX[s.kind])fxPlay(HFX[s.kind],hx,hy,(ghost.mega?1.6:1)*(s.kind==='bubble'?1.9:1),Math.random()*.4-.2,Math.random()<.5?-1:1);else if(s.kind==='fly'){fxPlay('lember',hx,hy,(ghost.mega?1.5:1.05)*rnd(.85,1.2),rnd(0,TAU),1);if(Math.random()<.35)fxPlay('lspark',hx,hy,(ghost.mega?.9:.6)*rnd(.8,1.1),rnd(0,TAU),1)}else if(s.kind==='smash')fxPlay('smash',ghost.x,GY+4*S,1,0,1);else if(s.kind==='animal')fxPlay('zhit',hx,hy,1.8,0,1);else if(s.kind==='beam')fxPlay('bimp',hx,hy,1.25,Math.random()*TAU,1);else fxPlay('spark',hx,hy,pw[2],Math.random()*.6-.3,Math.random()<.5?-1:1);
     hitImpact(pw[0],pw[1])}
   if(s.kind==='quill'){ghost.quills=Math.min(24,(ghost.quills||0)+(s.sup?12:1));sfx.quillHit()}
   else if(s.kind==='ivy'){ghost.blanket=1.3;ghost.itch=8;ghost.itchRate=superDmg('effective')*.35/8;pop('BLANKETED!',ghost.x,gy-74*GK*S,'#4fbf5a',40);if(!(superBG&&superBG.k==='ivy'))setFx('ivy',2.4);sfx.ivyHit()}
@@ -1745,7 +1745,7 @@ function hitGhost(s){
   else if(s.kind==='smash'){pop(['SMASH!','KA-BLAM!','WHAMMO!','KER-SPLAT!'][Math.floor(Math.random()*4)],ghost.x,gy-80*GK*S,C.red,62,.9);sfx.beansSmash()}
   else if(s.kind==='honk'){pop(['MY EARS!','BWONNNG!','OWWW!'][Math.floor(Math.random()*3)],ghost.x,gy-84*GK*S,'#f2b544',38,1);snd('shoeHit');ghost.notes=1.6}
   else if(s.kind==='beam'){if(Math.random()<.35)pop(['ZZZAP!','HOLY MOLY!','FWOOOM!'][Math.floor(Math.random()*3)],ghost.x+rnd(-30,30)*S,gy-84*GK*S,'#ffd23f',36,.6);if(Math.random()<.4)snd('beamHit',.6)}
-  else if(s.kind==='bubble'){ghost.gumT=2.6;pop('SPLORT!',ghost.x,gy-80*GK*S,'#ff7fb8',46);snd('gumPop');burst(ghost.x,gy,'#ff7fb8',12)}
+  else if(s.kind==='bubble'){ghost.gumT=ghost.fxT;ghost.gumN=(ghost.gumN||0)+1;pop(ghost.gumN>1?'DOUBLE STUCK!':'SPLORT!',ghost.x,gy-80*GK*S,'#ff7fb8',ghost.gumN>1?58:56);snd('gumPop');shake=Math.max(shake,.55);setFx('flash',.08)} /* v63 (user): gum glues him down: no throws, he barely drifts, more bubbles = stuck longer */
   else if(s.kind==='pie'){ghost.splat=2.2;pop('SPLAT!',ghost.x,gy-74*GK*S,'#ff8fb1',46);sfx.pieSplat()}
   else if(s.kind==='banana'){pop('THWACK!',ghost.x,gy-74*GK*S,C.gold,40);sfx.bananaHit()}
   else if(s.kind==='animal'){const q=HITQ[s.animal]||['POW!'];pop(q[Math.floor(Math.random()*q.length)],ghost.x,gy-84*GK*S,C.gold,38,1.2);sfx.ghostHit();if(sfx[s.animal+'Hit'])sfx[s.animal+'Hit']()}
@@ -1895,12 +1895,12 @@ function lmuHeatGlow(){const g=ghost,hot=Math.max(g.heat||0,(g.fx==='lit'&&g.fxT
   gr.addColorStop(0,'rgba(255,150,40,'+a+')');gr.addColorStop(.6,'rgba(255,90,0,'+a*.5+')');gr.addColorStop(1,'rgba(255,60,0,0)');ctx.fillStyle=gr;ctx.beginPath();ctx.arc(x,y,r,0,TAU);ctx.fill();ctx.restore()}
 /* ---------- chapter scenes: after levels 5, 10, 15, 20 and 25 Grumble drops something new, Todd grabs it, learns what it does, and chases him to the next setting ---------- */
 const CHAPTERS={
-  5:{k:'oat',gift:'oat',kind:'New power-up',name:'APPLE JUICE',pose:'eat_oat',snd:'oatEat',desc:"Franky's apple juice! Todd can take twice the bonks now. Each bonk icon gets a yellow ring that soaks up a hit. Booster can toss you more."},
-  10:{k:'shoe',gift:'shoe',kind:'New weapon',name:'SHOE HORN',pose:'h_shoe',snd:'shoeHonk',give:1,desc:"An old boot that's somehow a tuba. HONK it at Grumble for a splitting headache. Booster can toss it to you now."},
-  15:{k:'bearhand',gift:'bearhand',kind:'New power-up',name:'BEAR HANDED',pose:'cheer',snd:'bearHanded',desc:"All of Todd's weapons do DOUBLE damage for 15 seconds, bonks or not. Booster can toss it to you now."},
-  20:{k:'gum',gift:'gum',kind:'New weapon',name:'GARGANTU-GUM',pose:'eat_gum',snd:'gumEat',give:1,desc:"Chew it, then blow a giant bubble that floats up and pops all over Grumble. Booster can toss it to you now."},
-  25:{k:'waffli',gift:'waffli',kind:'New power-up',name:'WAFFLICIOUS',pose:'cheer',snd:'waffli',desc:"For 10 seconds, everything Grumble throws turns into waffles. Grab 'em all! Booster can toss it to you now."},
-  30:{k:'lmu',gift:'lmu',kind:'New weapon',name:'LIGHT-M-UPPER',pose:'f_lmu',snd:'lmuRip',give:1,desc:"A spinning firefly cannon with a backpack full of bugs. Tap and Todd turns on Grumble and lets him have it: one massive blazing blast. Booster can toss it to you now."}};
+  5:{k:'oat',gift:'oat',kind:'New power-up',name:'APPLE JUICE',pose:'eat_oat',snd:'oatEat',desc:"Franky's apple juice!\nRefills and doubles Todd's health."},
+  10:{k:'shoe',gift:'shoe',kind:'New weapon',name:'SHOE HORN',pose:'h_shoe',snd:'shoeHonk',give:1,desc:"An old boot that's somehow a tuba??\nGive Grumble a splitting headache!"},
+  15:{k:'bearhand',gift:'bearhand',kind:'New power-up',name:'BEAR HANDED',pose:'cheer',snd:'bearHanded',desc:"Harness the power of TWO adult bears!\nTodd's attacks do DOUBLE damage."},
+  20:{k:'gum',gift:'gum',kind:'New weapon',name:'GARGANTU-GUM',pose:'eat_gum',snd:'gumEat',give:1,desc:"Ghosts HATE bubble gum!\nSlow down Grumble with each sticky bubble!"},
+  25:{k:'waffli',gift:'waffli',kind:'New power-up',name:'WAFFLICIOUS',pose:'cheer',snd:'waffli',desc:"It's raining waffles!\nAny junk Grumble tosses becomes delicious."},
+  30:{k:'lmu',gift:'lmu',kind:'New weapon',name:'LIGHT-M-UPPER',pose:'f_lmu',snd:'lmuRip',give:1,desc:"A hand-held gatling gun powered by a backpack full of blazing fireflies.\nLIGHT-M-UP!!"}};
 let chap=null; const chapDone={};
 function snd(k,v){return clip(k,v)}
 function chapArt(c){return c.gift==='waffli'?'w_plain':'x_'+c.gift}
@@ -1914,7 +1914,7 @@ function chapterUpdate(dt){const h=chap;if(!h)return;h.t+=dt;
     if(it.y>=GY-52*S){it.y=GY-52*S;it.land=true;it.x=clamp(it.x,120*S,W-120*S)}}
   if(h.ph==='fly'){if(it){const side=bear.x<it.x?-1:1;bear.tx=it.x+side*46*S}
     if(it&&it.land&&Math.abs(bear.x-bear.tx)<10*S){h.ph='use';h.ut=0;h.item=null;bear.face=bear.faceS=bear.x<it.x?1:-1;bear.pose=h.c.pose;snd(h.c.snd)||sfx.power();
-      burst(bear.x,GY-120*S,PW[h.c.k]?PW[h.c.k].color:'#f2b544',14);if(h.c.k==='oat'){bear.oat=MAXH;renderMeter()}
+      burst(bear.x,GY-120*S,PW[h.c.k]?PW[h.c.k].color:'#f2b544',14);if(h.c.k==='oat'){bear.oat=MAXH;bear.hits=0;renderMeter()}
       if(h.c.k==='waffli')for(let i=0;i<8;i++)burst(bear.x+rnd(-120,120)*S,GY-rnd(120,220)*S,'#f2b544',3)}}
   else if(h.ph==='use'){h.ut+=dt;if(h.c.k==='lmu'&&h.ut>LMU.spin&&h.ut<2.3){h.acc=(h.acc||0)+dt;while(h.acc>1/LMU.rate){h.acc-=1/LMU.rate;lmuShot(null,todd2Key(bear,0))}}if(h.ut>2.4){h.ph='card';showChapCard()}}
   else if(h.ph==='cheer'){h.ct+=dt;
@@ -1927,7 +1927,7 @@ function chapRows(A){const short=document.body.classList.contains('short'),T=sho
   cd.style.setProperty('--m1',(T-B[0]-p.t*h)+'px');cd.style.setProperty('--m2',(T-B[1]-p.b*h)+'px');cd.style.setProperty('--m3',(T-B[2])+'px');cd.style.setProperty('--m4',(T-B[3])+'px')}
 function showChapCard(){const c=chap.c,A=SPR[chapArt(c)];$('chKind').textContent=c.kind;$('chImg').src=A?A.img.src:'';chapRows(A);
   const n=$('chName');n.textContent='';for(const ch of c.name){const sp=document.createElement('span');sp.textContent=ch===' '?'\u00a0':ch;n.append(sp)}
-  $('chDesc').textContent=c.desc;$('chapCard').hidden=false;n.style.fontSize='';{const cw=n.parentElement.clientWidth-24;if(n.scrollWidth>cw)n.style.fontSize=(parseFloat(getComputedStyle(n).fontSize)*cw/n.scrollWidth)+'px'}sfx.power()}
+  $('chDesc').textContent=c.desc.replace(/\\n/g,'\n');$('chapCard').hidden=false;n.style.fontSize='';{const cw=n.parentElement.clientWidth-24;if(n.scrollWidth>cw)n.style.fontSize=(parseFloat(getComputedStyle(n).fontSize)*cw/n.scrollWidth)+'px'}sfx.power()}
 function chapGo(){if(!chap||chap.ph!=='card')return;$('chapCard').hidden=true;chap.ph='cheer';chap.ct=0;bear.pose='cheer';music('win');snd('cheer')}
 function finishChapter(){const h=chap;if(!h)return;if(h.c.k==='oat'&&!bear.oat){bear.oat=MAXH}
   chapDone[h.lv]=true;chap=null;$('chapCard').hidden=true;bear.pose=null;state='clear';
@@ -2111,7 +2111,7 @@ function update(dt){
 
   // ghost
   ghost.t+=dt*(ghostStunned()?.12:slowT>0?.4:1); ghost.throwA=Math.max(0,(ghost.throwA||0)-dt); ghost.fxT=Math.max(0,(ghost.fxT||0)-dt); ghost.offT=Math.max(0,(ghost.offT||0)-dt); ghost.squash=Math.max(0,ghost.squash-dt); ghost.hitT=Math.max(0,ghost.hitT-dt); ghost.splat=Math.max(0,ghost.splat-dt); ghost.notes=Math.max(0,(ghost.notes||0)-dt);
-  if(ghost.gumT>0){ghost.gumT-=dt;if(ghost.gumT<=0&&!ghost.ko){pop('SCHLORP!',ghost.x,ghost.y+ghost.yOff-80*GK*S,'#ff7fb8',34,.8);burst(ghost.x,ghost.y+ghost.yOff,'#ff7fb8',10);snd('gumPeel')}}
+  if(ghost.gumT>0){ghost.gumT-=dt;if(ghost.gumT<=0)ghost.gumN=0;if(ghost.gumT<=0&&!ghost.ko){pop('SCHLORP!',ghost.x,ghost.y+ghost.yOff-80*GK*S,'#ff7fb8',34,.8);burst(ghost.x,ghost.y+ghost.yOff,'#ff7fb8',10);snd('gumPeel')}}
   if(ghost.hold>0){ghost.hold-=dt;ghost.yOff=-280*S;if(ghost.hold<=0)$('hud').classList.remove('intro')}
   else if(state!=='bossintro'&&state!=='cave')ghost.yOff+=(0-ghost.yOff)*Math.min(1,dt*2.5);
   const gtx=W/2+Math.sin(ghost.t*(.55+Math.min(.9,(level-1)*.03)))*W*.27+Math.sin(ghost.t*1.9+1)*W*.05+(level>=3?(bear.x-W/2)*.15:0);
@@ -3698,6 +3698,7 @@ function grumFrame(g,key){const pr=(t,d)=>Math.max(0,Math.min(5,Math.floor((1-Ma
     case 'laugh':return Math.floor(now*11)%6; case 'flee':return Math.floor(now*12)%6; case 'descend':case 'beam':return Math.floor(now*9)%6;
     case 'throw':return g.throwA>0?3+Math.min(2,Math.floor((1-g.throwA/(g.throwD||.4))*3)):Math.max(0,Math.min(2,Math.floor((1-g.throwT/.3)*3)));
     case 'pie':return pr(g.splat,2.2);
+    case 'gum':return g.fxT>1.2?0:Math.min(5,1+Math.floor((1-g.fxT/1.2)*5));
     case 'blanket':return Math.floor(now*7)%3;
     case 'blanket_off':return 3+Math.min(2,Math.floor((1-g.offT/.55)*3));
     case 'itch':case 'headache':return Math.floor(now*9)%6;
