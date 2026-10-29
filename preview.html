@@ -86,7 +86,8 @@ canvas{display:block;width:100%;height:100%;touch-action:none;cursor:grab}
 .bar i{display:block;height:100%;width:100%;background:var(--green);border-right:2px solid var(--ink);box-sizing:border-box;transition:width .2s}
 .meter{display:flex;gap:6px;justify-content:flex-end;align-items:center;padding:3px 4px}
 .meter svg{overflow:visible;width:20px;height:20px;fill:var(--paper);stroke:var(--ink);stroke-width:1.8;stroke-linejoin:round;transition:transform .2s}
-.meter svg.armor{filter:drop-shadow(2px 0 0 #ffe600) drop-shadow(-2px 0 0 #ffe600) drop-shadow(0 2px 0 #ffe600) drop-shadow(0 -2px 0 #ffe600)}
+.meter svg .ring{display:none;fill:#ffe600;stroke:#ffe600;stroke-width:7;stroke-linejoin:round}
+.meter svg.armor .ring{display:inline}
 .meter svg.armor.blink{animation:armorBlink .6s steps(1) 1}
 .meter svg.armor.gain{animation:armorGain .45s ease-in-out 3}
 @keyframes armorGain{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.2;transform:scale(1.35)}}
@@ -675,8 +676,10 @@ const bestKey=m=>m==='daily'?'bonkd-daily-'+dayNum():'bonkd-best';
 
 function refreshMenuBest(){const b=store(bestKey('free')),wf=store('bonkd-waffles');$('menuBest').textContent=(wf?wf.toLocaleString()+' waffles · ':'')+'Best '+b.toLocaleString();$('menuBest').hidden=true} /* user: no waffle total or best score on the main menu */
 refreshMenuBest();
-const lumpSVG='<svg class="lump" viewBox="0 0 24 24"><path d="M7.5 21.5C6.5 13 8 3 12 3s5.5 10 4.5 18.5z"/></svg>';
-const starSVG='<svg class="star" viewBox="0 0 24 24"><path d="M12 2.2l2.9 6.5 7.1.7-5.4 4.7 1.6 7-6.2-3.8-6.2 3.8 1.6-7L2 9.4l7.1-.7z"/></svg>';
+const LUMPD='M7.5 21.5C6.5 13 8 3 12 3s5.5 10 4.5 18.5z',STARD='M12 2.2l2.9 6.5 7.1.7-5.4 4.7 1.6 7-6.2-3.8-6.2 3.8 1.6-7L2 9.4l7.1-.7z';
+/* v63: the juice ring is ONE clean yellow band drawn behind each icon (a fat stroke of the same shape), not four offset shadows */
+const lumpSVG='<svg class="lump" viewBox="0 0 24 24"><path class="ring" d="'+LUMPD+'"/><path d="'+LUMPD+'"/></svg>';
+const starSVG='<svg class="star" viewBox="0 0 24 24"><path class="ring" d="'+STARD+'"/><path d="'+STARD+'"/></svg>';
 $('meter').innerHTML=lumpSVG+starSVG+starSVG+starSVG;
 function renderMeter(){const n=$('meter').children.length;[...$('meter').children].forEach((s,i)=>{s.classList.toggle('on',i<bear.hits);if(!s.classList.contains('blink'))s.classList.toggle('armor',n-1-i<(bear.oat|0))})}
 /* v63: new juice rings pulse a few times so the player sees what the juice did */
