@@ -1473,7 +1473,7 @@ let TEST=false;try{TEST=TESTER&&/[?&]test\b/.test(location.search)}catch(e){}
 let JUMP=null;try{const m=location.search.match(/[?&]lv=(\w+)/);if(m&&TESTER)JUMP=m[1].toLowerCase()}catch(e){}if(JUMP)TEST=true;
 /* ?fx: a test run where Booster brings every super and signature move in turn, every few seconds */
 let FXTEST=false;try{FXTEST=TESTER&&/[?&]fx\b/.test(location.search)}catch(e){}if(FXTEST)TEST=true;
-/* &w=gum,porcu,banana (testers): Booster tosses exactly these, in this order, then stops coming; a missed one comes back next */
+/* &w=gum,porcu,banana (testers): Booster tosses exactly these, in this order, over and over (user, v63) */
 let WSEQ=null;try{const m=location.search.match(/[?&]w=([\w,]+)/);if(m&&TESTER){WSEQ=m[1].split(',').filter(k=>PW[k]);if(!WSEQ.length)WSEQ=null}}catch(e){}if(WSEQ)TEST=true;
 /* ---------- anonymous play stats: queued here, sent in batches by the web build (no names, no personal info) ---------- */
 const EVQ=[],SESS=(window.crypto&&crypto.randomUUID)?crypto.randomUUID():'00000000-0000-4000-8000-'+String(Date.now()).padStart(12,'0').slice(-12);
@@ -1485,7 +1485,7 @@ setTimeout(()=>{let r=0;try{r=+localStorage.getItem('bonkd-runs')||0}catch(e){}t
 document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden'&&(state==='play'||state==='ko'||state==='story'||state==='levelup'))track('left',{k:state,n:lvlTime})});
 let testI=0;
 const HELP={snail:1,oat:1,beam:1,shoe:1,gum:1,bearhand:1,waffli:1,pie:1,banana:1,jello:1,bun:1,zooka:1,mitt:1,magnet:1,paddle:1,ivy:1,porcu:1,beans:1,lmu:1};
-function pickPower(){if(WSEQ)return WSEQ[Math.min(testI++,WSEQ.length-1)];if(FXTEST)return ['ivy','bearhand','zooka','shoe','porcu','beam','beans','lmu'][testI++%8];if(TEST&&!JUMP)return ['ivy','porcu','beans'][testI++%3];const cur=bear.jello?'jello':bear.weapon&&bear.weapon.type, armed=!!cur;if(bear.hits>=2&&rng()<.45)return 'kit';const own=wallet.owned();const pool=Object.keys(PW).filter(k=>k!==cur&&(!SUPER[k]||own.has(k))&&(armed||HELP[k]||(k==='bucket'&&level>=3))&&(k!=='kit'||bear.hits>0)&&(k!=='bucket'||!bear.helmet)&&(k!=='snail'||slowT<=0)&&!(PW[k].unlock&&level<=PW[k].unlock&&!isCleared())&&(k!=='bearhand'||bearT<=0)&&(k!=='beam'||!beamer)&&(k!=='waffli'||waffT<=0)&&(k!=='oat'||(bear.oat|0)<MAXH));const wt=k=>PW[k].w*(k==='bucket'&&level>=3?1.8:1);const tot=pool.reduce((a,k)=>a+wt(k),0);let r=rng()*tot;for(const k of pool){r-=wt(k);if(r<=0)return k}return pool[0]}
+function pickPower(){if(WSEQ)return WSEQ[testI++%WSEQ.length];if(FXTEST)return ['ivy','bearhand','zooka','shoe','porcu','beam','beans','lmu'][testI++%8];if(TEST&&!JUMP)return ['ivy','porcu','beans'][testI++%3];const cur=bear.jello?'jello':bear.weapon&&bear.weapon.type, armed=!!cur;if(bear.hits>=2&&rng()<.45)return 'kit';const own=wallet.owned();const pool=Object.keys(PW).filter(k=>k!==cur&&(!SUPER[k]||own.has(k))&&(armed||HELP[k]||(k==='bucket'&&level>=3))&&(k!=='kit'||bear.hits>0)&&(k!=='bucket'||!bear.helmet)&&(k!=='snail'||slowT<=0)&&!(PW[k].unlock&&level<=PW[k].unlock&&!isCleared())&&(k!=='bearhand'||bearT<=0)&&(k!=='beam'||!beamer)&&(k!=='waffli'||waffT<=0)&&(k!=='oat'||(bear.oat|0)<MAXH));const wt=k=>PW[k].w*(k==='bucket'&&level>=3?1.8:1);const tot=pool.reduce((a,k)=>a+wt(k),0);let r=rng()*tot;for(const k of pool){r-=wt(k);if(r<=0)return k}return pool[0]}
 function spawnAngel(){const side=rng()<.5?-1:1;angel={side,x:side<0?-80*S:W+80*S,y:H*.46,phase:'in',t:0,fs:-side};sfx.boosterIn()}
 function tossGift(){
   const type=pickPower(), ax=angel.x, ay=angel.y+10*S, tx=rnd(.15,.85)*W;
@@ -2148,7 +2148,7 @@ function update(dt){
     const armed=!!bear.weapon||!!bear.jello, busy=!!angel||gifts.length>0||ghost.yOff<-30*S||!!superBG;
     if(!armed&&!busy)angelT=Math.min(angelT,1.6+rng()*1.4);
     if(!busy)angelT-=dt*(armed?.35:1)*(bossMode?1.8:1);
-    if(angelT<=0&&!busy&&!(WSEQ&&testI>=WSEQ.length)){spawnAngel();angelT=(TEST&&!JUMP)||WSEQ?4:12+rng()*4}
+    if(angelT<=0&&!busy){spawnAngel();angelT=(TEST&&!JUMP)||WSEQ?4:12+rng()*4}
   }
   /* the clear card follows soon after the last waffle is grabbed (user: the wait was too long); a special waffle's name only needs its first 1.4 s */
   if(state==='levelup'){levelT+=dt;if(levelT>2&&!wafs.length&&(!showCur||showCur.t>1.6)&&!showQ.length){clrT+=dt;if(clrT>.45)showClear()}else clrT=0}
@@ -2186,7 +2186,7 @@ function update(dt){
       if(g.y>=GY-34*S){g.y=GY-34*S;g.land=true;g.lt=0;g.rot=0;burst(g.x,GY-6*S,'#ffffff',5)}
     }
     if(state==='play'&&!(superBG&&!superBG.ended)&&(giftTouch(g)||Math.hypot(g.x-hp.x,g.y-hp.y)<62*S||Math.hypot(g.x-bear.x,g.y-by)<58*S)){g.gone=true;track('gift',{k:g.type});activate(g.type,g.x,g.y)}
-    else if(g.land&&g.lt>1.5){g.gone=true;track('gift_miss',{k:g.type});if(WSEQ&&testI>0)WSEQ.splice(testI,0,g.type);pop('MISSED!',g.x,GY-50*S,C.white,22,.7);burst(g.x,GY-20*S,'#ffffff',8)}
+    else if(g.land&&g.lt>1.5){g.gone=true;track('gift_miss',{k:g.type});pop('MISSED!',g.x,GY-50*S,C.white,22,.7);burst(g.x,GY-20*S,'#ffffff',8)}
   }
   gifts=gifts.filter(g=>!g.gone);
   for(const w of wafs){
