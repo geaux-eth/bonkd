@@ -3,6 +3,7 @@
 ## Official description (user, v64)
 - The game's description everywhere is exactly: "Get waffles. Don't get BONKD!" (meta description, share cards, manifest, README, store listings, arcade row). Remind the user of it whenever a description is needed.
 - Link previews: og/twitter tags in build_web.py (title "BONKD!"), image og.jpg (1200x630) in the repo root, made by scratchpad banners/og_still7.py from the arcade label art (same logo, blue and waffles, hand-placed, user-approved). Never change that art without the user. Apps cache previews; add ?v=N to the shared link to refresh.
+- Deploy layout (v64): the game lives at play.html (copy of the built bonkd-web/index.html). index.html is a tiny share page made by scratchpad share_page.py (share tags + location.replace('play.html'+search+hash)), because Discord and iMessage give up on the 50 MB game before reading its tags. Never put the game back at index.html. preview.html stays the full test game. Site name and title on the card are both "BONKD!".
 
 ## Weapon checklist: every weapon, existing or new, needs ALL of these
 
