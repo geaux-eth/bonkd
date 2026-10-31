@@ -327,6 +327,29 @@ body.keys .act::after{content:'SPACE';position:absolute;bottom:-18px;left:50%;tr
 .bd-toast small{display:block;font-family:var(--display);font-size:12px;letter-spacing:.06em;color:var(--red)}
 .bd-toast b{display:block;font-family:var(--display);font-weight:400;font-size:22px;letter-spacing:.03em;line-height:1}
 .bd-toast.out{opacity:0;transition:opacity .4s}
+/* v67 progress: the level map on the Progress page and the replay pick */
+.pg{display:grid;gap:10px}
+.pg-row{display:grid;gap:5px}
+.pg-a{margin:0;font-family:var(--display);font-size:15px;letter-spacing:.03em;display:flex;align-items:center;gap:6px}
+.pg-a img{width:26px;height:26px;object-fit:contain}
+.pg-a em{font-style:normal;font-size:11px;letter-spacing:.05em;padding:3px 7px 1px;border:2px solid var(--ink);border-radius:8px;background:var(--gold);transform:rotate(-4deg)}
+.pg-tiles{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px}
+.pg-t{min-width:0;border:2.5px solid var(--ink);border-radius:12px;background:var(--paper);padding:6px 3px 4px;display:grid;justify-items:center;gap:2px;font-family:var(--display);color:var(--ink);cursor:pointer;box-shadow:2px 2px 0 var(--ink)}
+.pg-t b{font-weight:400;font-size:20px;line-height:1}
+.pg-t i{font-style:normal;font-family:var(--body);font-weight:800;font-size:10px;line-height:1.1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+.pg-t s{text-decoration:none;font-size:10.5px;letter-spacing:.03em;line-height:1}
+.pg-t.done{background:var(--cream)}
+.pg-t.clean{background:var(--gold)}
+.pg-t.locked{background:#ececec;box-shadow:none;cursor:default;color:#9a9a9a;border-color:#b9b9b9}
+.pg-t.sel{transform:translate(2px,2px);box-shadow:0 0 0 var(--ink);outline:3px dashed var(--red);outline-offset:2px}
+.pg-pick{display:grid;justify-items:center;gap:5px;text-align:center;border:2.5px solid var(--ink);border-radius:14px;background:var(--cream);padding:10px 12px 12px}
+.pg-pick p{margin:0}
+.pg-pn{font-family:var(--display);font-size:18px;letter-spacing:.03em}
+.pg-pi{font-weight:800;font-size:14px}
+.pg-pnote{font-size:12px;font-weight:600;opacity:.8}
+.pg-h{margin:10px 0 0;text-align:center;font-family:var(--display);font-weight:400;font-size:22px;letter-spacing:.04em;border-top:2px solid var(--ink);padding-top:10px}
+@media (max-width:520px){.pg-t b{font-size:17px}.pg-t i{display:none}}
+
 @keyframes bdIn{from{transform:translateX(-50%) scale(.6);opacity:0}to{transform:translateX(-50%) scale(1);opacity:1}}
 
 .xclose:active{transform:translate(3px,3px);box-shadow:0 0 0 var(--ink)}
@@ -466,7 +489,7 @@ body.ready #boot{opacity:0;pointer-events:none}
       <button class="btn red go" id="playBtn"><img class="wicon" id="btnWaf" alt="">Play</button>
       <p class="sub outline" id="menuBest" hidden></p>
       <p class="howto" id="menuHow"></p>
-      <div class="links menu-links"><button class="link" id="boardBtn">Leaderboard</button><button class="link" id="storeBtn">Waffle Store</button><button class="link" id="badgeBtn">Badges</button></div>
+      <div class="links menu-links"><button class="link" id="boardBtn">Leaderboard</button><button class="link" id="storeBtn">Waffle Store</button><button class="link" id="badgeBtn">Progress</button></div>
     </div>
   </div>
   <button class="mute" id="muteBtn" aria-label="Mute sound" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 9h4l5-4v14l-5-4H3z" fill="#ffd23f" stroke="#161616" stroke-width="1.8" stroke-linejoin="round"/><path class="w" d="M15.5 8.5a5 5 0 0 1 0 7M18 6a8.5 8.5 0 0 1 0 12" fill="none" stroke="#161616" stroke-width="1.8" stroke-linecap="round"/><path class="x" d="M15.5 9.5l5 5m0-5l-5 5" fill="none" stroke="#df3a4e" stroke-width="2.4" stroke-linecap="round"/></svg></button>
@@ -491,7 +514,8 @@ body.ready #boot{opacity:0;pointer-events:none}
       <p class="pre" id="clrPre">Level 1</p>
       <h2 class="logo" aria-label="Clear!"><span>C</span><span>L</span><span>E</span><span>A</span><span>R</span><span>!</span></h2>
       <dl class="stats" id="clrStats"></dl>
-      <div class="btns"><button class="btn red" id="nextBtn">Next level</button></div>
+      <div class="btns" id="nextBtns"><button class="btn red" id="nextBtn">Next level</button></div>
+      <div class="btns" id="rpBtns" hidden><button class="btn red" id="rpAgain">Replay again</button><button class="btn plain" id="rpProg">Progress</button></div>
       <button class="link" id="clrStore" type="button">Waffle Store</button>
       <a class="link" id="shareClear" href="#" target="_blank" rel="noopener" hidden>Brag about it on X</a>
     </div>
@@ -545,13 +569,26 @@ body.ready #boot{opacity:0;pointer-events:none}
 
   <div class="overlay dim" id="badgePage" hidden>
     <div class="card wide bd-card">
-      <button class="xclose" id="bdX" type="button" aria-label="Close badges"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" stroke="#161616" stroke-width="3.2" stroke-linecap="round"/></svg></button>
-      <h2 class="logo st-logo" id="bdTitle">BADGES</h2>
+      <button class="xclose" id="bdX" type="button" aria-label="Close progress"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" stroke="#161616" stroke-width="3.2" stroke-linecap="round"/></svg></button>
+      <h2 class="logo st-logo" id="bdTitle">PROGRESS</h2>
+      <p class="bd-count" id="pgCount"></p>
+      <div class="pg-pick" id="pgPick" hidden><p class="pg-pn" id="pgName"></p><p class="pg-pi" id="pgInfo"></p><button class="btn red" id="pgGo" type="button">Replay</button><p class="pg-pnote" id="pgNote"></p></div>
+      <div class="pg" id="pgMap"></div>
+      <h3 class="pg-h">BADGES</h3>
       <p class="bd-count" id="bdCount"></p>
       <div class="bd-grid" id="bdGrid"></div>
     </div>
   </div>
-  <div class="bd-toast" id="badgeToast" hidden><img id="btImg" alt=""><div><small>BADGE UNLOCKED!</small><b id="btName"></b></div></div>
+  <div class="overlay dim" id="rpOver" hidden>
+    <div class="card">
+      <p class="pre" id="rpPre">Level 1</p>
+      <h2 class="logo red" aria-label="Bonkd!"><span>B</span><span>O</span><span>N</span><span>K</span><span>D</span><span>!</span></h2>
+      <p class="note" id="rpNote"></p>
+      <div class="btns"><button class="btn red" id="rpTry">Try again</button><button class="btn plain" id="rpProg2">Progress</button></div>
+      <button class="link" id="rpMenu" type="button">Menu</button>
+    </div>
+  </div>
+  <div class="bd-toast" id="badgeToast" hidden><img id="btImg" alt=""><div><small id="btSmall">BADGE UNLOCKED!</small><b id="btName"></b></div></div>
   <div class="overlay dim" id="storePage" hidden>
     <div class="card wide store">
       <button class="xclose" id="stX" type="button" aria-label="Close the store"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" stroke="#161616" stroke-width="3.2" stroke-linecap="round"/></svg></button>
@@ -833,7 +870,7 @@ let headURL='';
 function toddHead(){if(headURL||!SPR.todd_head)return headURL;headURL=SPR.todd_head.img.src;
   for(const id of['livesImg','contImg'])$(id).src=headURL;return headURL}
 function renderLives(){toddHead();const n=livesLeft();if(n!==shownLives){shownLives=n;$('livesN').textContent=n}}
-function afterKO(){const canBuy=wallet.lifeToday&&wallet.lifeToday()<LIFE_DAY_MAX&&wallet.bal()>=LIFE_PRICE;if(livesLeft()>0||canBuy)showCont();else showOver()}
+function afterKO(){if(REPLAY){replayKO();return}const canBuy=wallet.lifeToday&&wallet.lifeToday()<LIFE_DAY_MAX&&wallet.bal()>=LIFE_PRICE;if(livesLeft()>0||canBuy)showCont();else showOver()}
 function showCont(){state='cont';$('contMsg').hidden=true;$('cont').hidden=false;renderCont();track('cont_offer',{n:livesLeft()})}
 function renderCont(){toddHead();const n=livesLeft(),left=LIFE_DAY_MAX-(wallet.lifeToday?wallet.lifeToday():0),b=$('contBuy');
   $('contN').textContent=n;$('contBtn').hidden=n<1;
@@ -861,7 +898,7 @@ async function buyLife(){const r=await wallet.buyLife(),m=$('contMsg');
   m.hidden=false;shownLives=-1;renderLives();renderCont()}
 /* waffle wallet: local by default; the website version swaps in the shared one */
 let wallet={
-  bal(){return Math.max(0,store('bonkd-waffles')-store('bonkd-spent'))},
+  bal(){return Math.max(0,store('bonkd-waffles')+store('bonkd-bonus')-store('bonkd-spent'))},
   owned(){try{return new Set(JSON.parse(localStorage.getItem('bonkd-owned')||'[]'))}catch(e){return new Set()}},
   lives(){return store('bonkd-lives')},lifeToday(){return lifeBuys().length},lifeNext(){const b=lifeBuys();return b.length?Math.min(...b)+864e5:0},
   async buyLife(){const b=lifeBuys();if(b.length>=LIFE_DAY_MAX)return{ok:false,reason:'limit'};if(this.bal()<LIFE_PRICE)return{ok:false,reason:'not_enough'};store('bonkd-spent',store('bonkd-spent')+LIFE_PRICE);store('bonkd-lives',store('bonkd-lives')+1);b.push(Date.now());try{localStorage.setItem('bonkd-lifebuys',JSON.stringify(b))}catch(e){};return{ok:true}},
@@ -1253,7 +1290,7 @@ addEventListener('keydown',e=>{
   if(state==='bossintro'&&!e.repeat&&e.key==='Escape'){e.preventDefault();finishBossIntro();return}
   if(state==='chapter'&&!e.repeat){if(e.key==='Enter'||e.key===' '){e.preventDefault();if(chap&&chap.ph==='card')chapGo();return}}
   if(e.isTrusted&&['ArrowLeft','ArrowRight','a','d','A','D',' '].includes(e.key))setInput('keys');
-  if(e.key==='p'||e.key==='P'||e.key==='Escape'){if(!$('cardView').hidden){$('cardView').hidden=true;return}if(!$('stNo').hidden){$('stNo').hidden=true;return}if(!$('storePage').hidden){$('storePage').hidden=true;return}if(!$('profile').hidden){$('profile').hidden=true;return}if(!$('profPage').hidden){$('profPage').hidden=true;return}if(!$('settings').hidden){$('settings').hidden=true;return}if(!$('boardPanel').hidden){$('boardPanel').hidden=true;return}setPause(!paused);return}
+  if(e.key==='p'||e.key==='P'||e.key==='Escape'){if(!$('cardView').hidden){$('cardView').hidden=true;return}if(!$('badgePage').hidden){$('badgePage').hidden=true;return}if(!$('stNo').hidden){$('stNo').hidden=true;return}if(!$('storePage').hidden){$('storePage').hidden=true;return}if(!$('profile').hidden){$('profile').hidden=true;return}if(!$('profPage').hidden){$('profPage').hidden=true;return}if(!$('settings').hidden){$('settings').hidden=true;return}if(!$('boardPanel').hidden){$('boardPanel').hidden=true;return}setPause(!paused);return}
   if(e.key===' '||e.key==='Enter'){e.preventDefault();if(paused)return;if(state==='menu'||state==='over')start(mode);else if(state==='clear')nextLevel();else if(state==='play'&&!e.repeat)act()}
 });
 addEventListener('keyup',e=>{keys[e.key]=false});
@@ -1264,7 +1301,7 @@ try{if(navigator.audioSession)navigator.audioSession.type='playback'}catch(e){}
 $('againBtn').onclick=()=>start(mode);
 $('olClose').onclick=hideOut;$('olBuy').onclick=buyLifeOut;$('olPlay').onclick=()=>{hideOut();start(mode||'free')};
 $('contBtn').onclick=useLife;$('contEnd').onclick=()=>{if(state==='cont'){track('cont_end',{n:livesLeft()});showOver()}};$('contBuy').onclick=buyLife;
-function goMenu(){if(state!=='menu')ntScore();$('lvlCard').hidden=true;$('areaCard').hidden=true;clearTimeout(arTimer);music('menu');state='menu';paused=false;chap=null;bossMode=false;bossI=null;drips=[];['over','cont','pause','clear','chapCard'].forEach(k=>$(k).hidden=true);$('hud').hidden=true;$('menu').hidden=false;resetBoard();Object.assign(bear,{hits:0,ko:false,koT:0,hitT:0,helmet:0,weapon:null,jello:null});level=1;bgKey='';refreshMenuBest();if(AC&&AC.state==='suspended')AC.resume()}
+function goMenu(){REPLAY=0;$('rpOver').hidden=true;if(state!=='menu')ntScore();$('lvlCard').hidden=true;$('areaCard').hidden=true;clearTimeout(arTimer);music('menu');state='menu';paused=false;chap=null;bossMode=false;bossI=null;drips=[];['over','cont','pause','clear','chapCard'].forEach(k=>$(k).hidden=true);$('hud').hidden=true;$('menu').hidden=false;resetBoard();Object.assign(bear,{hits:0,ko:false,koT:0,hitT:0,helmet:0,weapon:null,jello:null});level=1;bgKey='';refreshMenuBest();if(AC&&AC.state==='suspended')AC.resume()}
 $('menuBtn').onclick=goMenu;
 function setPause(v){if(v&&!(state==='play'||state==='levelup'))return;paused=v;if(v){$('pauseLvl').textContent=bossMode?'Boss':'Level '+level;$('pauseName').textContent=sceneName()+(areaName()?', '+areaName():'')}$('pause').hidden=!v;try{if(AC)v?AC.suspend():AC.resume()}catch(e){}}
 $('pauseBtn').onclick=()=>setPause(true);
@@ -1297,7 +1334,7 @@ function haptic(pattern){if(!VIB)return;try{if(navigator.vibrate)navigator.vibra
   if(IN_FRAME)try{window.parent.postMessage({type:'bonkd:haptic',pattern},'*')}catch(e){}}
 applyAudioPrefs();
 $('resumeBtn').onclick=()=>setPause(false);
-$('restartBtn').onclick=()=>{setPause(false);start(mode)};
+$('restartBtn').onclick=()=>{setPause(false);start(mode,REPLAY)};
 $('quitBtn').onclick=goMenu;
 $('nextBtn').onclick=()=>nextLevel();
 $('clrStore').onclick=async()=>{const b=$('clrStore');b.disabled=true;try{await bankLevel()}catch(e){}b.disabled=false;openStore()};
@@ -1308,18 +1345,19 @@ function resetBoard(){strike=null;zaps=[];limps=[];showQ=[];showCur=null;items=[
 function setGhost(){lvTop=null;ghost.mega=false;ghost.roarT=0;megaK=1;$('bossName').textContent='GRUMBLE';ghost.pose=null;ghost.fxT=0;ghost.offT=0;ghost.throwA=0;ghost.hold=0;$("hud").classList.remove("intro");ghost.blanket=0;ghost.itch=0;ghost.quills=0;ghost.max=grumHP(level);ghost.hp=ghost.max;ghost.ko=false;ghost.koT=0;ghost.yOff=-280*S;ghost.splat=0;ghost.throwT=1.6;ghost.say=null;ghost.sayT=2.5;ghost.kdT=-1;ghost.kd=0;strike=null;zapT=6;lvStats={hits:0,bonks:0,waffles:0};updateHp()}
 function updateHp(){const el=$('hp');el.style.width=Math.max(0,ghost.hp/ghost.max*100)+'%';el.style.background=ghost.hp/ghost.max<.35?'#df3a4e':'#8ee26b';$('lvl').textContent=bossMode?'BOSS':'LV '+level}
 
-function start(m){
-  audio();
+function start(m,rp){
+  audio();REPLAY=rp|0;
   if(livesLeft()<=0){showOutOfLives();return}
   ntScored=false;
   mode=m; rng=m==='daily'?mulberry(dayNum()*9973+7):Math.random;
   resetBoard(); chap=null; lostItem=null; bossMode=false; bossDone=false; bossPhase=1; bossI=null; drips=[]; for(const k in chapDone)delete chapDone[k]; if(isCleared())for(const k in CHAPTERS)chapDone[k]=true; bearT=0; waffT=0; beamer=null;  shownLives=-1; t=0; score=0; shownScore=-1; level=1; lvlTime=0; angelT=2.5; bgKey=''; paused=false; runWaffles=0; runCounts={}; bankedCounts={}; bankedW=0; updateWaf();
   Object.assign(bear,{drinkT:0,aimT:0,oat:isCleared()?MAXH:0,pose:null,x:W/2,tx:W/2,hits:0,hitT:0,inv:0,ko:false,koT:0,helmet:0,zap:0,weapon:null,jello:null,swing:0,face:1,faceS:1,gs:1}); fx=null; runTop=null; lvTop=null;
   setGhost(); ghost.x=W/2;
-  ['menu','over','cont','pause','clear','chapCard','boardPanel','settings'].forEach(k=>$(k).hidden=true); renderMeter();
+  ['menu','over','cont','pause','clear','chapCard','boardPanel','settings','rpOver','badgePage'].forEach(k=>$(k).hidden=true); renderMeter();
   const run=++runId; store('bonkd-runs',store('bonkd-runs')+1);
   track('run_start',{lv:1,n:store('bonkd-runs')});
   if(JUMP){jumpTo(JUMP);return}
+  if(REPLAY){replayInto(REPLAY);return}
   beginStory();
 }
 function jumpTo(j){
@@ -1823,6 +1861,7 @@ function showClear(){
   for(const [k,v] of rows){const dt=document.createElement('dt'),dd=document.createElement('dd');dt.textContent=k;dd.textContent=v;dl.append(dt,dd)}
   $('clrPre').textContent=bossMode?'Boss':'Level '+level;
   if(lvTop&&lvTop.v>=500){$('shareClear').href=xURL('Grumble just poofed into a '+tc(lvTop.name)+' for me in Bonkd! 🧇 Level '+level+' cleared. Don\'t get BONKD!');$('shareClear').hidden=false}else $('shareClear').hidden=true;
+  $('nextBtns').hidden=!!REPLAY;$('rpBtns').hidden=!REPLAY;
   $('clear').hidden=false;
   if(typeof window.onLevelClear==='function')window.onLevelClear(level);
 }
@@ -2074,7 +2113,7 @@ function drawBossFX(){const b=bossI;
     if(d.t>d.warn){ctx.save();ctx.translate(d.x,d.y);ctx.scale(S,S);for(const [lw,c] of[[10,'#ffffff'],[5,INK]]){ctx.beginPath();ctx.moveTo(0,-26);ctx.bezierCurveTo(10,-8,15,2,15,9);ctx.arc(0,9,15,0,Math.PI);ctx.bezierCurveTo(-15,2,-10,-8,0,-26);ctx.lineWidth=lw;ctx.strokeStyle=c;ctx.lineJoin='round';ctx.stroke()}
       ctx.beginPath();ctx.moveTo(0,-26);ctx.bezierCurveTo(10,-8,15,2,15,9);ctx.arc(0,9,15,0,Math.PI);ctx.bezierCurveTo(-15,2,-10,-8,0,-26);ctx.fillStyle='#e8a915';ctx.fill();ctx.fillStyle='#fff3c4';ctx.beginPath();ctx.ellipse(-5,4,3.5,5,-.3,0,TAU);ctx.fill();ctx.restore()}}}
 function nextLevel(){
-  if(state!=='clear')return;
+  if(state!=='clear'||REPLAY)return;
   if(CHAPTERS[level]&&!chapDone[level]){startChapter();return}
   if(bossMode){bossMode=false;bossDone=true;$('clear').hidden=true;beginEnding();return}
   if(level===LAST_LV&&!bossDone){startCaveRun();return}
@@ -2485,7 +2524,7 @@ $('stClose').onclick=$('stX').onclick=()=>{$('storePage').hidden=true};
    streaker: played 10 days in a row (UTC days). Never in test or Level Jump runs. */
 const BADGES=[
   ['bonkless','BONKLESS','Clear a level without getting bonked.'],
-  ['ultra-bonkless','ULTRA BONKLESS','Clear all five levels of a setting in one run without getting bonked.'],
+  ['ultra-bonkless','ULTRA BONKLESS','Clear every level of a setting without getting bonked.'],
   ['connoisseur','CONNOISSEUR','Catch every kind of waffle.'],
   ['millionaire','MILLIONAIRE','Catch 1,000,000 waffles. Bought waffles don\'t count.'],
   ['grumblemax','VICTORIOUS','Defeat GRUMBLEMAX.'],
@@ -2497,25 +2536,99 @@ const BTQ=[];let btT=0;
 function earnBadge(id){try{if(TEST||(typeof JUMP!=='undefined'&&JUMP))return}catch(e){}
   ntSend({type:'badge',id});const h=badgeHave();if(h.has(id))return;h.add(id);
   try{localStorage.setItem('bonkd-badges',JSON.stringify([...h]))}catch(e){}
-  track('badge',{k:id});BTQ.push(id);showBadgeToast()}
-function showBadgeToast(){if(btT||!BTQ.length)return;const id=BTQ.shift(),b=BADGES.find(x=>x[0]===id);if(!b)return;
-  const t=$('badgeToast');$('btImg').src=BADGE_IMG[b[0]];$('btName').textContent=b[1];t.classList.remove('out');t.hidden=false;
+  track('badge',{k:id});toast(BADGE_IMG[id],'BADGE UNLOCKED!',BADGES.find(x=>x[0]===id)[1]);if(PAID.has(id))claimBadge(id)}
+function showBadgeToast(){if(btT||!BTQ.length)return;const q=BTQ.shift();
+  const t=$('badgeToast');$('btImg').src=q.img;$('btSmall').textContent=q.small;$('btName').textContent=q.name;t.classList.remove('out');t.hidden=false;
   try{sfx.waffle()}catch(e){}
   btT=setTimeout(()=>{t.classList.add('out');btT=setTimeout(()=>{t.hidden=true;btT=0;showBadgeToast()},450)},3200)}
 const cleanLv=new Set();
-function badgeLevelClear(lv,bonks,boss){if(boss||bonks>0)return;earnBadge('bonkless');cleanLv.add(lv);
-  if(lv%5===0&&lv<=30){let all=true;for(let i=lv-4;i<=lv;i++)if(!cleanLv.has(i))all=false;if(all)earnBadge('ultra-bonkless')}}
 function badgeWaffle(k){try{const s=new Set(JSON.parse(localStorage.getItem('bonkd-wkinds')||'[]'));if(s.has(k))return;s.add(k);
   localStorage.setItem('bonkd-wkinds',JSON.stringify([...s]));if(WT.every(w=>s.has(w.k)))earnBadge('connoisseur')}catch(e){}}
 function badgeMillions(){const n=Math.max(+(prof&&prof.waffles)||0,store('bonkd-waffles')||0);if(n>=1e6)earnBadge('millionaire')}
 function badgeStreak(){try{const d=utcDay(),o=JSON.parse(localStorage.getItem('bonkd-streak')||'{}');if(o.d===d)return;
   const y=new Date(Date.now()-864e5).toISOString().slice(0,10),n=o.d===y?(+o.n||0)+1:1;
   localStorage.setItem('bonkd-streak',JSON.stringify({d,n}));if(n>=10)earnBadge('streaker')}catch(e){}}
-function renderBadges(){const h=badgeHave();$('bdCount').textContent=h.size+' of '+BADGES.length+' earned';
-  $('bdGrid').innerHTML=BADGES.map(([id,nm,how])=>'<div class="bd'+(h.has(id)?'':' locked')+'"><img src="'+BADGE_IMG[id]+'" alt=""><b>'+nm+'</b><p>'+how+'</p></div>').join('')}
-$('badgeBtn').onclick=()=>{audio();renderBadges();$('badgePage').hidden=false};
 $('bdX').onclick=()=>{$('badgePage').hidden=true};
-try{if(/[?&]badgetest\b/.test(location.search)){window.__badgePop=id=>{BTQ.push(id);showBadgeToast()}}}catch(e){}
+/* ---------- v67 progress and replays ----------
+   Every level clear is kept per level: clears, fewest bonks, bonkless (on the device as bonkd-progress, and on the
+   profile through record_level, which also pays the once-only waffle rewards). Cleared levels can be replayed one at a
+   time from the Progress page: it needs a life to start, getting BONKD uses that life and ends the replay, waffles count
+   (bank_replay). ULTRA BONKLESS = all five levels of a setting bonkless, from any mix of runs and replays. */
+let REPLAY=0;
+const PAID=new Set(['connoisseur','streaker','explorer','grumblemax','millionaire']);
+function progLocal(){try{return JSON.parse(localStorage.getItem('bonkd-progress')||'{}')||{}}catch(e){return{}}}
+function progSave(p){try{localStorage.setItem('bonkd-progress',JSON.stringify(p))}catch(e){}}
+function progMerge(rows){const p=progLocal();for(const r of rows||[]){const o=p[r.level]||{c:0,b:99,k:0};o.c=Math.max(o.c,+r.clears||0);o.b=Math.min(o.b,+r.best);if(r.bonkless)o.k=1;p[r.level]=o}progSave(p)}
+function maxReached(){const p=progLocal();let m=store('bonkd-maxlv')||0;for(const k in p)m=Math.max(m,+k);return Math.max(m,(+(prof&&prof.best)||0)-1)}
+function canReplay(n){try{if(isCleared())return true}catch(e){}return !!progLocal()[n]||n<=maxReached()}
+const lvName=n=>ntTitle(SCENES[(n-1)%SCENES.length].n);
+const setLv=s=>[...Array(5)].map((_,i)=>(s-1)*5+i+1);
+function settingClean(p,s){return setLv(s).every(i=>p[i]&&p[i].k)}
+function toast(img,small,name){BTQ.push({img,small,name});showBadgeToast()}
+async function onProfileReady(){if(!SB)return;
+  try{const {data}=await SB.rpc('my_progress');if(Array.isArray(data))progMerge(data)}catch(e){}
+  /* badges earned before rewards existed are paid quietly once */
+  for(const id of badgeHave())if(PAID.has(id))claimBadge(id,true)}
+async function claimBadge(id,quiet){
+  if(SB&&myId){try{const {data}=await SB.rpc('claim_badge',{p_badge:id});if(data&&data.ok){if(data.wallet!=null)prof.wallet=data.wallet;
+      if(+data.paid>0&&!quiet){const b=BADGES.find(x=>x[0]===id);toast(BADGE_IMG[id],b[1]+' BONUS','+'+(+data.paid).toLocaleString()+' WAFFLES')}}}catch(e){}return}
+  const amt={connoisseur:5000,streaker:5000,explorer:2500,grumblemax:10000,millionaire:10000}[id];localReward('badge:'+id,amt,quiet?null:[BADGE_IMG[id],BADGES.find(x=>x[0]===id)[1]+' BONUS'])}
+function localReward(key,amt,show){try{const r=new Set(JSON.parse(localStorage.getItem('bonkd-rewards')||'[]'));if(r.has(key))return;r.add(key);
+  localStorage.setItem('bonkd-rewards',JSON.stringify([...r]));store('bonkd-bonus',store('bonkd-bonus')+amt);if(show)toast(show[0],show[1],'+'+amt.toLocaleString()+' WAFFLES')}catch(e){}}
+async function recordLevel(lv,bonks){
+  if(SB&&myId){try{const {data}=await SB.rpc('record_level',{p_level:lv,p_bonks:bonks,p_seconds:Math.max(8,Math.round(lvlTime))});
+      if(data&&data.ok){if(data.wallet!=null)prof.wallet=data.wallet;for(const g of data.got||[]){
+        if(g.key==='bonkless')toast(BADGE_IMG.bonkless,'LEVEL '+g.level+' BONKLESS!','+'+(+g.amount).toLocaleString()+' WAFFLES');
+        else toast(BADGE_IMG['ultra-bonkless'],AREAS[g.setting-1].toUpperCase()+' BONKLESS!','+'+(+g.amount).toLocaleString()+' WAFFLES')}}}catch(e){}return}
+  if(bonks===0){const s=lv===31?7:Math.ceil(lv/5);localReward('bonkless:'+lv,lv===31?1000:100*s,[BADGE_IMG.bonkless,'LEVEL '+lv+' BONKLESS!']);
+    if(lv<=30&&settingClean(progLocal(),s))localReward('ultra:'+s,1000*s,[BADGE_IMG['ultra-bonkless'],AREAS[s-1].toUpperCase()+' BONKLESS!'])}}
+function badgeLevelClear(lv,bonks,boss){if(boss)return;try{if(TEST||(typeof JUMP!=='undefined'&&JUMP))return}catch(e){}
+  const p=progLocal(),o=p[lv]||{c:0,b:99,k:0};o.c++;o.b=Math.min(o.b,bonks);if(bonks===0)o.k=1;p[lv]=o;progSave(p);
+  if(lv>(store('bonkd-maxlv')||0))store('bonkd-maxlv',lv);
+  if(bonks===0){earnBadge('bonkless');if(lv<=30&&settingClean(p,Math.ceil(lv/5)))earnBadge('ultra-bonkless')}
+  recordLevel(lv,bonks)}
+function renderProgress(){const p=progLocal(),top=maxReached();let cl=0,bk=0,cr=0;
+  const rows=[];
+  for(let s=1;s<=7;s++){const lvls=s<7?setLv(s):[31];
+    if(s===7&&!(canReplay(31)||top>=30))continue;   /* the last level stays a secret until you get there */
+    const crown=s<7&&settingClean(p,s);if(crown)cr++;
+    const tiles=lvls.map(n=>{const o=p[n],ok=canReplay(n);if(o||ok)cl++;if(o&&o.k)bk++;
+      const cls=!ok?'locked':o&&o.k?'clean':'done',st=!ok?'LOCKED':o&&o.k?'★ BONKLESS':o?o.b+(o.b===1?' BONK':' BONKS'):'CLEARED';
+      return '<button type="button" class="pg-t '+cls+'" data-lv="'+n+'"'+(ok?'':' disabled')+'><b>'+n+'</b>'+(ok?'<i>'+lvName(n)+'</i>':'')+'<s>'+st+'</s></button>'}).join('');
+    rows.push('<div class="pg-row"><p class="pg-a">'+AREAS[s-1].toUpperCase()+(crown?' <img src="'+BADGE_IMG['ultra-bonkless']+'" alt=""><em>ALL BONKLESS</em>':'')+'</p><div class="pg-tiles"'+(s===7?' style="grid-template-columns:minmax(0,1fr) repeat(4,minmax(0,1fr))"':'')+'>'+tiles+'</div></div>')}
+  $('pgMap').innerHTML=rows.join('');
+  $('pgCount').textContent=cl+' of 31 levels cleared · '+bk+' bonkless · '+cr+' of 6 settings all bonkless';
+  for(const b of $('pgMap').querySelectorAll('.pg-t:not(.locked)'))b.onclick=()=>pickLevel(+b.dataset.lv,b);
+  $('pgPick').hidden=true;
+  const h=badgeHave();$('bdCount').textContent=h.size+' of '+BADGES.length+' earned';
+  $('bdGrid').innerHTML=BADGES.map(([id,nm,how])=>'<div class="bd'+(h.has(id)?'':' locked')+'"><img src="'+BADGE_IMG[id]+'" alt=""><b>'+nm+'</b><p>'+how+'</p></div>').join('')}
+function pickLevel(n,el){for(const t of $('pgMap').querySelectorAll('.sel'))t.classList.remove('sel');el.classList.add('sel');
+  const o=progLocal()[n],s=n===31?7:Math.ceil(n/5),rw=n===31?1000:100*s;
+  $('pgName').textContent='LEVEL '+n+' · '+lvName(n).toUpperCase();
+  $('pgInfo').textContent=o?(o.k?'Bonkless! ':'Fewest bonks: '+o.b+'. ')+'Cleared '+o.c+(o.c===1?' time.':' times.'):'Cleared.';
+  $('pgNote').textContent=(o&&o.k?'':'Clear it with no bonks for +'+rw.toLocaleString()+' waffles. ')+'Needs a life to start; getting BONKD uses it.';
+  $('pgGo').textContent='Replay level '+n;$('pgGo').onclick=()=>{$('badgePage').hidden=true;start('free',n)};
+  $('pgPick').hidden=false;$('pgPick').scrollIntoView({block:'nearest',behavior:'smooth'})}
+function openProgress(){audio();renderProgress();$('badgePage').hidden=false;$('badgePage').querySelector('.card').scrollTop=0;track('progress_open',{lv:null})}
+$('badgeBtn').onclick=openProgress;
+/* a replay: straight into that level with the unlocks a player has there, no story; ends after the level */
+function replayInto(n){
+  ntScored=true;level=n;for(const k in CHAPTERS)if(+k<=n)chapDone[k]=true;if(n>5)bear.oat=MAXH;
+  setGhost();beginPlay();renderMeter();pops=pops.filter(p=>!p.img);clearTimeout(hintT);ghost.hold=.6;ghost.throwT=3;
+  track('replay_start',{lv:n});if(n>1)levelIntro()}
+async function replayKO(){state='rpover';
+  if(freeLeft()>0)spendDaily();else{try{await wallet.useLife()}catch(e){}}
+  try{await bankLevel()}catch(e){}shownLives=-1;renderLives();
+  $('rpPre').textContent='Level '+level;const n=livesLeft();
+  $('rpNote').textContent='That replay used a life. '+(n>0?n+(n===1?' life':' lives')+' left.':'No lives left for now.');
+  $('rpTry').hidden=n<1;$('rpOver').hidden=false;track('replay_ko',{lv:level})}
+$('rpTry').onclick=()=>{const n=level;$('rpOver').hidden=true;start('free',n)};
+$('rpProg2').onclick=()=>{goMenu();openProgress()};
+$('rpMenu').onclick=goMenu;
+$('rpAgain').onclick=()=>{const n=level;$('clear').hidden=true;start('free',n)};
+$('rpProg').onclick=()=>{goMenu();openProgress()};
+
+try{if(/[?&]badgetest\b/.test(location.search)){window.__badgePop=id=>toast(BADGE_IMG[id],'BADGE UNLOCKED!',BADGES.find(x=>x[0]===id)[1]);window.__bt={clear(b){lvStats.bonks=b|0;lvlTime=40;ghostDown()},ko(){state='ko';afterKO()},st:()=>({state,level,REPLAY,lives:livesLeft(),bal:wallet.bal()})}}}catch(e){}
 
 $('stBuyW').onclick=buyWaffles; $('noBuy').onclick=buyWaffles; $('noClose').onclick=()=>{$('stNo').hidden=true};
 
@@ -2585,7 +2698,7 @@ async function loadTop(){
       SB=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
       const {data:{session}}=await SB.auth.getSession();
       if(session)myId=session.user.id; else await newSession();
-      await loadMe(); await loadTop();
+      await loadMe(); await loadTop(); try{onProfileReady()}catch(e){}
       wallet={bal(){return Math.max(0,+prof.wallet||0)},owned(){return new Set(prof.owned||[])},
         cleared(){return !!prof.cleared},async markCleared(){if(prof.cleared)return;prof.cleared=true;try{await SB.rpc('mark_cleared')}catch(e){}},
         lives(){return +prof.lives||0},lifeToday(){return +prof.lives_today||0},lifeNext(){return prof.lives_next?Date.parse(prof.lives_next):0},
@@ -2613,9 +2726,9 @@ let bankBusy=null;
 async function bankLevel(){if(TEST)return;if(bankBusy)return bankBusy;
   bankBusy=(async()=>{const c=unbankedCounts(),w=runWaffles-bankedW;if(!Object.keys(c).length)return;
     if(!SB||!myId){store('bonkd-waffles',localWaf()+w);bankedCounts=Object.assign({},runCounts);bankedW=runWaffles;badgeMillions();return}
-    try{const {data,error}=await SB.rpc('bank_waffles',{p_counts:c,p_level:level,p_seconds:Math.round(t)});if(error)throw error;
+    try{const {data,error}=await SB.rpc(REPLAY?'bank_replay':'bank_waffles',{p_counts:c,p_level:level,p_seconds:Math.round(t)});if(error)throw error;
       store('bonkd-waffles',localWaf()+w);bankedCounts=Object.assign({},runCounts);bankedW=runWaffles;
-      prof.waffles=data.waffles;badgeMillions();prof.best=data.best;prof.wallet=(+data.waffles||0)+(+data.bought||0)-(+data.spent||0);prof.owned=data.owned||prof.owned}
+      prof.waffles=data.waffles;badgeMillions();prof.best=data.best;prof.wallet=(+data.waffles||0)+(+data.bought||0)+(+data.bonus||0)-(+data.spent||0);prof.owned=data.owned||prof.owned}
     catch(e){}})();
   try{await bankBusy}finally{bankBusy=null}}
 async function saveRun(){
@@ -2627,7 +2740,7 @@ async function saveRun(){
     try{
       const {data,error}=await SB.rpc('submit_run',{p_counts:unbankedCounts(),p_level:level,p_seconds:Math.round(t)});bankedCounts=Object.assign({},runCounts);bankedW=runWaffles;
       if(error)throw error;
-      prof.waffles=data.waffles;prof.best=data.best;prof.wallet=(+data.waffles||0)+(+data.bought||0)-(+data.spent||0);prof.owned=data.owned||prof.owned;
+      prof.waffles=data.waffles;prof.best=data.best;prof.wallet=(+data.waffles||0)+(+data.bought||0)+(+data.bonus||0)-(+data.spent||0);prof.owned=data.owned||prof.owned;
       if(runWaffles){$('saveNote').textContent=(prof.nick?prof.nick+"'s":'Your')+' Leaderboard total: '+(+data.waffles).toLocaleString()+'.';$('saveNote').hidden=false}
       loadTop();
     }catch(e){
