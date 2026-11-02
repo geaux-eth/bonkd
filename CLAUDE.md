@@ -5,6 +5,10 @@
 - Link previews: og/twitter tags in build_web.py (title "BONKD!"), image og.jpg (1200x630) in the repo root, made by scratchpad banners/og_still7.py from the arcade label art (same logo, blue and waffles, hand-placed, user-approved). Never change that art without the user. Apps cache previews; add ?v=N to the shared link to refresh.
 - Deploy layout (v64): the game lives at play.html (copy of the built bonkd-web/index.html). index.html is a tiny share page made by scratchpad share_page.py (share tags + location.replace('play.html'+search+hash)), because Discord and iMessage give up on the 50 MB game before reading its tags. Never put the game back at index.html. preview.html stays the full test game. Site name and title on the card are both "BONKD!".
 
+## Underwater Quest: planned arcade items (user, v68 plan; NOT on Nibble This yet)
+- Don't declare these on the arcade row until the quest ships (user: players must not see them before they earn them). When it ships, add each as a thing with its real art in nt/<id>.png: conch (Conch Shell, Mer-Mayhem drop), laserhelmet (Laser Helmet, sharks drop), crabba (Crabba-Dabba-Doinker), guitarpoon (Guitarpoon), inkquisition (Spanish Inkquisition), spatula (Silver Spatula).
+- Arcade row plan once CD's per-item edit_game is live (cap now 60; removed items stay with players who have them): remove lotto (Waffle Lotto Ticket is not an arcade item, user); keep every other thing and badge. Then the game must stop sending 'lotto' item events.
+
 ## Weapon checklist: every weapon, existing or new, needs ALL of these
 
 1. **Drop look**: what hangs from the burlap bandana parachute. Use the simplest recognizable piece (the barn, the rolled blanket, the porcupine), not the whole gun. The strings must touch real points on the item's top edge.
