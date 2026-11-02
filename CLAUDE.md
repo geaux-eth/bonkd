@@ -8,6 +8,7 @@
 ## Underwater Quest: planned arcade items (user, v68 plan; NOT on Nibble This yet)
 - Don't declare these on the arcade row until the quest ships (user: players must not see them before they earn them). When it ships, add each as a thing with its real art in nt/<id>.png: conch (Conch Shell, Mer-Mayhem drop), laserhelmet (Laser Helmet, sharks drop), crabba (Crabba-Dabba-Doinker), guitarpoon (Guitarpoon), inkquisition (Spanish Inkquisition), spatula (Silver Spatula).
 - Arcade row plan once CD's per-item edit_game is live (cap now 60; removed items stay with players who have them): remove lotto (Waffle Lotto Ticket is not an arcade item, user); keep every other thing and badge. Then the game must stop sending 'lotto' item events.
+- Nibble This visibility (CD, Nov 2): unearned items show only as a locked tile with the game's name, plus a count ("3/16"); names and pictures stay hidden. A per-item/badge secret flag is coming that hides it completely (no tile, not in the count) until earned: use it for the quest items when they're declared. The game decides when to send an item (e.g. after a waffle purchase). Real-money sales inside the machine need the Nibble This team's OK; quests and supers are bought with waffles, so that doesn't apply.
 
 ## Weapon checklist: every weapon, existing or new, needs ALL of these
 
