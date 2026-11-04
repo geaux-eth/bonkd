@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Cloak Wars endings</title>
+<meta name="description" content="Who will you save? The background story for a new Nibbles adventure.">
+<meta name="robots" content="noindex">
+<meta property="og:type" content="article">
+<meta property="og:title" content="The Cloak Wars">
+<meta property="og:description" content="Who will you save?">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="The Cloak Wars">
+<meta name="twitter:description" content="Who will you save?">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;800&family=Crimson+Pro:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0d1412;--ink:#e9e4d6;--dim:#a9a593;--crystal:#bff3e2;--glow:#5fe0b8;--red:#c9433b;--rule:#2b3a34}
+*{box-sizing:border-box}
+html{background:var(--bg)}
+body{margin:0;color:var(--ink);font:400 1.18rem/1.7 'Crimson Pro',Georgia,'Times New Roman',serif;
+  background:radial-gradient(ellipse 80% 50% at 50% 0%,#17322a 0%,transparent 70%),radial-gradient(ellipse 60% 40% at 50% 100%,#1a1013 0%,transparent 70%),var(--bg);min-height:100vh;
+  padding:env(safe-area-inset-top,0) max(20px,env(safe-area-inset-right,0px)) env(safe-area-inset-bottom,0) max(20px,env(safe-area-inset-left,0px))}
+main{max-width:38rem;margin:0 auto;padding:4.5rem 0 5rem}
+header{text-align:center;margin-bottom:3.5rem}
+h1{font:800 clamp(2.6rem,9vw,4.2rem)/1.05 'Cinzel',Georgia,serif;letter-spacing:.04em;margin:0;color:var(--crystal);
+  text-shadow:0 0 18px rgba(95,224,184,.45),0 0 48px rgba(95,224,184,.2)}
+.tag{margin:1rem 0 0;font-style:italic;font-size:1.4rem;color:var(--dim)}
+.gem{display:block;width:14px;height:14px;margin:2.2rem auto 0;transform:rotate(45deg);background:var(--glow);box-shadow:0 0 14px 3px rgba(95,224,184,.6)}
+h2{font:600 .95rem/1.3 'Cinzel',Georgia,serif;letter-spacing:.22em;text-transform:uppercase;color:var(--glow);margin:3.2rem 0 1rem;text-wrap:balance}
+h2::after{content:"";display:block;width:2.5rem;height:1px;background:var(--rule);margin-top:.8rem}
+p{margin:0 0 1.15rem}
+.beat{font-size:1.35rem;font-style:italic;color:var(--crystal);margin:1.8rem 0}
+.lead::first-letter{font:800 3.4rem/.9 'Cinzel',Georgia,serif;float:left;margin:.35rem .5rem 0 0;color:var(--crystal)}
+strong{color:#fff;font-weight:600}
+.red{color:#e3685f}
+.end{margin-top:3.5rem;padding-top:2rem;border-top:1px solid var(--rule);text-align:center;font-style:italic;color:var(--dim)}
+.end b{display:block;font:800 1.5rem/1.3 'Cinzel',Georgia,serif;font-style:normal;color:var(--crystal);margin-top:.8rem;text-shadow:0 0 14px rgba(95,224,184,.35)}
+@media (max-width:480px){body{font-size:1.08rem}main{padding-top:3rem}}
+
+.opt{font:600 .8rem/1 system-ui,sans-serif;letter-spacing:.12em;text-transform:uppercase;color:#000;background:#ffd84a;display:inline-block;padding:.45rem .7rem;border-radius:4px;margin:0 0 1rem}
+.sec{padding:3rem 0 5rem;border-bottom:6px dashed #333}
+.sec:last-child{border-bottom:0}
+@keyframes pulse{0%,100%{opacity:.75;box-shadow:0 0 10px 2px rgba(95,224,184,.45)}50%{opacity:1;box-shadow:0 0 26px 8px rgba(95,224,184,.85)}}
+/* 1 reveal */
+.r1 .gap{height:7rem}
+.r1 .crys{text-align:center;font-size:1.45rem;line-height:1.5;color:var(--ink);text-wrap:balance;margin:0}
+.r1 .gem{margin:2.6rem auto 2.4rem;animation:pulse 3.2s ease-in-out infinite}
+.r1 .q{text-align:center;font:800 clamp(2.2rem,9vw,3.6rem)/1.1 'Cinzel',Georgia,serif;color:var(--crystal);text-shadow:0 0 18px rgba(95,224,184,.45),0 0 48px rgba(95,224,184,.2);margin:0;text-wrap:balance}
+/* 2 whisper */
+.r2 .gap{height:5rem}
+.r2 .crys{text-align:center;font-size:1.3rem;color:#fff;text-wrap:balance;margin:0 0 2rem}
+.r2 .q{text-align:center;font:italic 400 clamp(2.4rem,10vw,3.4rem)/1.15 'Crimson Pro',Georgia,serif;color:#fff;margin:0}
+/* 3 title card */
+.r3 .card{margin:4rem calc(-1*max(20px,env(safe-area-inset-left,0px)));min-height:92vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:2rem 24px;
+  background:radial-gradient(circle at 50% 50%,rgba(95,224,184,.18) 0%,transparent 45%),#060908}
+.r3 .crys{font-size:1.3rem;color:var(--dim);font-style:italic;text-wrap:balance;max-width:24rem;margin:0}
+.r3 .gem{width:34px;height:34px;margin:3rem auto;animation:pulse 3.2s ease-in-out infinite}
+.r3 .q{font:800 clamp(2.2rem,9vw,3.6rem)/1.1 'Cinzel',Georgia,serif;color:var(--crystal);text-shadow:0 0 18px rgba(95,224,184,.5),0 0 48px rgba(95,224,184,.25);margin:0;text-wrap:balance}
+</style>
+</head>
+<body>
+<main>
+<header><h1>Ending options</h1><p class="tag">Three looks for the last part of The Cloak Wars</p></header>
+<section class="sec r1"><span class="opt">Option 1 · The Reveal</span>
+<h2>Tonight in the Pond</h2>
+<p>Tonight, somewhere in the Pond, a rogue emissary races against time.</p>
+<p>In the Mystic Forest, an obedient Acolyte walks along a fortified wall.</p>
+<p>In an empty dimly-lit home, the jewel clasp on a hanging black cloak pulses with a mysterious glow.</p>
+<div class="gap"></div>
+<p class="crys">The power of a Daylight Crystal will soon be in your hands.</p>
+<span class="gem" aria-hidden="true"></span>
+<p class="q">Who will you save?</p>
+</section>
+<section class="sec r2"><span class="opt">Option 2 · The Whisper</span>
+<h2>Tonight in the Pond</h2>
+<p>Tonight, somewhere in the Pond, a rogue emissary races against time.</p>
+<p>In the Mystic Forest, an obedient Acolyte walks along a fortified wall.</p>
+<p>In an empty dimly-lit home, the jewel clasp on a hanging black cloak pulses with a mysterious glow.</p>
+<div class="gap"></div>
+<p class="crys">The power of a Daylight Crystal will soon be in your hands.</p>
+<p class="q">Who will you save?</p>
+</section>
+<section class="sec r3"><span class="opt">Option 3 · The Title Card</span>
+<h2>Tonight in the Pond</h2>
+<p>Tonight, somewhere in the Pond, a rogue emissary races against time.</p>
+<p>In the Mystic Forest, an obedient Acolyte walks along a fortified wall.</p>
+<p>In an empty dimly-lit home, the jewel clasp on a hanging black cloak pulses with a mysterious glow.</p>
+<div class="card">
+<p class="crys">The power of a Daylight Crystal will soon be in your hands.</p>
+<span class="gem" aria-hidden="true"></span>
+<p class="q">Who will you save?</p>
+</div>
+</section>
+</main>
+</body>
+</html>
