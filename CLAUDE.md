@@ -5,6 +5,15 @@
 - Link previews: og/twitter tags in build_web.py (title "BONKD!"), image og.jpg (1200x630) in the repo root, made by scratchpad banners/og_still7.py from the arcade label art (same logo, blue and waffles, hand-placed, user-approved). Never change that art without the user. Apps cache previews; add ?v=N to the shared link to refresh.
 - Deploy layout (v64): the game lives at play.html (copy of the built bonkd-web/index.html). index.html is a tiny share page made by scratchpad share_page.py (share tags + location.replace('play.html'+search+hash)), because Discord and iMessage give up on the 50 MB game before reading its tags. Never put the game back at index.html. preview.html stays the full test game. Site name and title on the card are both "BONKD!".
 
+## Source of truth (Nov 24)
+- The scratchpad build pipeline (bonkd_src.html, build.py, build_web.py, art and audit scripts) was lost when the session's container was replaced. play.html IS the source now: edit it directly, test changes on preview.html first (same file except the head), then copy the script and body across on approval. Test harness: copy preview.html, insert window.__ev=s=>eval(s); before the final requestAnimationFrame(frame); and drive it with Playwright (__ev("start('free')") with ?test&lv=N&k=<tester key>).
+
+## v68 fixes (on preview first)
+- Junk Magnet: when its 12 s run out, any junk it still holds fires itself at Grumble (.22 s apart), then the magnet is gone (it used to stay forever while holding junk).
+- End-of-run card shows waffles only: big number = waffles grabbed this run, "Best run N" = most waffles in one run on this device (bonkd-bestrun). The old hidden score (time x10 + 500 per level) is no longer shown anywhere (players read 307,466 as waffles saved).
+- The session event's k is 'arcade' when the game runs inside the Nibble This machine (else 'app' or 'web').
+- Identity: the website and the Nibble This arcade keep separate browser storage, so a player who plays in both gets two anonymous accounts (two names, two waffle totals). The link code flow (Profile > Link another device / Use a link code) joins them.
+
 ## Underwater Quest: planned arcade items (user, v68 plan; NOT on Nibble This yet)
 - Don't declare these on the arcade row until the quest ships (user: players must not see them before they earn them). When it ships, add each as a thing with its real art in nt/<id>.png: conch (Conch Shell, Mer-Mayhem drop), laserhelmet (Laser Helmet, sharks drop), crabba (Crabba-Dabba-Doinker), guitarpoon (Guitarpoon), inkquisition (Spanish Inkquisition), spatula (Silver Spatula).
 - Arcade row plan once CD's per-item edit_game is live (cap now 60; removed items stay with players who have them): remove lotto (Waffle Lotto Ticket is not an arcade item, user); keep every other thing and badge. Then the game must stop sending 'lotto' item events.
