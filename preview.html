@@ -399,6 +399,7 @@ body.keys .act::after{content:'SPACE';position:absolute;bottom:-18px;left:50%;tr
 .pf-hdl{font-weight:800;font-size:16px;padding:9px 12px;border:2.5px solid var(--ink);border-radius:12px;background:var(--paper);color:var(--ink);text-align:center;min-height:1.3em;line-height:1.3;white-space:nowrap;overflow:hidden;-webkit-user-select:text;user-select:text;cursor:text}
 .pf-hdl:empty:before{content:attr(data-ph);color:#9aa0a8}
 .pf-hdl:focus-visible{outline:3px dashed var(--ink);outline-offset:2px}
+#pfEmail{text-transform:none;letter-spacing:0}
 .pf input{font:inherit;font-weight:800;font-size:16px;padding:9px 12px;border:2.5px solid var(--ink);border-radius:12px;background:var(--paper);color:var(--ink);text-align:center}
 .pf input:focus-visible{outline:3px dashed var(--ink);outline-offset:2px}
 .err{margin:0;color:var(--red);font-weight:800;font-size:14px}
@@ -667,13 +668,13 @@ body.ready #boot{opacity:0;pointer-events:none}
       <p class="pre">Profile</p>
       <div class="pp-head"><img class="av big" id="ppAv" alt=""><div class="pp-id"><b id="ppName">No profile yet</b><span id="ppWaf"></span></div></div>
       <div id="ppNone">
-        <p class="note">Create a profile to put your name on the Leaderboard and play on your phone and computer.</p>
-        <div class="btns"><button class="btn red" id="ppCreate" type="button">Create profile</button><button class="link" id="ppLogin" type="button">Use a link code</button></div>
+        <p class="note">Create a profile to put your name on the Leaderboard and keep your waffles everywhere you play.</p>
+        <div class="btns"><button class="btn red" id="ppCreate" type="button">Create profile</button><button class="link" id="ppLogin" type="button">Played before? Sign in with email</button></div>
       </div>
       <div id="ppHas" hidden>
         <div class="pp-sec"><p class="label">Character</p><div class="pp-who" id="ppWho" role="group" aria-label="Character"></div></div>
         <div class="pp-sec"><p class="label">Background</p><div class="pp-col" id="ppCol" role="group" aria-label="Background color"></div></div>
-        <div class="pp-btns"><button class="seg" id="ppRename" type="button">Change name</button><button class="seg" id="ppPin" type="button">Link another device</button><button class="seg" id="ppSwitch" type="button">Use a link code</button><button class="seg" id="ppShare" type="button">Share my card</button></div>
+        <div class="pp-btns"><button class="seg" id="ppRename" type="button">Change name</button><button class="seg" id="ppEmail" type="button">Save with email</button><button class="seg" id="ppPin" type="button" hidden>Link another device</button><button class="seg" id="ppSwitch" type="button" hidden>Use a link code</button><button class="seg" id="ppShare" type="button">Share my card</button></div>
         <div class="movebox" id="ppMove" hidden><p class="label">Your link code</p><p class="code" id="ppCode"></p><p class="note">On your other phone or computer, open Settings → Profile → Use a link code and type this in. It works once, for the next 15 minutes. Both devices keep playing as you.</p></div>
       </div>
       <div class="btns"><button class="btn plain small" id="ppClose" type="button">Close</button></div>
@@ -687,6 +688,7 @@ body.ready #boot{opacity:0;pointer-events:none}
       <p class="note" id="pfText"></p>
       <form class="pf" id="pfForm">
         <div id="pfName" class="pf-hdl" contenteditable="true" role="textbox" aria-label="Leaderboard handle" data-ph="Pick a handle" autocorrect="off" autocapitalize="off" spellcheck="false" inputmode="text" enterkeyhint="done"></div>
+        <input id="pfEmail" type="email" autocomplete="email" autocapitalize="off" spellcheck="false" placeholder="you@email.com" aria-label="Email" hidden>
         <input id="pfPin" maxlength="7" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="Link code" aria-label="Link code">
         <p class="err" id="pfErr" role="alert" hidden></p>
         <div class="btns"><button class="btn red" id="pfGo" type="submit">Save</button><button class="btn plain small" id="pfCancel" type="button">Not now</button></div>
@@ -2683,6 +2685,31 @@ let tour=null,boardMode='all',SB=null,myId=null,prof={},boardRows=[],boardErr=fa
 let askedSession=false;
 const localWaf=()=>store('bonkd-waffles');
 async function newSession(){const r=await SB.auth.signInAnonymously();if(r.error)throw r.error;myId=r.data.session.user.id}
+/* v69 email sign-in. A fresh device first tries to attach the email to its own anonymous account (updateUser -> code, type
+   email_change). If that email already belongs to a player, the device makes a one-time merge code (prep_merge), signs in
+   to the email account with a code (type email), then absorb_merge pours this device's waffles and progress into it. */
+let myEmail='',emailFlow=null;
+async function refreshEmail(){try{const {data}=await SB.auth.getUser();myEmail=(data&&data.user&&data.user.email)||''}catch(e){}}
+async function emailSend(email){
+  emailFlow={email,mode:'link',merge:null};
+  const {data:{user}}=await SB.auth.getUser();
+  if(user&&!user.email){const {error}=await SB.auth.updateUser({email});
+    if(!error)return{ok:true};
+    const m=String(error.message||'')+' '+(error.code||'');
+    if(/rate|too many|security purposes/i.test(m))return{ok:false,reason:'too_many'};
+    if(!/already|exists|registered/i.test(m))return{ok:false,reason:/invalid|valid email/i.test(m)?'bad_email':''}}
+  emailFlow.mode='switch';
+  try{const {data}=await SB.rpc('prep_merge');if(data&&data.ok)emailFlow.merge=data.code}catch(e){}
+  const {error}=await SB.auth.signInWithOtp({email,options:{shouldCreateUser:false}});
+  if(error)return{ok:false,reason:/rate|too many|security purposes/i.test(String(error.message))?'too_many':''};
+  return{ok:true}}
+async function emailVerify(token){
+  const f=emailFlow;if(!f)return{ok:false,reason:'bad_otp'};
+  const {data,error}=await SB.auth.verifyOtp({email:f.email,token,type:f.mode==='link'?'email_change':'email'});
+  if(error||!data||!data.session&&!data.user)return{ok:false,reason:'bad_otp'};
+  if(data.session)myId=data.session.user.id;
+  if(f.mode==='switch'&&f.merge){try{await SB.rpc('absorb_merge',{p_code:f.merge})}catch(e){}}
+  emailFlow=null;await refreshEmail();track('email_saved',{lv:null,k:f.mode});return{ok:true}}
 let dayInfo=null;
 window.bonkdRefreshMe=()=>SB?loadMe():Promise.resolve();
 async function loadMe(){try{const {data}=await SB.rpc('my_profile');prof=data||{};if(prof.id)myId=prof.id}catch(e){}try{const {data}=await SB.rpc('daily_lives');if(data&&data.day)dayInfo=data}catch(e){}renderProfile()}
@@ -2699,6 +2726,7 @@ async function loadTop(){
       SB=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
       const {data:{session}}=await SB.auth.getSession();
       if(session)myId=session.user.id; else await newSession();
+      await refreshEmail();
       await loadMe(); await loadTop(); try{onProfileReady()}catch(e){}
       wallet={bal(){return Math.max(0,+prof.wallet||0)},owned(){return new Set(prof.owned||[])},
         cleared(){return !!prof.cleared},async markCleared(){if(prof.cleared)return;prof.cleared=true;try{await SB.rpc('mark_cleared')}catch(e){}},
@@ -2762,6 +2790,7 @@ function renderProfile(){
   $('ppWaf').textContent=has?(+prof.waffles||0).toLocaleString()+' waffles on the board':'';
   setImg($('ppAv'),key);
   $('ppNone').hidden=has; $('ppHas').hidden=!has;
+  $('ppEmail').textContent=myEmail?'Saved to '+myEmail.replace(/^(.)[^@]*(@.*)$/,'$1•••$2'):'Save with email';$('ppEmail').disabled=!!myEmail;
   const [who,col]=key.split(':');
   const wb=$('ppWho'); if(!wb.childElementCount){for(const w of WHO){const b=document.createElement('button');b.type='button';b.dataset.who=w;b.setAttribute('aria-label',w);const i=document.createElement('img');i.alt='';b.append(i);b.onclick=()=>pickPfp(w,null);wb.append(b)}}
   for(const b of wb.children){b.classList.toggle('on',b.dataset.who===who);b.setAttribute('aria-pressed',b.dataset.who===who);setImg(b.firstChild,b.dataset.who+':'+col)}
@@ -2803,14 +2832,17 @@ $('boardBtn').onclick=openBoard; $('boardBtn2').onclick=openBoard;
 $('boardClose').onclick=()=>{$('boardPanel').hidden=true};
 function openPage(){if(!SB)return;$('ppMove').hidden=true;$('profPage').hidden=false;renderProfile();loadMe()}
 $('pfEdit').onclick=openPage; $('pfBoardEdit').onclick=openPage; $('ppClose').onclick=()=>{$('profPage').hidden=true};
-$('ppCreate').onclick=()=>openProfile('create'); $('ppLogin').onclick=()=>openProfile('login');
+$('ppCreate').onclick=()=>openProfile('create'); $('ppLogin').onclick=()=>openProfile('email'); $('ppEmail').onclick=()=>{if(!myEmail)openProfile('email')};
 $('ppRename').onclick=()=>openProfile('rename'); $('ppSwitch').onclick=()=>openProfile('login');
 $('ppPin').onclick=async()=>{try{const {data,error}=await SB.rpc('get_move_code');if(error||!data.ok)throw 0;$('ppCode').textContent=data.code;$('ppMove').hidden=false}catch(e){$('ppCode').textContent='Try again';$('ppMove').hidden=false}};
 /* one-time prompt per session, right after a level is cleared */
 window.onLevelClear=()=>{if(SB&&!!!prof.nick&&!askedSession){askedSession=true;setTimeout(()=>{if(state==='clear')openProfile('create')},700)}};
 /* create / log in / change name / change PIN — all in-game */
 const PF={
-  create:{pre:'Save your',logo:'WAFFLES!',text:'Pick a handle for the Leaderboard. Make one up! You can change it anytime.',go:'Save',cancel:'Not now',swap:'Already playing on another device? Use a link code',name:true,pin:false},
+  create:{pre:'Save your',logo:'WAFFLES!',text:'Pick a handle for the Leaderboard. Make one up! You can change it anytime.',go:'Save',cancel:'Not now',swap:'Played before? Sign in with email',swapTo:'email',name:true,pin:false},
+  /* v69 email sign-in: one email keeps a player's waffles everywhere (any phone or computer, the website or the Nibble This arcade) */
+  email:{pre:'Keep your',logo:'WAFFLES!',text:"Enter your email and we'll send you a 6-digit code. Then your waffles follow you everywhere you play.",go:'Send code',cancel:'Not now',name:false,pin:false,email:true},
+  code:{pre:'Check your',logo:'EMAIL!',text:'',go:'Done',cancel:'Back',swap:'Send a new code',swapTo:'email',name:false,pin:true},
   login:{pre:'Link this',logo:'DEVICE!',text:'Type the link code from your other phone or computer. Both will share one profile, and waffles you earned here get added in.',go:'Link',cancel:'Cancel',swap:'New here? Create a profile',name:false,pin:true},
   rename:{pre:'Change your',logo:'HANDLE',text:'Your waffles stay the same.',go:'Save',cancel:'Cancel',name:true,pin:false}
 };
@@ -2820,16 +2852,20 @@ function openProfile(mode){
   $('pfPre').textContent=m.pre; logoSpans($('pfLogo'),m.logo); $('pfText').textContent=m.text;
   $('pfGo').textContent=m.go;$('pfCancel').textContent=m.cancel;
   $('pfSwap').textContent=m.swap||'';$('pfSwap').hidden=!m.swap;
-  $('pfName').hidden=!m.name;$('pfPin').hidden=!m.pin;$('pfPin').value='';$('pfErr').hidden=true;
+  $('pfName').hidden=!m.name;$('pfPin').hidden=!m.pin;$('pfPin').value='';$('pfErr').hidden=true;$('pfEmail').hidden=!m.email;
+  $('pfPin').placeholder=mode==='code'?'6-digit code':'Link code';$('pfPin').maxLength=mode==='code'?6:7;$('pfPin').inputMode=mode==='code'?'numeric':'text';$('pfPin').autocomplete=mode==='code'?'one-time-code':'off';
+  if(mode==='code')$('pfText').textContent='Type the 6-digit code we just sent to '+(emailFlow&&emailFlow.email||'your email')+'.';
   $('pfName').value=(mode==='rename'||mode==='create')?(prof.nick||''):'';
-  $('profile').hidden=false; setTimeout(()=>{try{(m.name?$('pfName'):$('pfPin')).focus({preventScroll:true})}catch(e){}},60);
+  $('profile').hidden=false; setTimeout(()=>{try{(m.name?$('pfName'):m.email?$('pfEmail'):$('pfPin')).focus({preventScroll:true})}catch(e){}},60);
 }
-const PFERR={name_taken:"That name's taken! Try another.",bad_name:'Use 2–14 letters, numbers or spaces.',bad_code:"That code didn't work. Codes work once, for 15 minutes.",no_profile:'Create a profile first.',signed_out:"Couldn't reach the Leaderboard. Try again."};
+const PFERR={bad_email:"That email doesn't look right.",bad_otp:"That code didn't work. Check the email and try again, or send a new one.",too_many:'Too many codes sent. Wait a few minutes and try again.',name_taken:"That name's taken! Try another.",bad_name:'Use 2–14 letters, numbers or spaces.',bad_code:"That code didn't work. Codes work once, for 15 minutes.",no_profile:'Create a profile first.',signed_out:"Couldn't reach the Leaderboard. Try again."};
 function pfFail(r){$('pfErr').textContent=PFERR[r]||"Couldn't reach the Leaderboard. Try again.";$('pfErr').hidden=false}
 $('pfForm').addEventListener('submit',async e=>{
   e.preventDefault(); if(!SB)return;
   const nick=$('pfName').value.trim(), code=$('pfPin').value.trim();
   if(pfMode==='login'&&code.replace(/\s/g,'').length!==6)return pfFail('bad_code');
+  if(pfMode==='email'){const em=$('pfEmail').value.trim();if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(em))return pfFail('bad_email');$('pfGo').disabled=true;try{const r=await emailSend(em);if(!r.ok)return pfFail(r.reason);openProfile('code')}catch(_){pfFail('')}finally{$('pfGo').disabled=false}return}
+  if(pfMode==='code'){if(!/^\d{6}$/.test(code.replace(/\s/g,'')))return pfFail('bad_otp');$('pfGo').disabled=true;try{const r=await emailVerify(code.replace(/\s/g,''));if(!r.ok)return pfFail(r.reason);$('profile').hidden=true;await loadMe();await loadTop();renderBoard();renderProfile();pop(prof.nick?'WELCOME BACK, '+prof.nick.toUpperCase()+'!':'EMAIL SAVED!',W/2,H*.3,C.gold,30,1.8);if(!prof.nick)setTimeout(()=>openProfile('create'),900)}catch(_){pfFail('bad_otp')}finally{$('pfGo').disabled=false}return}
   $('pfGo').disabled=true;
   try{
     if(pfMode==='login'){
@@ -2840,14 +2876,15 @@ $('pfForm').addEventListener('submit',async e=>{
     }else{
       const {data,error}=await SB.rpc('save_profile',{p_nick:nick}); if(error)throw error; track('profile_saved',{lv:null});
       if(!data.ok)return pfFail(data.reason);
-      $('profile').hidden=true; pop(pfMode==='create'?'PROFILE SAVED!':'NAME CHANGED!',W/2,H*.3,C.gold,30,1.6);
+      const wasCreate=pfMode==='create';$('profile').hidden=true; pop(wasCreate?'PROFILE SAVED!':'NAME CHANGED!',W/2,H*.3,C.gold,30,1.6);
+      if(wasCreate&&!myEmail)setTimeout(()=>{if($('profile').hidden)openProfile('email')},1100);
     }
     await loadMe(); await loadTop(); renderBoard();
   }catch(_){pfFail('')}
   finally{$('pfGo').disabled=false}
 });
-$('pfCancel').onclick=()=>{$('profile').hidden=true};
-$('pfSwap').onclick=()=>openProfile(pfMode==='login'?'create':'login');
+$('pfCancel').onclick=()=>{if(pfMode==='code')openProfile('email');else $('profile').hidden=true};
+$('pfSwap').onclick=()=>openProfile(PF[pfMode].swapTo||(pfMode==='login'?'create':'login'));
 
 /* ---------- drawing helpers (thin ink, two-tone cel shading like the art) ---------- */
 function stroke(lw){ctx.lineWidth=lw||LW;ctx.strokeStyle=INK;ctx.lineJoin='round';ctx.lineCap='round';ctx.stroke()}
