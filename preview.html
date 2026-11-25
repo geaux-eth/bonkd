@@ -4843,7 +4843,11 @@ function layoutMenuLinks(){
   lk.style.marginTop=((pBot+g-a.top)/zs)+'px';
   const b2=inkBox(ws),a2=inkBox(lb);lk.style.gap=((a2.bot+g-b2.top)/zs)+'px';
   mlKey=key}
-let gearState=null;function frame(ts){if(gearState!==state){gearState=state;syncGear()}const dt=Math.min(.05,(ts-last)/1000);last=ts;if(!paused){superUpdate(dt);updFlyers(dt);if(superFx){superFx.t+=dt;if(superFx.t>=superFx.d)superFx=null;updFxs(dt*.5)}else if(hitStop>0){hitStop-=dt;updFxs(dt);shake=Math.max(0,shake-dt*.5)}else{now+=dt;update(dt);updFxs(dt)}}render();layoutMenuLinks();requestAnimationFrame(frame)}
+/* v68: an error inside one frame must never stop the game loop (a player's game froze after the Porcu-Popper and Ivy supers);
+   it's reported once per kind as an 'err' event (k = message, n = line, m = column in play.html) so we can find it */
+const ERRSEEN=new Set();function gameErr(e){try{const msg=String(e&&e.message||e),m=String(e&&e.stack||'').match(/:(\d+):(\d+)\)?\s*$/m)||String(e&&e.stack||'').match(/:(\d+):(\d+)/),key=msg+(m?m[1]:'');if(ERRSEEN.has(key)||ERRSEEN.size>8)return;ERRSEEN.add(key);console.error('BONKD frame error',e);track('err',{k:msg.slice(0,24),n:m?+m[1]:0,m:m?+m[2]:0,lv:level});setTimeout(flushEv,500)}catch(_){}}
+window.addEventListener('error',ev=>gameErr(ev.error||ev.message));
+let gearState=null;function frame(ts){try{if(gearState!==state){gearState=state;syncGear()}const dt=Math.min(.05,(ts-last)/1000);last=ts;if(!paused){superUpdate(dt);updFlyers(dt);if(superFx){superFx.t+=dt;if(superFx.t>=superFx.d)superFx=null;updFxs(dt*.5)}else if(hitStop>0){hitStop-=dt;updFxs(dt);shake=Math.max(0,shake-dt*.5)}else{now+=dt;update(dt);updFxs(dt)}}render();layoutMenuLinks();}catch(e){gameErr(e)}requestAnimationFrame(frame)}
 requestAnimationFrame(frame);
 /* drop the loading screen once the menu's art and font are in (or after 8 s whatever happens) */
 {const t0=performance.now();const chk=()=>{const ok=SPR.bd_meadow&&SPR.c_todd_wk0&&SPR.w_plain&&SPR.font_atlas&&(!document.fonts||document.fonts.status==='loaded');
