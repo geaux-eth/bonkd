@@ -2843,7 +2843,7 @@ const PF={
   /* v69 email sign-in: one email keeps a player's waffles everywhere (any phone or computer, the website or the Nibble This arcade) */
   email:{pre:'Keep your',logo:'WAFFLES!',text:"Enter your email and we'll send you a 6-digit code. Then your waffles follow you everywhere you play.",go:'Send code',cancel:'Not now',name:false,pin:false,email:true},
   code:{pre:'Check your',logo:'EMAIL!',text:'',go:'Done',cancel:'Back',swap:'Send a new code',swapTo:'email',name:false,pin:true},
-  login:{pre:'Link this',logo:'DEVICE!',text:'Type the link code from your other phone or computer. Both will share one profile, and waffles you earned here get added in.',go:'Link',cancel:'Cancel',swap:'New here? Create a profile',name:false,pin:true},
+  login:{pre:'Link this',logo:'DEVICE!',text:'On the phone or computer you played on before, open the game, tap the gear, then Manage next to Profile, then Link another device. Type that code here. Your waffles from both get joined into one profile.',go:'Link',cancel:'Cancel',swap:'New here? Create a profile',name:false,pin:true},
   rename:{pre:'Change your',logo:'HANDLE',text:'Your waffles stay the same.',go:'Save',cancel:'Cancel',name:true,pin:false}
 };
 function logoSpans(el,txt){el.textContent='';el.setAttribute('aria-label',txt);for(const ch of txt){const sp=document.createElement('span');sp.textContent=ch;el.append(sp)}}
